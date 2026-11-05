@@ -93,6 +93,20 @@ async function api(req, env, url) {
 
   if (p === '/api/state' && req.method === 'GET') return json(await loadState(env));
 
+  // The app's outbox: a list of changes applied together in one D1 batch (all or nothing).
+  if (p === '/api/ops' && req.method === 'POST') {
+    const ops = ((await req.json().catch(() => ({}))).ops) || [];
+    if (!Array.isArray(ops) || ops.length > 100) return json({ error: 'bad ops' }, 400);
+    let stmts;
+    try {
+      stmts = ops.flatMap((o) => opStatements(env, o));
+    } catch (e) {
+      return json({ error: String((e && e.message) || e) }, 400);
+    }
+    if (stmts.length) await env.DB.batch(stmts);
+    return json({ ok: true, n: ops.length });
+  }
+
   if (p === '/api/op' && req.method === 'POST') {
     await applyOp(env, await req.json());
     return json({ ok: true });
@@ -160,6 +174,68 @@ async function loadState(env) {
     focus: (focus.results && focus.results[0]) || null,
     wave: (waves.results && waves.results[0]) || null,
   };
+}
+
+// What each delete also removes, so nothing is left orphaned.
+const CASCADE = {
+  projects: [['tasks', 'project'], ['project_materials', 'project_id']],
+  tasks: [['tasks', 'parent_id']],
+  habits: [['habit_logs', 'habit']],
+  topics: [['topic_links', 'topic_id']],
+};
+
+function toCol(c, v) {
+  if (c === 'subtodos') return JSON.stringify(Array.isArray(v) ? v : parseJSON(v, []));
+  if (c === 'done') return v ? 1 : 0;
+  return v === undefined ? null : v;
+}
+
+// One outbox change → the D1 statements for it. Throws on anything not whitelisted.
+function opStatements(env, o) {
+  if (!o || typeof o !== 'object') throw new Error('bad op');
+  if (o.op === 'settings') {
+    const patch = o.patch || {};
+    return Object.keys(patch).map((k) =>
+      env.DB.prepare('INSERT INTO settings (key,value) VALUES (?1,?2) ON CONFLICT(key) DO UPDATE SET value=excluded.value').bind(k, patch[k] == null ? '' : String(patch[k])),
+    );
+  }
+  if (o.op === 'habit') {
+    const date = String(o.date || ''), habit = String(o.habit || '');
+    if (!date || !habit) throw new Error('bad habit op');
+    if (o.delta != null) {
+      // +1 / −1 is applied on the server, so taps from two phones both count
+      const d = parseInt(o.delta, 10) || 0;
+      return [env.DB.prepare('INSERT INTO habit_logs (date,habit,value) VALUES (?1,?2,MAX(0,?3)) ON CONFLICT(date,habit) DO UPDATE SET value=MAX(0,habit_logs.value+?3)').bind(date, habit, d)];
+    }
+    const val = Math.max(0, parseInt(o.value, 10) || 0);
+    return [env.DB.prepare('INSERT INTO habit_logs (date,habit,value) VALUES (?1,?2,?3) ON CONFLICT(date,habit) DO UPDATE SET value=excluded.value').bind(date, habit, val)];
+  }
+  const cols = TABLES[o.table];
+  if (!cols) throw new Error('bad table');
+  if (o.op === 'delete') {
+    const id = o.id || (o.row && o.row.id);
+    if (!id) throw new Error('delete needs an id');
+    const out = (CASCADE[o.table] || []).map(([t, c]) => env.DB.prepare('DELETE FROM ' + t + ' WHERE ' + c + '=?1').bind(id));
+    out.push(env.DB.prepare('DELETE FROM ' + o.table + ' WHERE id=?1').bind(id));
+    return out;
+  }
+  if (o.op === 'patch') {
+    // only the fields that changed, so one person's edit never rewrites the other's
+    const fields = o.fields || {};
+    const set = Object.keys(fields).filter((c) => c !== 'id' && cols.includes(c));
+    if (!o.id || !set.length) return [];
+    const sql = 'UPDATE ' + o.table + ' SET ' + set.map((c, i) => c + '=?' + (i + 1)).join(',') + ' WHERE id=?' + (set.length + 1);
+    return [env.DB.prepare(sql).bind(...set.map((c) => toCol(c, fields[c])), o.id)];
+  }
+  if (o.op === 'upsert') {
+    const row = o.row || {};
+    if (!row.id) throw new Error('upsert needs an id');
+    const placeholders = cols.map((_, i) => '?' + (i + 1)).join(',');
+    const updates = cols.filter((c) => c !== 'id').map((c) => c + '=excluded.' + c).join(',');
+    const sql = 'INSERT INTO ' + o.table + ' (' + cols.join(',') + ') VALUES (' + placeholders + ') ON CONFLICT(id) DO UPDATE SET ' + updates;
+    return [env.DB.prepare(sql).bind(...cols.map((c) => toCol(c, row[c])))];
+  }
+  throw new Error('bad op');
 }
 
 async function applyOp(env, b) {

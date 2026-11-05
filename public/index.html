@@ -563,6 +563,64 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 .helpbtn:hover{background:#EDF2F8}
 .mobonly{display:none}
 
+/* trust pass: carry-over, sync, undo, who's this, confirm */
+.carry{border-bottom:1px solid var(--line-soft);margin-bottom:2px}
+.carryhd{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0 2px}
+.carryttl{font-weight:600;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#7E8894}
+.carrymore{display:block;margin:0 0 12px 34px}
+.carryempty{padding:16px 0 18px;font-weight:500;font-size:13px;color:#8A93A0;text-align:center}
+.pill.due.over{color:#C2704B}
+.subrow{flex-wrap:wrap;row-gap:4px}
+.subrow .slabel{flex:1 1 0;min-width:90px}
+.subrow .pill{flex:none;white-space:nowrap}
+.daypick{position:relative;display:inline-flex;align-items:center}
+.daypick input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0;margin:0;font-size:16px}
+.daypick input::-webkit-calendar-picker-indicator{position:absolute;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.subof{display:block;padding:5px 0 0;font-weight:500;color:#5A616B;text-align:left}
+.subof b{color:var(--accent-deep);font-weight:600}
+.jstatus{margin-top:10px;font-weight:500;font-size:12px;color:#8A93A0}
+.toast{width:max-content}
+.toast-act{border:none;background:rgba(255,255,255,.14);color:#fff;font-weight:700;font-size:13px;border-radius:8px;padding:5px 11px;margin-left:4px;cursor:pointer;flex:none}
+.toast-act:hover{background:rgba(255,255,255,.24)}
+.syncln{display:inline-flex;align-items:center;gap:6px;font-weight:500;font-size:12px;color:#5A616B;margin-left:4px;min-width:0}
+.syncln .linkbtn{padding:0;font-size:12px}
+.syncdot{width:7px;height:7px;border-radius:999px;background:var(--accent);flex:none;display:inline-block}
+.offline .syncdot{background:#B4792B}
+.error .syncdot{background:#C64A3B}
+.syncbtn{height:32px;gap:6px;padding:0 11px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.78);align-items:center;justify-content:center;cursor:pointer;flex:none;font-family:inherit}
+.syncw{font-weight:600;font-size:12px;color:#2F343B;white-space:nowrap}
+.syncbtn .syncdot{width:9px;height:9px}
+.whomodal{max-width:440px}
+.whottl{margin:0;font-weight:700;font-size:21px;letter-spacing:-.01em;color:#15171A}
+.whosub{margin:6px 0 16px;font-weight:400;font-size:13px;color:#5A616B;line-height:1.5}
+.whocards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.whocard{display:flex;flex-direction:column;align-items:center;gap:6px;padding:20px 12px 18px;border:1px solid var(--field);border-radius:16px;background:#fff;cursor:pointer;font-family:inherit;transition:border-color .12s,box-shadow .12s,transform .15s cubic-bezier(.16,1,.3,1)}
+.whocard:hover{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+.whocard:active{transform:scale(.98)}
+.av.whoav{width:48px;height:48px;font-size:19px}
+.whon{font-weight:700;font-size:15px;color:#15171A;text-align:center}
+.whos{font-weight:500;font-size:12px;color:#8A93A0;text-align:center}
+.overlay.confirmov{z-index:95}
+.modal.confirm{max-width:420px}
+.cfttl{margin:0;font-weight:700;font-size:18px;color:#15171A;letter-spacing:-.01em}
+.cfbody{margin:8px 0 0;font-size:13.5px;color:#5A616B;line-height:1.55}
+.cfacts{flex-wrap:wrap}
+.cfalt{flex:1 1 100%}
+.btn:disabled{opacity:.45;cursor:default;box-shadow:none}
+.btn.danger{background:#C64A3B;border:none;color:#fff}
+.btn.danger:hover{filter:brightness(.94)}
+.devrow{display:flex;align-items:center;gap:10px}
+.devt{flex:1;min-width:0;font-size:14px;color:#2F343B}
+.finhd{margin:22px 2px 10px}
+.fingrid .projcard{opacity:.82}
+@media(max-width:820px){
+  .toast{bottom:calc(80px + env(safe-area-inset-bottom,0px))}
+  .overlay.confirmov{align-items:flex-end;padding:0}
+  .modal.confirm{max-width:none;border-radius:20px 20px 0 0;padding-bottom:calc(22px + env(safe-area-inset-bottom,0px))}
+  .overlay.whoov{padding:0}
+  .modal.whomodal{max-width:none;width:100%;height:100%;max-height:none;border-radius:0;display:flex;flex-direction:column;justify-content:center}
+}
+
 /* mobile */
 .mobnav{display:none}
 @media(max-width:820px){
@@ -609,13 +667,21 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
   function shortDate(s){ if(!s) return ''; var d=parseYmd(s); return DOW[d.getDay()]+' '+d.getDate()+' '+MON[d.getMonth()].slice(0,3); }
   function monthY(d){ return MON[d.getMonth()]+' '+d.getFullYear(); }
   function to12(t){ if(!t) return ''; var p=t.split(':'); var hh=+p[0]; var ap=hh<12?'am':'pm'; var h12=hh%12; if(h12===0)h12=12; return h12+(p[1]!=='00'?(':'+p[1]):'')+ap; }
-  var TODAY = ymd(new Date());
+  // The day turns over at 4am, so a 00:30 journal still counts as "tonight". App re-checks it each minute.
+  var DAY_START_HOUR=4;
+  function logicalToday(){ return ymd(new Date(Date.now()-DAY_START_HOUR*3600000)); }
+  var TODAY = logicalToday();
   function daysUntil(s){ return Math.round((parseYmd(s)-parseYmd(TODAY))/86400000); }
   function fmtUntil(s){ var n=daysUntil(s); return n<0?(-n+'d ago'):(n===0?'today':n+'d'); }
   function uid(pre){ return pre+'_'+Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36); }
 
   var OWNER_COLOR={me:'#15171A',partner:'#5B6B86',shared:'#B4792B'};
-  var OWNER_LETTER={me:'M',partner:'P',shared:'·'};
+  // Owners are stored as me|partner|shared; labels read from the viewer's side. App sets VIEW every render.
+  var VIEW={who:'me',names:{me:'Mahesh',partner:'Partner'}};
+  function otherOf(w){ return w==='partner'?'me':'partner'; }
+  function nameOf(o){ if(o==='shared') return 'Both'; return VIEW.names[o]||(o==='partner'?'Partner':'Mahesh'); }
+  function relName(o){ return o===VIEW.who?'You':nameOf(o); }
+  function initialOf(o){ return ((nameOf(o)||'?').trim().charAt(0)||'?').toUpperCase(); }
   var PROJ_COLORS=['#1F6FEB','#5B6B86','#2E9E6B','#B0529E','#C2704B','#B4792B','#4F5B76','#7A5BD8'];
   var TASK_TYPES=[
     {id:'task',label:'Task',color:'#1F6FEB',event:false},
@@ -659,6 +725,8 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 
   function lsGet(k,d){ try{ var v=localStorage.getItem(k); return v==null?d:v; }catch(e){ return d; } }
   function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+  function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
+  function timeOf(ms){ var d=new Date(ms); return to12(pad2(d.getHours())+':'+pad2(d.getMinutes())); }
 
   // ---- api ----
   function apiGet(p){ return fetch(p,{headers:{'accept':'application/json'}}); }
@@ -679,17 +747,52 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
   var chevR=html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M10 6l6 6-6 6" stroke="#3A4350" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   var checkMark=html`<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6.2l2.2 2.2 4.8-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
-  function Avatar(props){ var o=props.owner; if(o==='shared'){ return html`<span style=${{display:'inline-flex'}}>
-      <span class=${'av '+(props.cls||'avm')} style=${{background:OWNER_COLOR.me,border:'2px solid #fff'}}>M</span>
-      <span class=${'av '+(props.cls||'avm')} style=${{background:OWNER_COLOR.partner,marginLeft:'-8px',border:'2px solid #fff'}}>P</span></span>`; }
-    return html`<span class=${'av '+(props.cls||'avm')} style=${{background:OWNER_COLOR[o]||'#8A847C'}}>${OWNER_LETTER[o]||'?'}</span>`; }
+  function Avatar(props){ var o=props.owner; if(o==='shared'){ return html`<span style=${{display:'inline-flex'}} title="Both">
+      <span class=${'av '+(props.cls||'avm')} style=${{background:OWNER_COLOR.me,border:'2px solid #fff'}}>${initialOf('me')}</span>
+      <span class=${'av '+(props.cls||'avm')} style=${{background:OWNER_COLOR.partner,marginLeft:'-8px',border:'2px solid #fff'}}>${initialOf('partner')}</span></span>`; }
+    return html`<span class=${'av '+(props.cls||'avm')} title=${OWNER_COLOR[o]?relName(o):''} style=${{background:OWNER_COLOR[o]||'#8A847C'}}>${OWNER_COLOR[o]?initialOf(o):'?'}</span>`; }
   function Check(props){ return html`<button class=${'check'+(props.sm?' sm':'')+(props.done?' on':'')} aria-pressed=${!!props.done} aria-label=${props.label||'Toggle done'} onClick=${props.onClick}>${props.done?checkMark:null}</button>`; }
 
-  function OwnerSeg(props){ return html`<div class="ownerseg">
-    <button class=${props.value==='me'?'on':''} onClick=${function(){props.onChange('me');}}>Me</button>
-    <button class=${props.value==='partner'?'on':''} onClick=${function(){props.onChange('partner');}}>Partner</button>
-    <button class=${props.value==='shared'?'on':''} onClick=${function(){props.onChange('shared');}}>Shared</button>
-  </div>`; }
+  function OwnerSeg(props){ var other=otherOf(VIEW.who); var opts=[[VIEW.who,'You'],[other,nameOf(other)],['shared','Both']];
+    return html`<div class="ownerseg">${opts.map(function(o){ return html`<button key=${o[0]} class=${props.value===o[0]?'on':''} onClick=${function(){props.onChange(o[0]);}}>${o[1]}</button>`; })}</div>`; }
+  // owner filter <option>s, viewer-relative: Everyone · You · {other} · Both
+  function ownerOptions(){ var other=otherOf(VIEW.who); return [['all','Everyone'],[VIEW.who,'You'],[other,nameOf(other)],['shared','Both']].map(function(o){ return html`<option key=${o[0]} value=${o[0]}>${o[1]}</option>`; }); }
+
+  // ---- local copy of a change: the same ops the server applies, replayed over the last server state ----
+  var STORE_KEY={tasks:'tasks',projects:'projects',project_materials:'project_materials',journal:'journal',habits:'habits',topics:'topics',topic_links:'topic_links',notes:'notes'};
+  function idxOf(a,id){ for(var i=0;i<a.length;i++){ if(a[i].id===id) return i; } return -1; }
+  function applyOp(n,op){
+    if(op.op==='settings'){ n.settings=Object.assign({},n.settings||{},op.patch); return; }
+    if(op.op==='habit'){ var hl=(n.habit_logs||[]).slice(); var hi=-1; for(var k=0;k<hl.length;k++){ if(hl[k].habit===op.habit&&hl[k].date===op.date){hi=k;break;} }
+      var cur=hi>=0?(hl[hi].value||0):0; var v=op.delta!=null?Math.max(0,cur+op.delta):Math.max(0,op.value||0);
+      if(hi>=0) hl[hi]=Object.assign({},hl[hi],{value:v}); else hl.push({date:op.date,habit:op.habit,value:v}); n.habit_logs=hl; return; }
+    if(op.table==='focus'){ if(op.op==='upsert') n.focus=op.row; else if(op.op==='patch') n.focus=Object.assign({},n.focus||{},op.fields); return; }
+    if(op.table==='waves'){ if(op.op==='upsert') n.wave=op.row; return; }
+    var key=STORE_KEY[op.table]; if(!key) return;
+    var arr=(n[key]||[]).slice(), i;
+    if(op.op==='upsert'){ i=idxOf(arr,op.row.id); if(i>=0) arr[i]=op.row; else if(op.prepend) arr.unshift(op.row); else arr.push(op.row); }
+    else if(op.op==='patch'){ i=idxOf(arr,op.id); if(i>=0) arr[i]=Object.assign({},arr[i],op.fields); }
+    else if(op.op==='delete'){ arr=arr.filter(function(x){ return x.id!==op.id && !(op.table==='tasks'&&x.parent_id===op.id); });
+      if(op.table==='projects'){ n.tasks=(n.tasks||[]).filter(function(t){return t.project!==op.id;}); n.project_materials=(n.project_materials||[]).filter(function(m){return m.project_id!==op.id;}); }
+      if(op.table==='habits'){ n.habit_logs=(n.habit_logs||[]).filter(function(l){return l.habit!==op.id;}); }
+      if(op.table==='topics'){ n.topic_links=(n.topic_links||[]).filter(function(l){return l.topic_id!==op.id;}); } }
+    n[key]=arr;
+  }
+  function replay(base,ops){ if(!base) return base; var n=Object.assign({},base); (ops||[]).forEach(function(op){ applyOp(n,op); }); return n; }
+  function loadOutbox(){ try{ var v=JSON.parse(localStorage.getItem('sp_outbox')||'[]'); return Array.isArray(v)?v:[]; }catch(e){ return []; } }
+  function saveOutbox(a){ try{ localStorage.setItem('sp_outbox',JSON.stringify(a)); }catch(e){} }
+  function stripOp(o){ var c=Object.assign({},o); delete c._k; delete c._label; delete c.prepend; return c; }
+
+  // Unfinished work from earlier days: missed plan (date passed) or missed deadline (due passed). Events don't carry.
+  function carriedFrom(tasks,pass){
+    var cand=(tasks||[]).filter(function(t){ if(t.done||isEventType(t.type)||!pass(t)) return false; if(t.date===TODAY||t.due===TODAY) return false; return (!!t.date&&t.date<TODAY)||(!!t.due&&t.due<TODAY); });
+    var ids={}; cand.forEach(function(t){ ids[t.id]=1; });
+    var parents={}; (tasks||[]).forEach(function(t){ if(!t.parent_id && (t.date===TODAY||(t.due===TODAY&&!t.done)) && pass(t)) parents[t.id]=1; });
+    // a subtask shows under its parent when the parent is already listed
+    var out=cand.filter(function(t){ return !(t.parent_id && (ids[t.parent_id]||parents[t.parent_id])); });
+    out.sort(function(a,b){ var ao=(a.due&&a.due<TODAY)?0:1, bo=(b.due&&b.due<TODAY)?0:1; if(ao!==bo) return ao-bo; var ak=(ao===0?a.due:a.date)||'', bk=(bo===0?b.due:b.date)||''; return ak<bk?-1:ak>bk?1:0; });
+    return out;
+  }
 
   // ---- derived helpers ----
   function childrenOf(tasks,id){ return (tasks||[]).filter(function(t){return t.parent_id===id;}); }
@@ -707,28 +810,45 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
   }
 
   // ---- Task row (Today / lists) ----
+  // "Pick a day": a real date input laid over the button, so the phone's own picker opens on tap
+  function DayPick(props){
+    return html`<span class="daypick"><span class="view" aria-hidden="true">Pick a day</span><input type="date" aria-label=${'Pick a day for '+props.title} min=${TODAY}
+      onClick=${function(e){ try{ if(e.currentTarget.showPicker) e.currentTarget.showPicker(); }catch(_){} }}
+      onChange=${function(e){ if(e.target.value) props.onPick(e.target.value); }} /></span>`;
+  }
+  function dueOver(t){ return !t.done && !!t.due && t.due<TODAY; }
   function TaskRow(props){
-    var t=props.t, proj=props.proj, tasks=props.tasks;
-    var exp=useState(false); var open=exp[0], setOpen=exp[1];
+    var t=props.t, proj=props.proj, tasks=props.tasks, carry=props.carry;
     var subs=childrenOf(tasks,t.id);
     var done=subs.filter(function(s){return s.done;}).length;
+    // open by itself when a subtask is due (or overdue), so it isn't hidden behind the toggle
+    var subDue=subs.some(function(s){ return !s.done && s.due && s.due<=TODAY; });
+    var exp=useState(subDue); var open=exp[0], setOpen=exp[1];
+    var planned=!t.done && !!t.date && t.date<TODAY;
     return html`<div class="arow">
       <div class="atime kind" style=${{color:typeDef(t.type).color}}>${typeDef(t.type).label}</div>
       ${isEventType(t.type)?html`<span style=${{width:'20px',flex:'none'}}></span>`:html`<${Check} done=${t.done} label=${t.title} onClick=${function(){props.onToggle(t);}} />`}
       <div class="abody">
         <div class=${'atitle'+(t.done?' done':'')}>${t.title}</div>
         <div class="ameta">
+          ${props.parent?html`<span class="tag">in ${props.parent.title}</span>`:null}
           ${proj?html`<span class="tag"><span class="dot" style=${{background:proj.color}}></span>${proj.name}</span>`:null}
           ${isEventType(t.type)&&t.time?html`<span class="pill">${to12(t.time)}</span>`:null}
-          ${t.due?html`<span class="pill due">Due ${shortDate(t.due)}${t.due_time?(' · '+to12(t.due_time)):''}</span>`:null}
+          ${planned?html`<span class="pill">planned ${shortDate(t.date)}</span>`:null}
+          ${t.due?html`<span class=${'pill due'+(dueOver(t)?' over':'')}>Due ${shortDate(t.due)}${t.due_time?(' · '+to12(t.due_time)):''}</span>`:null}
           ${subs.length?html`<button class="view" onClick=${function(){setOpen(!open);}}>${done}/${subs.length} subtasks ${open?'▴':'▾'}</button>`:null}
+          ${carry?html`<${Fragment}>
+            <button class="view" onClick=${function(){carry.onToday(t);}}>Today</button>
+            <${DayPick} title=${t.title} onPick=${function(ds){carry.onPick(t,ds);}} />
+            ${t.date?html`<button class="view" onClick=${function(){carry.onUnplan(t);}}>Unplan</button>`:null}
+          <//>`:null}
           <button class="view" onClick=${function(){props.onEdit(t);}}>Edit</button>
         </div>
         ${open&&subs.length?html`<div class="subs">${subs.map(function(s){return html`
           <div class=${'subrow'+(s.done?' done':'')} key=${s.id}>
             <${Check} sm=${true} done=${s.done} label=${s.title} onClick=${function(){props.onToggle(s);}} />
             <span class="slabel">${s.title}</span>
-            ${s.due?html`<span class="pill due">${shortDate(s.due)}${s.due_time?(' · '+to12(s.due_time)):''}</span>`:null}
+            ${s.due?html`<span class=${'pill due'+(dueOver(s)?' over':'')}>${shortDate(s.due)}${s.due_time?(' · '+to12(s.due_time)):''}</span>`:null}
           </div>`;})}</div>`:null}
       </div>
       <${Avatar} owner=${t.owner} cls="avm" />
@@ -802,7 +922,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var remMs = running?Math.max(0,(f.ends_at||0)-Date.now()) : paused?Math.max(0,f.remaining||0) : total;
     var done = running && remMs<=0;
     var prog = done?1:(total>0?Math.min(1,Math.max(0,1-remMs/total)):0);
-    var who = f.started_by==='me'?(props.meName||'You') : f.started_by==='partner'?(props.partnerName||'Partner') : '';
+    var who = f.started_by?relName(f.started_by):'';
     var dotc = done?'#2E9E6B':running?'#1F6FEB':paused?'#C2873B':'#9AA3AF';
     var clockSvg=html`<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
     return html`<div class=${'focusw'+(active?' active':'')}>
@@ -836,11 +956,17 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var habits=props.habits, habitLogs=props.habitLogs, topics=props.topics, topicLinks=props.topicLinks, settings=props.settings, whoami=props.whoami, notes=props.notes;
     var projMap={}; (projects||[]).forEach(function(p){projMap[p.id]=p;});
     var isToday = sel===TODAY;
-    var fpass=function(t){ return props.filter==='all'||t.owner===props.filter||t.owner==='shared'; };
-    var scheduled=(tasks||[]).filter(function(t){ return !t.parent_id && t.date===sel && fpass(t); });
-    var schedIds={}; scheduled.forEach(function(t){ schedIds[t.id]=1; });
-    var dueHere=(tasks||[]).filter(function(t){ return t.due===sel && !t.done && fpass(t) && !schedIds[t.id]; });
-    var dayTasks=scheduled.concat(dueHere);
+    var fpass=function(t){ return props.filter==='all'||t.owner===whoami||t.owner==='shared'; };
+    var onDay=function(t){ return t.date===sel || (t.due===sel && !t.done); };
+    var tops=(tasks||[]).filter(function(t){ return !t.parent_id && onDay(t) && fpass(t); });
+    var topIds={}; tops.forEach(function(t){ topIds[t.id]=1; });
+    // a subtask is listed on its own only when its parent isn't (otherwise it shows nested, once)
+    var loneSubs=(tasks||[]).filter(function(t){ return t.parent_id && !topIds[t.parent_id] && onDay(t) && fpass(t); });
+    var dayTasks=tops.concat(loneSubs);
+    var taskMap={}; (tasks||[]).forEach(function(t){ taskMap[t.id]=t; });
+    var carried=isToday?carriedFrom(tasks,fpass):[];
+    var cmS=useState(false); var carryAll=cmS[0], setCarryAll=cmS[1];
+    var carryShown=carryAll?carried:carried.slice(0,5);
     var dayRoutines=(routines||[]).filter(function(r){ return (!r.days||r.days==='daily'); });
     var nowHour=new Date().getHours();
     var upAll=(upcoming||[]).filter(function(d){ return d.date>TODAY; });
@@ -850,9 +976,9 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var countH=myHabits.filter(function(h){return h.kind==='count';});
     var checkH=myHabits.filter(function(h){return h.kind!=='count';});
     function logVal(id,ds){ var a=habitLogs||[]; for(var i=0;i<a.length;i++){if(a[i].habit===id&&a[i].date===ds)return a[i].value;} return undefined; }
-    function streak(id){ var m={}; (habitLogs||[]).forEach(function(l){if(l.habit===id)m[l.date]=l.value;}); var c=0,d=new Date(); for(var i=0;i<60;i++){var k=ymd(addDays(d,-i)); if(m[k]&&m[k]>0)c++; else if(i===0)continue; else break;} return c; }
+    function streak(id){ var m={}; (habitLogs||[]).forEach(function(l){if(l.habit===id)m[l.date]=l.value;}); var c=0,d=parseYmd(TODAY); for(var i=0;i<60;i++){var k=ymd(addDays(d,-i)); if(m[k]&&m[k]>0)c++; else if(i===0)continue; else break;} return c; }
     function trend(id){ return (habitLogs||[]).filter(function(l){return l.habit===id;}).slice().sort(function(a,b){return a.date<b.date?-1:1;}).slice(-7); }
-    var curWeek=ymd(startOfWeek(new Date()));
+    var curWeek=ymd(startOfWeek(parseYmd(TODAY)));
     var curTopic=(topics||[]).filter(function(t){return t.week===curWeek;})[0];
     var topicN=curTopic?(topicLinks||[]).filter(function(l){return l.topic_id===curTopic.id;}).length:0;
     var myNotes=(notes||[]).filter(function(n){return n.owner===whoami;});
@@ -869,9 +995,14 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 
       <div class="card agenda">
         <div class="cardhd"><div class="hdttl"><h2>${longDay(parseYmd(sel))}</h2><button class="addinline" aria-label="Add something for this day" onClick=${function(){props.onAdd(sel);}}>+</button></div><span class="meta">${dayTasks.length+(isToday?dayRoutines.length:0)} items</span></div>
+        ${carried.length?html`<div class="carry">
+          <div class="carryhd"><span class="carryttl">From earlier · ${carried.length}</span><button class="view" onClick=${function(){props.onMoveAllToday(carried);}}>Move all to today</button></div>
+          ${carryShown.map(function(t){ return html`<${TaskRow} t=${t} tasks=${tasks} proj=${projMap[t.project]} parent=${t.parent_id?taskMap[t.parent_id]:null} carry=${props.carry} onToggle=${props.onToggle} onEdit=${props.onEdit} key=${'c'+t.id} />`; })}
+          ${carried.length>5?html`<button class="view carrymore" onClick=${function(){setCarryAll(!carryAll);}}>${carryAll?'Show fewer':('Show '+(carried.length-5)+' more')}</button>`:null}
+        </div>`:null}
         ${isToday ? dayRoutines.map(function(r){ var sh=+r.start.split(':')[0]; var eh=+r.end.split(':')[0]; var now=nowHour>=sh&&nowHour<eh; return html`<${Block} r=${r} dur=${durOf(r)} now=${now} key=${r.id} />`; }) : null}
-        ${dayTasks.map(function(t){ return html`<${TaskRow} t=${t} tasks=${tasks} proj=${projMap[t.project]} onToggle=${props.onToggle} onEdit=${props.onEdit} key=${t.id} />`; })}
-        ${(dayTasks.length===0 && !(isToday&&dayRoutines.length))?html`<div class="empty"><div class="big">A clear day ✨</div><div class="sub">Nothing planned — enjoy the space, and add something whenever you like.</div><button class="btn primary" style=${{maxWidth:'220px',margin:'14px auto 4px'}} onClick=${function(){props.onAdd(sel);}}>+ Add a task</button></div>`:null}
+        ${dayTasks.map(function(t){ return html`<${TaskRow} t=${t} tasks=${tasks} proj=${projMap[t.project]} parent=${t.parent_id?taskMap[t.parent_id]:null} onToggle=${props.onToggle} onEdit=${props.onEdit} key=${t.id} />`; })}
+        ${(dayTasks.length===0 && !(isToday&&dayRoutines.length))?(carried.length?html`<div class="carryempty">Nothing new today.</div>`:html`<div class="empty"><div class="big">A clear day ✨</div><div class="sub">Nothing planned — enjoy the space, and add something whenever you like.</div><button class="btn primary" style=${{maxWidth:'220px',margin:'14px auto 4px'}} onClick=${function(){props.onAdd(sel);}}>+ Add a task</button></div>`):null}
       </div>
 
       <div style=${{display:'flex',justifyContent:'space-between',alignItems:'baseline',margin:'26px 2px 0'}}>
@@ -886,8 +1017,8 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
             <div style=${{display:'flex',alignItems:'flex-end',gap:'12px',marginTop:'8px'}}>
               <div><span class="big" style=${{fontSize:'34px'}}>${v==null?'—':v}</span><span style=${{fontWeight:500,fontSize:'12px',color:'#8A93A0',marginLeft:'6px'}}>today${h.target!=null?(' · aim ≤ '+h.target):''}${h.unit?(' '+h.unit):''}</span></div>
               <div style=${{marginLeft:'auto',display:'flex',gap:'8px'}}>
-                <button class="stepbtn" aria-label="One fewer" onClick=${function(){props.onSetHabit(h.id,Math.max(0,(v||0)-1));}}>−</button>
-                <button class="stepbtn" aria-label="One more" onClick=${function(){props.onSetHabit(h.id,(v||0)+1);}}>+</button>
+                <button class="stepbtn" aria-label="One fewer" onClick=${function(){props.onStepHabit(h.id,-1);}}>−</button>
+                <button class="stepbtn" aria-label="One more" onClick=${function(){props.onStepHabit(h.id,1);}}>+</button>
               </div>
             </div>
             <div class="bars" aria-hidden="true">${tr.map(function(x,i){ return html`<div key=${i} class=${x.date===TODAY?'now':''} style=${{height:Math.max(8,Math.round((x.value||0)/mx*100))+'%'}}></div>`; })}</div>
@@ -946,7 +1077,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     }
     function clickItem(it){ if(it.pid) props.onOpenProject(it.pid); else if(it.t) props.onEditTask(it.t); }
     function timed(ds){ return (tasks||[]).filter(function(t){ return t.date===ds && t.time && pass(t); }); }
-    function allday(ds){ return (tasks||[]).filter(function(t){ return !t.parent_id && t.date===ds && !t.time && pass(t); }); }
+    function allday(ds){ return (tasks||[]).filter(function(t){ return t.date===ds && !t.time && pass(t); }); }
     function dues(ds){ return (tasks||[]).filter(function(t){ return t.due===ds && !t.done && t.date!==ds && pass(t); }); }
 
     var unsched=(tasks||[]).filter(function(t){ return !t.parent_id && !t.date && !t.done && pass(t); });
@@ -961,11 +1092,11 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       <div class="seg"><button class=${mode==='week'?'on':''} onClick=${function(){setMode('week');}}>Week</button><button class=${mode==='month'?'on':''} onClick=${function(){setMode('month');}}>Month</button><button class=${mode==='timeline'?'on':''} onClick=${function(){setMode('timeline');}}>Timeline</button></div>
       <button class="navcirc" aria-label="Previous" onClick=${function(){setCur(mode==='week'?addDays(cur,-7):addMonths(cur,-1));}}>${chevL}</button>
       <button class="navcirc" aria-label="Next" onClick=${function(){setCur(mode==='week'?addDays(cur,7):addMonths(cur,1));}}>${chevR}</button>
-      <button class="pillbtn" onClick=${function(){setCur(new Date());}}>Today</button>
+      <button class="pillbtn" onClick=${function(){setCur(parseYmd(TODAY));}}>Today</button>
       <button class=${'pillbtn'+(rg?' on':'')} onClick=${function(){ setMode('month'); setRg(rg?null:{start:null,end:null}); }}>${rg?'Picking dates…':'+ Project from dates'}</button>
       <span style=${{fontWeight:700,fontSize:'16px',color:'#15171A',letterSpacing:'-.01em'}}>${mode==='week'?('Week of '+shortDate(ymd(startOfWeek(cur)))):monthY(cur)}</span>
       <div style=${{marginLeft:'auto',display:'flex',gap:'8px',flexWrap:'wrap'}}>
-        <select class="fsel" aria-label="Owner" value=${fo} onChange=${function(e){setFo(e.target.value);}}><option value="all">Everyone</option><option value="me">Me</option><option value="partner">Partner</option><option value="shared">Shared</option></select>
+        <select class="fsel" aria-label="Owner" value=${fo} onChange=${function(e){setFo(e.target.value);}}>${ownerOptions()}</select>
         <select class="fsel" aria-label="Project" value=${fp} onChange=${function(e){setFp(e.target.value);}}><option value="all">All projects</option>${active.map(function(p){return html`<option key=${p.id} value=${p.id}>${p.name}</option>`;})}</select>
       </div>
     </div>`;
@@ -1072,8 +1203,9 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
   function Projects(props){
     var projects=props.projects, tasks=props.tasks;
     var active=(projects||[]).filter(function(p){return !p.archived;});
-    return html`<div class="projgrid">
-      ${active.map(function(p){ var st=projStats(p.id,tasks);
+    var finished=(projects||[]).filter(function(p){return !!p.archived;});
+    var fS=useState(false); var showFin=fS[0], setShowFin=fS[1];
+    function card(p){ var st=projStats(p.id,tasks);
         var open=Math.max(0,(st.total||0)-(st.done||0));
         var hasTl=!!(p.start_date&&p.end_date);
         var tpct=0; if(hasTl){ var a=parseYmd(p.start_date),b=parseYmd(p.end_date),x=parseYmd(TODAY); tpct=Math.max(0,Math.min(1,(x-a)/((b-a)||1)))*100; }
@@ -1096,14 +1228,20 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
               <div class="pc-tldates"><span>${shortDate(p.start_date)}</span><span>${shortDate(p.end_date)}</span></div>
             </div>`:html`<div class="pc-tl pc-notl">No timeline yet</div>`}
             <div class="pc-foot">
-              ${p.end_date?html`<span class=${'pc-due'+(dleft!=null&&dleft<=14?' soon':'')}>${dleft<0?(-dleft+'d over'):(dleft===0?'Due today':dleft+'d left')}</span>`:html`<span class="pc-due none">No due date</span>`}
+              ${p.archived?html`<span class="pc-due none">Finished</span>`:p.end_date?html`<span class=${'pc-due'+(dleft!=null&&dleft<=14?' soon':'')}>${dleft<0?(-dleft+'d over'):(dleft===0?'Due today':dleft+'d left')}</span>`:html`<span class="pc-due none">No due date</span>`}
               <span class="pc-open"><${Avatar} owner=${p.owner} cls="avm" /><span class="pc-count">${open?(open+' open'):(st.total?'All done':'No tasks')}</span></span>
             </div>
           </div>
         </button>`;
-      })}
-      <button class="newproj" onClick=${function(){props.onNew();}}><span style=${{fontSize:'24px',lineHeight:1}}>+</span>New project</button>
-    </div>`;
+    }
+    return html`<${Fragment}>
+      <div class="projgrid">
+        ${active.map(card)}
+        <button class="newproj" onClick=${function(){props.onNew();}}><span style=${{fontSize:'24px',lineHeight:1}}>+</span>New project</button>
+      </div>
+      ${finished.length?html`<div class="finhd"><button class="view" onClick=${function(){setShowFin(!showFin);}}>${showFin?'Hide finished':('Finished · '+finished.length)} ${showFin?'▴':'▾'}</button></div>`:null}
+      ${showFin&&finished.length?html`<div class="projgrid fingrid">${finished.map(card)}</div>`:null}
+    <//>`;
   }
 
   // ---- Tasks table (the "Show all" destination) ----
@@ -1115,7 +1253,8 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var sS=useState('open'); var fsv=sS[0], setFs=sS[1];
     function bucket(t){
       if(t.done) return {k:'done',l:'Done',o:6};
-      if(!t.due) return {k:'nodate',l:'No deadline',o:5};
+      // planned for a day that has passed counts as overdue too, not "No deadline"
+      if(!t.due) return (t.date&&t.date<TODAY&&!isEventType(t.type))?{k:'over',l:'Overdue',o:0}:{k:'nodate',l:'No deadline',o:5};
       var d=daysUntil(t.due);
       if(d<0) return {k:'over',l:'Overdue',o:0};
       if(d===0) return {k:'today',l:'Today',o:1};
@@ -1136,7 +1275,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     return html`<${Fragment}>
       <div class="tvbar">
         <select class="tsel" value=${fo} onChange=${function(e){setFo(e.target.value);}}>
-          <option value="all">Everyone</option><option value="me">${props.meName||'Me'}</option><option value="partner">${props.partnerName||'Partner'}</option><option value="shared">Shared</option>
+          ${ownerOptions()}
         </select>
         <select class="tsel" value=${fp} onChange=${function(e){setFp(e.target.value);}}>
           <option value="all">All projects</option>${(projects||[]).filter(function(p){return !p.archived;}).map(function(p){return html`<option key=${p.id} value=${p.id}>${p.name}</option>`;})}
@@ -1157,7 +1296,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
                 <span class=${'tvttl'+(t.done?' done':'')}>${t.title||'Untitled task'}</span>
                 ${p?html`<span class="tvproj"><span class="dot" style=${{background:p.color,width:'7px',height:'7px'}}></span><span class="tvpn">${p.name}</span></span>`:html`<span class="tvproj none">—</span>`}
                 <${Avatar} owner=${t.owner} cls="avm" />
-                <span class=${'tvdue'+(ov?' over':'')}>${t.due?(shortDate(t.due)+(t.due_time?(' · '+to12(t.due_time)):'')):'—'}</span>
+                <span class=${'tvdue'+(ov?' over':'')}>${t.due?(shortDate(t.due)+(t.due_time?(' · '+to12(t.due_time)):'')):(ov?('planned '+shortDate(t.date)):'—')}</span>
               </div>`;
             })}
           <//>`;
@@ -1226,7 +1365,8 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
           </div>
           <div class="pmeta">
             <${Avatar} owner=${p.owner} cls="avm" />
-            <span class="pmeta-t">${p.owner==='shared'?'Shared':(p.owner==='partner'?'Partner':'You')} · ${p.kind&&p.kind!=='plain'?p.kind:'project'}</span>
+            <span class="pmeta-t">${relName(p.owner)} · ${p.kind&&p.kind!=='plain'?p.kind:'project'}</span>
+            ${p.archived?html`<span class="pill">Finished</span><button class="view" onClick=${function(){props.onReopen(p.id);}}>Reopen</button>`:null}
             <button class="view" style=${{marginLeft:'auto'}} onClick=${function(){props.onEdit(p);}}>Edit</button>
           </div>
           <div class="pbar" style=${{marginTop:'14px'}}><i style=${{width:st.pct+'%'}}></i></div>
@@ -1235,7 +1375,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
             <div class="prow"><span class="k">Deadline</span><span class="v">${p.end_date?shortDate(p.end_date):'—'}</span></div>
             <div class="prow"><span class="k">Days left</span><span class="v">${p.end_date?(daysUntil(p.end_date)>=0?(daysUntil(p.end_date)+'d'):(-daysUntil(p.end_date)+'d over')):'—'}</span></div>
             <div class="prow"><span class="k">Started</span><span class="v">${p.start_date?shortDate(p.start_date):'—'}</span></div>
-            <div class="prow"><span class="k">Owner</span><span class="v"><${Avatar} owner=${p.owner} cls="avm" />${p.owner==='shared'?'Shared':(p.owner==='partner'?'Partner':'You')}</span></div>
+            <div class="prow"><span class="k">Owner</span><span class="v"><${Avatar} owner=${p.owner} cls="avm" />${relName(p.owner)}</span></div>
           </div>
         </div>
         <div class="pbody">
@@ -1280,7 +1420,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
             ${mats.map(function(m){ return html`<div class="matrow" key=${m.id}>
               <span style=${{color:'#AEB6C1'}}>🔗</span>
               <a href=${m.url} target="_blank" rel="noreferrer noopener">${m.title||m.url}</a>
-              <button class="x" aria-label="Remove" onClick=${function(){props.onDelMaterial(m.id);}}>×</button>
+              <button class="x" aria-label="Remove" onClick=${function(){props.onDelMaterial(m);}}>×</button>
             </div>`; })}
             <div class="addrow">
               <input type="text" placeholder="Label" style=${{width:'110px'}} value=${nm.title} onInput=${function(e){setNm(Object.assign({},nm,{title:e.target.value}));}} />
@@ -1320,7 +1460,8 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
   // ---- Project editor modal ----
   function ProjectEditor(props){
     var ed=props.editing||{};
-    var st=useState({ name:ed.name||'', owner:ed.owner||props.whoami||'me', color:ed.color||PROJ_COLORS[0], kind:ed.kind||'project', start_date:ed.start_date||'', end_date:ed.end_date||'', description:ed.description||'' });
+    // older projects were saved with kind "plain", which has no option of its own; it means "project"
+    var st=useState({ name:ed.name||'', owner:ed.owner||props.whoami||'me', color:ed.color||PROJ_COLORS[0], kind:(ed.kind&&ed.kind!=='plain')?ed.kind:'project', start_date:ed.start_date||'', end_date:ed.end_date||'', description:ed.description||'' });
     var f=st[0], set=st[1];
     function upd(k,v){ var o=Object.assign({},f); o[k]=v; set(o); }
     return html`<div class="pov" style=${{zIndex:62}} onClick=${function(e){if(e.target===e.currentTarget)props.onClose();}}>
@@ -1362,6 +1503,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var f=st[0], set=st[1];
     var subsInit=(props.children||[]).map(function(s){return {id:s.id,title:s.title,due:s.due||'',due_time:s.due_time||'',done:!!s.done,owner:s.owner,created_at:s.created_at,exists:true};});
     var subS=useState(subsInit); var subs=subS[0], setSubs=subS[1];
+    var origSubs=useRef(subsInit); // what the subtasks were when the sheet opened, so a save sends only what changed
     var rmS=useState([]); var removed=rmS[0], setRemoved=rmS[1];
     function upd(k,v){ var o=Object.assign({},f); o[k]=v; set(o); }
     function addSub(){ setSubs(subs.concat([{id:uid('tk'),title:'',due:'',done:false,exists:false}])); }
@@ -1369,7 +1511,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     function rmSub(i){ var s=subs[i]; if(s.exists) setRemoved(removed.concat([s.id])); setSubs(subs.filter(function(_,j){return j!==i;})); }
     return html`<div class="pov" style=${{zIndex:62}} onClick=${function(e){if(e.target===e.currentTarget)props.onClose();}}>
       <div class="ppanel" role="dialog" aria-modal="true" aria-label=${ed.id?'Edit':'New'}>
-        <div class="phd"><div style=${{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}><div><div class="meyebrow">${ed.id?'Edit':'Create'}</div><h3 style=${{margin:0,fontWeight:700,fontSize:'19px',letterSpacing:'-.01em'}}>${ed.id?'Edit':'New'} ${typeDef(f.type).label.toLowerCase()}</h3></div><button class="x" aria-label="Close" onClick=${props.onClose}>×</button></div></div>
+        <div class="phd"><div style=${{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}><div><div class="meyebrow">${ed.id?'Edit':'Create'}</div><h3 style=${{margin:0,fontWeight:700,fontSize:'19px',letterSpacing:'-.01em'}}>${ed.id?'Edit':'New'} ${props.parent?'subtask':typeDef(f.type).label.toLowerCase()}</h3>${props.parent?html`<button class="linkbtn subof" onClick=${function(){props.onOpenParent(props.parent);}}>Subtask of <b>${props.parent.title}</b> →</button>`:null}</div><button class="x" aria-label="Close" onClick=${props.onClose}>×</button></div></div>
         <div class="pbody">
           <label class="lbl">Title</label>
           <input class="fld" type="text" value=${f.title} onInput=${function(e){upd('title',e.target.value);}} placeholder=${isEventType(f.type)?'e.g. Call with Ari':'e.g. Draft the intro'} />
@@ -1390,7 +1532,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
           </select>
           <label class="lbl">Whose</label>
           <${OwnerSeg} value=${f.owner} onChange=${function(v){upd('owner',v);}} />
-          ${!isEventType(f.type)?html`<${Fragment}>
+          ${!isEventType(f.type)&&!props.parent?html`<${Fragment}>
             <label class="lbl">Subtasks (each can have a deadline)</label>
             ${subs.map(function(s,i){ return html`<div class="subedit" key=${s.id}>
               <input type="text" value=${s.title} placeholder="Subtask" onInput=${function(e){setSub(i,'title',e.target.value);}} />
@@ -1404,7 +1546,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
         <div class="sheetfoot">
           ${ed.id?html`<button class="btn del" onClick=${function(){props.onDelete(ed.id);}}>Delete</button>`:null}
           <button class="btn ghost" onClick=${props.onClose}>Cancel</button>
-          <button class="btn primary" onClick=${function(){ if(f.title.trim()) props.onSave(f, ed.id, subs, removed); }}>Save</button>
+          <button class="btn primary" onClick=${function(){ if(f.title.trim()) props.onSave(f, ed.id, subs, removed, origSubs.current); }}>Save</button>
         </div>
       </div>
     </div>`;
@@ -1416,10 +1558,15 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var draftS=useState(''); var draft=draftS[0], setDraft=draftS[1];
     var tagS=useState(''); var tag=tagS[0], setTag=tagS[1];
     var todayEntry=(entries||[]).filter(function(e){return e.date===TODAY && e.owner===whoami;})[0];
-    useEffect(function(){ if(todayEntry){ setDraft(todayEntry.text||''); setTag(todayEntry.tag||''); } },[todayEntry&&todayEntry.id]);
+    // an unsaved draft is kept on this device, so switching tabs (or the app closing) doesn't lose it
+    var draftKey='sp_jdraft_'+TODAY+'_'+whoami;
+    useEffect(function(){ var local=lsGet(draftKey,null); setDraft(local!=null?local:(todayEntry?(todayEntry.text||''):'')); setTag(todayEntry?(todayEntry.tag||''):''); },[todayEntry&&todayEntry.id, draftKey]);
+    var savedText=todayEntry?(todayEntry.text||''):'';
+    var jstatus = props.pending?(props.offline?'Not sent yet · it saves when you’re back online':'Saving…')
+      : (draft!==savedText?(draft.trim()?'Not saved yet':'') : (todayEntry&&todayEntry.updated_at?('Saved · '+timeOf(todayEntry.updated_at)):''));
     var TAGS=[['good','Good day'],['hard','Hard day'],['shipped','Shipped something'],['rest','Rest']];
     var earlier=(entries||[]).slice().sort(function(a,b){return a.date<b.date?1:-1;}).filter(function(e){return !(e.date===TODAY&&e.owner===whoami);});
-    var curWeek=ymd(startOfWeek(new Date()));
+    var curWeek=ymd(startOfWeek(parseYmd(TODAY)));
     var curTopic=(topics||[]).filter(function(t){return t.week===curWeek;})[0];
     var curLinks=curTopic?(topicLinks||[]).filter(function(l){return l.topic_id===curTopic.id;}):[];
     var pastTopics=(topics||[]).filter(function(t){return t.week!==curWeek && t.title;}).slice(0,6);
@@ -1431,15 +1578,16 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
         <section class="card jwrite">
           <div style=${{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}><h2 style=${{margin:0,fontWeight:700,fontSize:'18px'}}>Tonight's entry</h2><span style=${{fontWeight:500,fontSize:'12px',color:'#8A93A0'}}>${shortDate(TODAY)}</span></div>
           <p class="jprompt">How did today feel? What lifted you, what weighed on you?</p>
-          <textarea class="ta" placeholder="Start writing…" value=${draft} onInput=${function(e){setDraft(e.target.value);}}></textarea>
+          <textarea class="ta" placeholder="Start writing…" value=${draft} onInput=${function(e){setDraft(e.target.value); lsSet(draftKey,e.target.value);}}></textarea>
           <div class="tags">
             ${TAGS.map(function(tg){ return html`<button key=${tg[0]} class=${'tagchip'+(tag===tg[0]?' on':'')} onClick=${function(){setTag(tag===tg[0]?'':tg[0]);}}>${tg[1]}</button>`; })}
-            <button class="savebtn" onClick=${function(){props.onSave(draft,tag);}}>Save entry</button>
+            <button class="savebtn" onClick=${function(){props.onSave(draft,tag); lsDel(draftKey);}}>Save entry</button>
           </div>
+          ${jstatus?html`<div class="jstatus" aria-live="polite">${jstatus}</div>`:null}
         </section>
         <h3 style=${{fontWeight:600,fontSize:'11px',letterSpacing:'.07em',textTransform:'uppercase',color:'#3C6FB0',margin:'24px 2px 10px'}}>Earlier</h3>
         ${earlier.map(function(e){ var tl=({good:'Good day',hard:'Hard day',shipped:'Shipped something',rest:'Rest'})[e.tag]||''; var tc=e.tag==='hard'?'#C64A3B':(e.tag==='shipped'?'#2E9E6B':'#8A93A0');
-          return html`<section class="card jentry" key=${e.id}><div class="jh"><span style=${{fontWeight:600,fontSize:'13px'}}>${shortDate(e.date)}${e.owner==='partner'?' · Partner':''}</span>${tl?html`<span style=${{fontWeight:500,fontSize:'11px',color:tc}}>${tl}</span>`:null}</div><p>${e.text}</p></section>`;
+          return html`<section class="card jentry" key=${e.id}><div class="jh"><span style=${{fontWeight:600,fontSize:'13px'}}>${shortDate(e.date)}${e.owner!==whoami?(' · '+nameOf(e.owner)):''}</span>${tl?html`<span style=${{fontWeight:500,fontSize:'11px',color:tc}}>${tl}</span>`:null}</div><p>${e.text}</p></section>`;
         })}
         ${earlier.length===0?html`<p style=${{color:'#8A93A0',fontSize:'13px',padding:'0 2px'}}>Nothing here yet — your first entry is waiting.</p>`:null}
       </div>
@@ -1450,7 +1598,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
           <input class="fld" type="text" placeholder="e.g. Type design history" value=${ttl} onInput=${function(e){setTtl(e.target.value);}} onBlur=${function(){ if(ttl.trim()) props.onSetTopic(ttl); }} />
           ${curTopic?html`<${Fragment}>
             <div style=${{fontWeight:600,fontSize:'10px',letterSpacing:'.06em',textTransform:'uppercase',color:'#9AA3AF',margin:'14px 0 4px'}}>Links studied</div>
-            ${curLinks.map(function(l){ return html`<div class="matrow" key=${l.id}><span style=${{color:'#AEB6C1'}}>🔗</span><a href=${l.url} target="_blank" rel="noreferrer noopener">${l.title||l.url}</a><button class="x" aria-label="Remove" onClick=${function(){props.onDelTopicLink(l.id);}}>×</button></div>`; })}
+            ${curLinks.map(function(l){ return html`<div class="matrow" key=${l.id}><span style=${{color:'#AEB6C1'}}>🔗</span><a href=${l.url} target="_blank" rel="noreferrer noopener">${l.title||l.url}</a><button class="x" aria-label="Remove" onClick=${function(){props.onDelTopicLink(l);}}>×</button></div>`; })}
             <div class="addrow"><input type="text" placeholder="Label" style=${{width:'80px'}} value=${nl.title} onInput=${function(e){setNl(Object.assign({},nl,{title:e.target.value}));}} /><input class="grow" type="url" placeholder="https://…" value=${nl.url} onInput=${function(e){setNl(Object.assign({},nl,{url:e.target.value}));}} /><button class="mini" onClick=${function(){ if((nl.url||'').trim()){ props.onAddTopicLink(curTopic.id,nl.title,nl.url); setNl({title:'',url:''}); } }}>Add</button></div>
           <//>`:html`<div style=${{fontSize:'12px',color:'#8A93A0',marginTop:'10px'}}>Name a topic above to start saving links to it.</div>`}
         </section>
@@ -1471,7 +1619,10 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var notifS=useState((function(){try{return lsGet('sp_notif','')==='1';}catch(e){return false;}})()); var notifOn=notifS[0], setNotifOn=notifS[1];
     function toggleNotif(){ if(notifOn){ setNotifOn(false); lsSet('sp_notif','0'); return; } try{ if(typeof Notification==='undefined'){ setNotifOn(true); lsSet('sp_notif','1'); return; } if(Notification.permission==='granted'){ setNotifOn(true); lsSet('sp_notif','1'); } else { Notification.requestPermission().then(function(p){ var ok=p==='granted'; setNotifOn(ok); lsSet('sp_notif',ok?'1':'0'); }); } }catch(e){} }
     function updNm(k,v){ var o=Object.assign({},nm); o[k]=v; setNm(o); setSaved(false); }
-    var meLabel=(nm.meName||'').trim()||'Mahesh', pLabel=(nm.partnerName||'').trim()||'Partner';
+    // "Your name" is the viewer's own name, whichever of the two is holding this device
+    var mine=props.whoami==='partner'?'partner':'me', theirs=otherOf(mine);
+    var myKey=mine==='me'?'meName':'partnerName', theirKey=theirs==='me'?'meName':'partnerName';
+    var myLabel=(nm[myKey]||'').trim()||nameOf(mine), pLabel=(nm[theirKey]||'').trim()||nameOf(theirs);
     var habits=(props.habits||[]).filter(function(h){return !h.archived;});
     return html`<div class="overlay" onClick=${function(e){if(e.target===e.currentTarget)props.onClose();}}>
       <div class="setmodal" role="dialog" aria-modal="true">
@@ -1495,11 +1646,17 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
         <div class="setbody">
           <div class="mhd"><h3>${({people:'People',habits:'Habits',notifs:'Notifications',appearance:'Appearance',about:'About & sharing'})[tab]||'Settings'}</h3><button class="x" aria-label="Close" onClick=${props.onClose}>×</button></div>
           ${tab==='people'?html`<${Fragment}>
-            <p style=${{margin:'0 0 14px',fontWeight:400,fontSize:'13px',color:'#8A93A0'}}>Names shown on tasks, projects, journal and the “Viewing as” switch.</p>
+            <label class="lbl" style=${{marginTop:0}}>This device</label>
+            <div class="devrow">
+              <span class="av avm" style=${{background:OWNER_COLOR[mine]}}>${initialOf(mine)}</span>
+              <span class="devt">This device is <b>${nameOf(mine)}</b></span>
+              <button class="gbtn" onClick=${function(){props.onSwitchWho(theirs);}}>Switch to ${nameOf(theirs)}</button>
+            </div>
+            <p style=${{margin:'8px 0 4px',fontWeight:400,fontSize:'12.5px',color:'#8A93A0'}}>Each phone or laptop is set once. Switching changes whose tasks show as “You” here.</p>
             <label class="lbl">Your name</label>
-            <div style=${{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}}><span class="av avm" style=${{background:OWNER_COLOR.me}}>${meLabel.charAt(0).toUpperCase()}</span><input class="fld" type="text" value=${nm.meName} placeholder="Mahesh" onInput=${function(e){updNm('meName',e.target.value);}} /></div>
-            <label class="lbl">Partner’s name</label>
-            <div style=${{display:'flex',alignItems:'center',gap:'10px'}}><span class="av avm" style=${{background:OWNER_COLOR.partner}}>${pLabel.charAt(0).toUpperCase()}</span><input class="fld" type="text" value=${nm.partnerName} placeholder="Partner" onInput=${function(e){updNm('partnerName',e.target.value);}} /></div>
+            <div style=${{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}}><span class="av avm" style=${{background:OWNER_COLOR[mine]}}>${myLabel.charAt(0).toUpperCase()}</span><input class="fld" type="text" value=${nm[myKey]} placeholder=${nameOf(mine)} onInput=${function(e){updNm(myKey,e.target.value);}} /></div>
+            <label class="lbl">Their name</label>
+            <div style=${{display:'flex',alignItems:'center',gap:'10px'}}><span class="av avm" style=${{background:OWNER_COLOR[theirs]}}>${pLabel.charAt(0).toUpperCase()}</span><input class="fld" type="text" value=${nm[theirKey]} placeholder=${nameOf(theirs)} onInput=${function(e){updNm(theirKey,e.target.value);}} /></div>
             <div style=${{display:'flex',alignItems:'center',gap:'14px',marginTop:'18px'}}><button class="btn primary" style=${{flex:'none',padding:'10px 22px'}} onClick=${function(){props.onSaveNames(nm);setSaved(true);}}>Save</button>${saved?html`<span style=${{fontWeight:600,fontSize:'13px',color:'#2E9E6B'}}>Saved ✓</span>`:null}</div>
           <//>`:null}
           ${tab==='habits'?html`<${Fragment}>
@@ -1594,7 +1751,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     {c:'#2E9E6B',g:icons.calendar,t:'Calendar',d:'See your days at a glance. Tap any day to drop in a task or a plan.'},
     {c:'#C2704B',g:svgFlame,t:'Habits',d:'Keep the small daily promises — reading, cutting back — and watch the streak grow.'},
     {c:'#7A5BD8',g:icons.journal,t:'Journal & notes',d:'End the day with a few honest words, and keep little notes as they come.'},
-    {c:'#5B6B86',g:svgPeople,t:'Me · Partner · Shared',d:'Mark anything as yours, theirs, or shared — you\'ll both see it, live.'}
+    {c:'#5B6B86',g:svgPeople,t:'Yours · theirs · both',d:'Mark anything as yours, theirs, or for both of you — you\'ll both see it, live.'}
   ];
   function Intro(props){
     return html`<div class="overlay" onClick=${function(e){if(e.target===e.currentTarget)props.onClose();}}>
@@ -1623,11 +1780,58 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
   function NoteCard(props){
     var n=props.note; var c=noteColor(n.color);
     var s=useState(n.text||''); var v=s[0], setV=s[1];
+    var focused=useRef(false);
+    // take the other device's edit when this card isn't being typed in
+    useEffect(function(){ if(!focused.current) setV(n.text||''); },[n.text]);
     return html`<div class="notecd" style=${{background:c.bg,borderColor:c.bd}}>
-      <textarea class="notearea2" style=${{color:c.fg}} placeholder="Jot a thought, a feeling…" value=${v} onInput=${function(e){setV(e.target.value);}} onBlur=${function(){props.onSave(n,v);}}></textarea>
+      <textarea class="notearea2" style=${{color:c.fg}} placeholder="Jot a thought, a feeling…" value=${v} onFocus=${function(){focused.current=true;}} onInput=${function(e){setV(e.target.value);}} onBlur=${function(){ focused.current=false; if(v!==(n.text||'')) props.onSave(n,v); }}></textarea>
       <div class="notefoot">
         <div class="notecolors">${NOTE_COLORS.map(function(cc){ return html`<button class=${'ncol'+(n.color===cc.id?' on':'')} key=${cc.id} style=${{background:cc.bg,borderColor:cc.bd}} aria-label=${cc.id} onClick=${function(){props.onColor(n,cc.id);}}></button>`; })}</div>
-        <button class="noterm" style=${{color:c.fg}} aria-label="Delete note" onClick=${function(){props.onDelete(n.id);}}>×</button>
+        <button class="noterm" style=${{color:c.fg}} aria-label="Delete note" onClick=${function(){props.onDelete(n);}}>×</button>
+      </div>
+    </div>`;
+  }
+
+  // ---- first run on a device: who is holding it ----
+  function WhoModal(props){
+    var aS=useState(false); var asking=aS[0], setAsking=aS[1];
+    var vS=useState(''); var v=vS[0], setV=vS[1];
+    var me=props.meName||'Mahesh', pn=(props.partnerName||'').trim();
+    var unset=!pn || pn==='Partner';
+    return html`<div class="overlay whoov">
+      <div class="modal whomodal" role="dialog" aria-modal="true" aria-labelledby="whottl">
+        <div class="meyebrow">Welcome</div>
+        <h3 id="whottl" class="whottl">Who’s this?</h3>
+        <p class="whosub">So the app knows which tasks are yours. Each phone or laptop asks once — you can change it in Settings.</p>
+        ${!asking?html`<div class="whocards">
+          <button class="whocard" onClick=${function(){props.onPick('me');}}>
+            <span class="av whoav" style=${{background:OWNER_COLOR.me}}>${me.charAt(0).toUpperCase()}</span>
+            <span class="whon">${me}</span><span class="whos">That’s me</span>
+          </button>
+          <button class="whocard" onClick=${function(){ if(unset) setAsking(true); else props.onPick('partner'); }}>
+            <span class="av whoav" style=${{background:OWNER_COLOR.partner}}>${unset?'?':pn.charAt(0).toUpperCase()}</span>
+            <span class="whon">${unset?('Not '+me+'?'):pn}</span><span class="whos">${unset?'Tap and add your name':'That’s me'}</span>
+          </button>
+        </div>`:html`<form onSubmit=${function(e){ e.preventDefault(); if(v.trim()) props.onPick('partner',v.trim()); }}>
+          <label class="lbl">Your name</label>
+          <input class="fld" type="text" autofocus value=${v} placeholder="Your first name" onInput=${function(e){setV(e.target.value);}} />
+          <div class="mactions"><button type="button" class="btn ghost" onClick=${function(){setAsking(false);}}>Back</button><button type="submit" class="btn primary" disabled=${!v.trim()}>Continue</button></div>
+        </form>`}
+      </div>
+    </div>`;
+  }
+
+  // ---- confirm before a delete that takes a lot with it ----
+  function ConfirmModal(props){
+    return html`<div class="overlay confirmov" onClick=${function(e){if(e.target===e.currentTarget)props.onClose();}}>
+      <div class="modal confirm" role="alertdialog" aria-modal="true" aria-labelledby="cfttl">
+        <h3 id="cfttl" class="cfttl">${props.title}</h3>
+        <p class="cfbody">${props.body}</p>
+        <div class="mactions cfacts">
+          ${props.alt?html`<button class="btn ghost cfalt" onClick=${props.alt.fn}>${props.alt.label}</button>`:null}
+          <button class="btn ghost" onClick=${props.onClose}>Cancel</button>
+          <button class="btn danger" onClick=${props.onConfirm}>${props.confirmLabel||'Delete'}</button>
+        </div>
       </div>
     </div>`;
   }
@@ -1635,10 +1839,13 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
   // ---- App ----
   function App(){
     var authS=useState('checking'); var auth=authS[0], setAuth=authS[1];
+    var authRef=useRef(auth); authRef.current=auth;
     var stS=useState(null); var store=stS[0], setStore=stS[1];
     var vS=useState((function(){var v=lsGet('sp_view','today'); return v==='settings'?'today':v;})()); var view=vS[0], setView=vS[1];
     var wS=useState(lsGet('sp_who','me')); var whoami=wS[0], setWho=wS[1];
+    var nwS=useState(lsGet('sp_who',null)==null); var needWho=nwS[0], setNeedWho=nwS[1];   // this device has never said who it is
     var fS=useState('all'); var filter=fS[0], setFilter=fS[1];
+    var dayS=useState(TODAY); var today=dayS[0], setToday=dayS[1];
     var selS=useState(TODAY); var sel=selS[0], setSel=selS[1];
     var modalS=useState(null); var modal=modalS[0], setModal=modalS[1];
     var panelS=useState(null); var panel=panelS[0], setPanel=panelS[1];       // project id
@@ -1647,22 +1854,108 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var gsHideS=useState(lsGet('sp_gs_hide','')==='1'); var gsHide=gsHideS[0], setGsHide=gsHideS[1];
     var habitEditS=useState(null); var habitEdit=habitEditS[0], setHabitEdit=habitEditS[1];
     var setOpenS=useState(false); var settingsOpen=setOpenS[0], setSettingsOpen=setOpenS[1];
+    var cfS=useState(null); var confirmBox=cfS[0], setConfirm=cfS[1];
     var refTimer=useRef(null);
     var toastS=useState(null); var toast=toastS[0], setToast=toastS[1];
     var waveOpenS=useState(false); var waveOpen=waveOpenS[0], setWaveOpen=waveOpenS[1];
     var toastTmr=useRef(null); var readyRef=useRef(false); var lastWaveRef=useRef(0); var lastFocusKeyRef=useRef('');
 
-    function refresh(){ return apiGet('/api/state').then(function(r){ if(r.status===401){ setAuth('out'); return null; } return r.json(); }).then(function(j){ if(j){ setStore(j); setAuth('in'); } }).catch(function(){}); }
-    useEffect(function(){ refresh();
-      function onVis(){ if(document.visibilityState!=='hidden') refresh(); }
+    // ---- saving: every change is shown at once, waits in an outbox until the server confirms it ----
+    var serverRef=useRef(null);            // the last good state from the server
+    var outboxRef=useRef(loadOutbox());    // changes not yet confirmed (kept on the device, so a reload offline loses nothing)
+    var confirmedRef=useRef([]);           // confirmed, but newer than serverRef; the next accepted refresh includes them
+    var heldRef=useRef([]);                // deletes waiting out their Undo window
+    var inflightRef=useRef(false), triesRef=useRef(0), retryTmr=useRef(null), seqRef=useRef(0), errShownRef=useRef(false);
+    var syncS=useState({st:'ok',n:outboxRef.current.length}); var sync=syncS[0], setSync=syncS[1];
+    function setSyncTo(st){ setSync({st:st,n:outboxRef.current.length}); }
+    function pendingOps(){ var held=[]; heldRef.current.forEach(function(h){ held=held.concat(h.ops); }); return confirmedRef.current.concat(outboxRef.current,held); }
+    function rebuild(){ if(serverRef.current) setStore(replay(serverRef.current,pendingOps())); }
+
+    function refresh(){
+      var startSeq=seqRef.current;
+      return apiGet('/api/state').then(function(r){
+        if(r.status===401){ setAuth('out'); return null; }
+        if(!r.ok) throw new Error('state '+r.status);
+        return r.json();
+      }).then(function(j){
+        if(!j) return;
+        if(!Array.isArray(j.tasks)) throw new Error('bad state');
+        if(seqRef.current!==startSeq) return;   // a save landed while this loaded; the refresh after it is newer
+        serverRef.current=j; confirmedRef.current=[];
+        setStore(replay(j,pendingOps())); setAuth('in');
+        if(outboxRef.current.length) flush(); else setSyncTo('ok');
+      }).catch(function(){
+        // keep what's on screen; one bad response never blanks the app
+        if(navigator.onLine===false) setSyncTo('offline');
+      });
+    }
+    function scheduleRefresh(){ clearTimeout(refTimer.current); refTimer.current=setTimeout(refresh,600); }
+    function labelOf(ops){ for(var i=0;i<ops.length;i++){ if(ops[i]._label) return '“'+ops[i]._label+'”'; } return 'your change'; }
+    function dropFromOutbox(batch){ var ks={}; batch.forEach(function(o){ ks[o._k]=1; }); outboxRef.current=outboxRef.current.filter(function(o){ return !ks[o._k]; }); saveOutbox(outboxRef.current); }
+    function flush(){
+      if(inflightRef.current || !outboxRef.current.length || authRef.current==='out') return;
+      var batch=outboxRef.current.slice(0,40);
+      inflightRef.current=true;
+      var slow=setTimeout(function(){ setSyncTo('saving'); },1000);
+      apiPost('/api/ops',{ops:batch.map(stripOp)}).then(function(r){
+        clearTimeout(slow); inflightRef.current=false;
+        if(r.ok){
+          dropFromOutbox(batch); confirmedRef.current=confirmedRef.current.concat(batch); seqRef.current++;
+          triesRef.current=0; errShownRef.current=false;
+          setSyncTo(outboxRef.current.length?'saving':'ok');
+          if(outboxRef.current.length) flush(); else scheduleRefresh();
+          return;
+        }
+        if(r.status===401){ setAuth('out'); setSyncTo('expired'); return; }
+        if(r.status===400){
+          // the server turned these down outright; retrying won't help, so drop them and resync
+          dropFromOutbox(batch); seqRef.current++; rebuild(); scheduleRefresh();
+          showToast({text:'Couldn’t save '+labelOf(batch)+' — the server turned it down'});
+          setSyncTo(outboxRef.current.length?'saving':'ok'); if(outboxRef.current.length) flush();
+          return;
+        }
+        retryLater(true,batch);
+      },function(){ clearTimeout(slow); inflightRef.current=false; retryLater(false,batch); });
+    }
+    function retryLater(serverErr,batch){
+      triesRef.current++; var t=triesRef.current;
+      if(!serverErr || navigator.onLine===false) setSyncTo('offline');
+      else if(t>=3){ setSyncTo('error'); if(!errShownRef.current){ errShownRef.current=true; showToast({text:'Couldn’t save '+labelOf(batch),action:{label:'Retry',fn:retryNow},ms:9000}); } }
+      clearTimeout(retryTmr.current); retryTmr.current=setTimeout(flush,[2000,5000,10000,20000,30000][Math.min(t-1,4)]);
+    }
+    function retryNow(){ triesRef.current=0; errShownRef.current=false; clearTimeout(retryTmr.current); flush(); }
+    function commit(ops){
+      ops=(ops||[]).filter(Boolean); if(!ops.length) return;
+      ops.forEach(function(o){ o._k=uid('op'); });
+      outboxRef.current=outboxRef.current.concat(ops); saveOutbox(outboxRef.current);
+      setStore(function(s){ return replay(s,ops); });
+      setSync(function(x){ return {st:x.st,n:outboxRef.current.length}; });
+      flush();
+    }
+    // deletes wait 6s before they're sent, so Undo is real; leaving the page sends them right away
+    function holdDelete(ops,text){
+      var h={id:uid('hd'),ops:ops}; heldRef.current=heldRef.current.concat([h]);
+      setStore(function(s){ return replay(s,ops); });
+      h.timer=setTimeout(function(){ releaseHeld(h.id); },6500);
+      showToast({text:text,action:{label:'Undo',fn:function(){ undoHeld(h.id); }},ms:6500});
+    }
+    function releaseHeld(id){ var h=heldRef.current.filter(function(x){return x.id===id;})[0]; if(!h) return; clearTimeout(h.timer); heldRef.current=heldRef.current.filter(function(x){return x.id!==id;}); h.ops.forEach(function(o){ o._k=uid('op'); }); outboxRef.current=outboxRef.current.concat(h.ops); saveOutbox(outboxRef.current); flush(); }
+    function undoHeld(id){ var h=heldRef.current.filter(function(x){return x.id===id;})[0]; if(!h) return; clearTimeout(h.timer); heldRef.current=heldRef.current.filter(function(x){return x.id!==id;}); rebuild(); }
+    function releaseAllHeld(){ heldRef.current.slice().forEach(function(h){ releaseHeld(h.id); }); }
+    // the day turns over at 4am; if you were looking at today, you move with it
+    function checkDay(){ var t=logicalToday(); if(t!==TODAY){ var old=TODAY; TODAY=t; setToday(t); setSel(function(s){ return s===old?t:s; }); } }
+
+    useEffect(function(){ refresh(); flush();
+      function onVis(){ if(document.visibilityState!=='hidden'){ checkDay(); refresh(); flush(); } else { releaseAllHeld(); } }
+      function onOnline(){ retryNow(); refresh(); }
+      function onHide(){ releaseAllHeld(); }
       window.addEventListener('focus',onVis); document.addEventListener('visibilitychange',onVis);
+      window.addEventListener('online',onOnline); window.addEventListener('pagehide',onHide);
       var iv=setInterval(function(){ if(document.visibilityState!=='hidden') refresh(); },20000);
-      return function(){ window.removeEventListener('focus',onVis); document.removeEventListener('visibilitychange',onVis); clearInterval(iv); };
+      var dv=setInterval(checkDay,60000);
+      return function(){ window.removeEventListener('focus',onVis); document.removeEventListener('visibilitychange',onVis); window.removeEventListener('online',onOnline); window.removeEventListener('pagehide',onHide); clearInterval(iv); clearInterval(dv); };
     },[]);
     useEffect(function(){ try{ if(localStorage.getItem('sp_intro_v1')!=='1') setShowIntro(true); }catch(e){} },[]);
-    function scheduleRefresh(){ clearTimeout(refTimer.current); refTimer.current=setTimeout(refresh,600); }
-    function applyLocal(fn){ setStore(function(s){ if(!s) return s; var n=Object.assign({},s); fn(n); return n; }); }
-    function postOp(b){ return apiPost('/api/op',b).then(scheduleRefresh,scheduleRefresh); }
     function setView2(v){ setView(v); lsSet('sp_view',v); }
     function setWho2(w){ setWho(w); lsSet('sp_who',w); }
 
@@ -1679,6 +1972,9 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var notes=store?store.notes:null;
     var focus=store?store.focus:null;
     var wave=store?store.wave:null;
+    // every label below reads from the viewer's side
+    VIEW.who=whoami; VIEW.names={me:(settings&&settings.meName)||'Mahesh',partner:(settings&&settings.partnerName)||'Partner'};
+    var other=otherOf(whoami);
     useEffect(function(){ try{
       var bg=(settings&&settings.theme_bg)||'sky', ft=(settings&&settings.theme_font)||'inter', rd=(settings&&settings.theme_radius)||'default';
       var bgp=BG_PRESETS.filter(function(p){return p.id===bg;})[0];
@@ -1690,94 +1986,128 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     // while a focus session runs, sync faster so both people see start/pause/reset within a few seconds
     useEffect(function(){ var f=store&&store.focus; if(!f||f.status!=='running') return; var iv=setInterval(function(){ if(document.visibilityState!=='hidden') refresh(); },5000); return function(){ clearInterval(iv); }; },[store&&store.focus&&store.focus.status]);
 
-    // task ops
-    function upsertTask(row){ applyLocal(function(n){ var a=(n.tasks||[]).slice(); var i=-1; for(var k=0;k<a.length;k++){if(a[k].id===row.id){i=k;break;}} if(i>=0)a[i]=row; else a.push(row); n.tasks=a; }); postOp({op:'upsert',table:'tasks',row:row}); }
-    function toggleTask(t){ upsertTask(Object.assign({},t,{done:!t.done})); }
-    function scheduleTask(t,ds,time){ upsertTask(Object.assign({},t,{date:ds,time:(time!=null?time:(t.time||''))})); }
-    function deleteTaskRow(id){ applyLocal(function(n){ n.tasks=(n.tasks||[]).filter(function(t){return t.id!==id;}); }); postOp({op:'delete',table:'tasks',row:{id:id}}); }
-    function deleteTask(id){ var kids=(tasks||[]).filter(function(t){return t.parent_id===id;}); applyLocal(function(n){ n.tasks=(n.tasks||[]).filter(function(t){return t.id!==id && t.parent_id!==id;}); }); kids.forEach(function(k){ postOp({op:'delete',table:'tasks',row:{id:k.id}}); }); postOp({op:'delete',table:'tasks',row:{id:id}}); setModal(null); }
-    function baseTask(o){ return Object.assign({ id:uid('tk'), title:'', project:'', owner:whoami, type:'task', date:'', time:'', due:'', due_time:'', done:false, subtodos:'[]', parent_id:null, sort:0, created_at:Date.now() }, o); }
-    function saveTask(f,id,subs,removed){
-      var rid=id||uid('tk'); var cur=id?((tasks||[]).filter(function(t){return t.id===id;})[0]||{}):{};
-      var parent=baseTask({ id:rid, title:f.title.trim(), project:f.project||'', owner:f.owner, type:f.type, date:f.date||'',
-        time:f.time||'', due:!isEventType(f.type)?(f.due||''):'', due_time:!isEventType(f.type)?(f.due_time||''):'', done:id?!!cur.done:false,
-        parent_id:null, sort:cur.sort||0, created_at:cur.created_at||Date.now() });
-      upsertTask(parent);
-      (subs||[]).forEach(function(s){ if(!(s.title||'').trim())return; upsertTask(baseTask({ id:s.id, title:s.title.trim(), project:f.project||'', owner:s.owner||f.owner, due:s.due||'', due_time:s.due_time||'', done:!!s.done, parent_id:rid, created_at:s.created_at||Date.now() })); });
-      (removed||[]).forEach(function(sid){ deleteTaskRow(sid); });
-      setModal(null);
+    // task ops — edits send only the fields that changed
+    function findTask(id){ return (tasks||[]).filter(function(t){return t.id===id;})[0]; }
+    function patchTask(t,fields){ commit([{op:'patch',table:'tasks',id:t.id,fields:fields,_label:t.title}]); }
+    function toggleTask(t){ patchTask(t,{done:!t.done}); }
+    function scheduleTask(t,ds,time){ patchTask(t,{date:ds,time:(time!=null?time:(t.time||''))}); }
+    var carry={ onToday:function(t){ patchTask(t,{date:TODAY}); }, onPick:function(t,ds){ patchTask(t,{date:ds}); }, onUnplan:function(t){ patchTask(t,{date:'',time:''}); } };
+    function moveAllToday(list){
+      var prev=list.map(function(t){ return {id:t.id,date:t.date||''}; });
+      commit(list.map(function(t){ return {op:'patch',table:'tasks',id:t.id,fields:{date:TODAY},_label:t.title}; }));
+      showToast({text:'Moved '+list.length+' to today',action:{label:'Undo',fn:function(){ commit(prev.map(function(p){ return {op:'patch',table:'tasks',id:p.id,fields:{date:p.date}}; })); }},ms:6500});
     }
-    function addProjectItem(pid,title,due){ upsertTask(baseTask({ title:title.trim(), project:pid, due:due||'' })); }
-    function addSubtask(parentId,pid,title,due){ upsertTask(baseTask({ title:title.trim(), project:pid, parent_id:parentId, due:due||'' })); }
+    function deleteTask(id){
+      var t=findTask(id); setModal(null); if(!t) return;
+      var kids=childrenOf(tasks,id).length;
+      holdDelete([{op:'delete',table:'tasks',id:id,_label:t.title}],'Deleted “'+t.title+'”'+(kids?(' and its '+kids+' subtask'+(kids>1?'s':'')):''));
+    }
+    function baseTask(o){ return Object.assign({ id:uid('tk'), title:'', project:'', owner:whoami, type:'task', date:'', time:'', due:'', due_time:'', done:false, subtodos:'[]', parent_id:null, sort:0, created_at:Date.now() }, o); }
+    var TASK_FIELDS=['title','project','owner','type','date','time','due','due_time'];
+    function saveTask(f,id,subs,removed,origSubs){
+      var ev=isEventType(f.type);
+      var vals={ title:f.title.trim(), project:f.project||'', owner:f.owner, type:f.type, date:f.date||'', time:f.time||'', due:ev?'':(f.due||''), due_time:ev?'':(f.due_time||'') };
+      var snap=(modal&&modal.editing)||{};   // the task as it was when the sheet opened
+      var ops=[], rid=id;
+      if(id){ var ch={}; TASK_FIELDS.forEach(function(k){ if((snap[k]||'')!==(vals[k]||'')) ch[k]=vals[k]; }); if(Object.keys(ch).length) ops.push({op:'patch',table:'tasks',id:id,fields:ch,_label:vals.title}); }
+      else { rid=uid('tk'); ops.push({op:'upsert',table:'tasks',row:baseTask(Object.assign({id:rid},vals)),_label:vals.title}); }
+      var projChanged=!!id && (snap.project||'')!==vals.project;
+      var om={}; (origSubs||[]).forEach(function(s){ om[s.id]=s; });
+      (subs||[]).forEach(function(s){ var title=(s.title||'').trim(); if(!title) return;
+        if(!s.exists){ ops.push({op:'upsert',table:'tasks',row:baseTask({id:s.id,title:title,project:vals.project,owner:s.owner||vals.owner,due:s.due||'',due_time:s.due_time||'',parent_id:rid}),_label:title}); return; }
+        var o=om[s.id]||{}, sc={};
+        if(title!==(o.title||'')) sc.title=title; if((s.due||'')!==(o.due||'')) sc.due=s.due||''; if((s.due_time||'')!==(o.due_time||'')) sc.due_time=s.due_time||''; if(projChanged) sc.project=vals.project;
+        if(Object.keys(sc).length) ops.push({op:'patch',table:'tasks',id:s.id,fields:sc,_label:title});
+      });
+      (removed||[]).forEach(function(sid){ ops.push({op:'delete',table:'tasks',id:sid}); });
+      commit(ops); setModal(null);
+    }
+    function addProjectItem(pid,title,due){ var t=baseTask({ title:title.trim(), project:pid, due:due||'' }); commit([{op:'upsert',table:'tasks',row:t,_label:t.title}]); }
+    function addSubtask(parentId,pid,title,due){ var t=baseTask({ title:title.trim(), project:pid, parent_id:parentId, due:due||'' }); commit([{op:'upsert',table:'tasks',row:t,_label:t.title}]); }
 
     // project ops
-    function upsertProject(row){ applyLocal(function(n){ var a=(n.projects||[]).slice(); var i=-1; for(var k=0;k<a.length;k++){if(a[k].id===row.id){i=k;break;}} if(i>=0)a[i]=row; else a.push(row); n.projects=a; }); postOp({op:'upsert',table:'projects',row:row}); }
+    var PROJ_FIELDS=['name','color','owner','kind','start_date','end_date','description'];
     function saveProject(f,id){
-      var rid=id||uid('pr'); var cur=id?((projects||[]).filter(function(p){return p.id===id;})[0]||{}):{};
-      var row={ id:rid, name:f.name.trim(), color:f.color, owner:f.owner, kind:f.kind, start_date:f.start_date||'', end_date:f.end_date||'', description:f.description||'', archived:cur.archived?1:0, sort:cur.sort||Date.now(), created_at:cur.created_at||Date.now() };
-      upsertProject(row); setPEdit(null); if(!id) setPanel(rid);
+      var vals={ name:f.name.trim(), color:f.color, owner:f.owner, kind:f.kind, start_date:f.start_date||'', end_date:f.end_date||'', description:f.description||'' };
+      if(id){ var snap=pEdit||{}, ch={}; PROJ_FIELDS.forEach(function(k){ if((snap[k]||'')!==(vals[k]||'')) ch[k]=vals[k]; }); if(Object.keys(ch).length) commit([{op:'patch',table:'projects',id:id,fields:ch,_label:vals.name}]); setPEdit(null); return; }
+      var rid=uid('pr'); commit([{op:'upsert',table:'projects',row:Object.assign({id:rid,archived:0,sort:Date.now(),created_at:Date.now()},vals),_label:vals.name}]);
+      setPEdit(null); setPanel(rid);
     }
-    function deleteProject(id){
-      var pt=(tasks||[]).filter(function(t){return t.project===id;});
-      var pm=(materials||[]).filter(function(m){return m.project_id===id;});
-      applyLocal(function(n){ n.projects=(n.projects||[]).filter(function(p){return p.id!==id;}); n.tasks=(n.tasks||[]).filter(function(t){return t.project!==id;}); n.project_materials=(n.project_materials||[]).filter(function(m){return m.project_id!==id;}); });
-      pt.forEach(function(t){ postOp({op:'delete',table:'tasks',row:{id:t.id}}); });
-      pm.forEach(function(m){ postOp({op:'delete',table:'project_materials',row:{id:m.id}}); });
-      postOp({op:'delete',table:'projects',row:{id:id}});
-      setPEdit(null); setPanel(null);
+    function askDeleteProject(id){
+      var p=(projects||[]).filter(function(x){return x.id===id;})[0]; if(!p) return;
+      var pt=(tasks||[]).filter(function(t){return t.project===id;}); var theirs=pt.filter(function(t){return t.owner===other;}).length;
+      var pm=(materials||[]).filter(function(m){return m.project_id===id;}).length;
+      var bits=[]; if(pt.length) bits.push(pt.length+' task'+(pt.length>1?'s':'')+(theirs?(' ('+theirs+' '+(theirs>1?'are':'is')+' '+nameOf(other)+'’s)'):'')); if(pm) bits.push(pm+' link'+(pm>1?'s':''));
+      setConfirm({ title:'Delete “'+p.name+'”?', body:bits.length?('This removes '+bits.join(' and ')+'.'):'It has no tasks or links yet.', confirmLabel:'Delete project',
+        alt:p.archived?null:{label:'Finish it instead',fn:function(){ setConfirm(null); finishProject(p); }},
+        onConfirm:function(){ setConfirm(null); setPEdit(null); setPanel(null); holdDelete([{op:'delete',table:'projects',id:id,_label:p.name}],'Deleted “'+p.name+'”'); } });
     }
+    // finishing keeps everything and moves it under Projects › Finished
+    function finishProject(p){ setPEdit(null); setPanel(null); commit([{op:'patch',table:'projects',id:p.id,fields:{archived:1},_label:p.name}]); showToast({text:'Finished “'+p.name+'”',action:{label:'Undo',fn:function(){ reopenProject(p.id); }},ms:6500}); }
+    function reopenProject(id){ commit([{op:'patch',table:'projects',id:id,fields:{archived:0}}]); }
     // material ops
-    function addMaterial(pid,title,url){ var u=url.trim(); if(!/^https?:\/\//i.test(u)) u='https://'+u; var row={ id:uid('mat'), project_id:pid, title:(title||'').trim()||u.replace(/^https?:\/\//,''), url:u, sort:Date.now(), created_at:Date.now() }; applyLocal(function(n){ n.project_materials=(n.project_materials||[]).concat([row]); }); postOp({op:'upsert',table:'project_materials',row:row}); }
-    function delMaterial(id){ applyLocal(function(n){ n.project_materials=(n.project_materials||[]).filter(function(m){return m.id!==id;}); }); postOp({op:'delete',table:'project_materials',row:{id:id}}); }
+    function addMaterial(pid,title,url){ var u=url.trim(); if(!/^https?:\/\//i.test(u)) u='https://'+u; var row={ id:uid('mat'), project_id:pid, title:(title||'').trim()||u.replace(/^https?:\/\//,''), url:u, sort:Date.now(), created_at:Date.now() }; commit([{op:'upsert',table:'project_materials',row:row,_label:row.title}]); }
+    function delMaterial(m){ holdDelete([{op:'delete',table:'project_materials',id:m.id,_label:m.title}],'Removed “'+(m.title||m.url)+'”'); }
 
     // habit / journal / settings
-    function setHabit(hid,value){
-      applyLocal(function(n){ var a=(n.habit_logs||[]).slice(); var i=-1; for(var k=0;k<a.length;k++){if(a[k].habit===hid&&a[k].date===TODAY){i=k;break;}} if(i>=0)a[i]=Object.assign({},a[i],{value:value}); else a.push({date:TODAY,habit:hid,value:value}); n.habit_logs=a; });
-      apiPost('/api/habit',{date:TODAY,habit:hid,value:value}).then(scheduleRefresh,scheduleRefresh);
+    function checkHabit(hid,value){ commit([{op:'habit',date:TODAY,habit:hid,value:value}]); }
+    function stepHabit(hid,delta){ commit([{op:'habit',date:TODAY,habit:hid,delta:delta}]); }   // +1/−1 adds up across both phones
+    var HABIT_FIELDS=['name','kind','owner','unit','target','caption','color'];
+    function saveHabit(f,id){
+      var vals={ name:f.name.trim(), kind:f.kind, owner:f.owner, unit:f.unit||'', target:(f.target===''||f.target==null)?null:Number(f.target), caption:f.caption||'', color:f.color||'#1F6FEB' };
+      if(id){ var snap=habitEdit||{}, ch={}; HABIT_FIELDS.forEach(function(k){ var a=snap[k]==null?'':snap[k], b=vals[k]==null?'':vals[k]; if(a!==b) ch[k]=vals[k]; }); if(Object.keys(ch).length) commit([{op:'patch',table:'habits',id:id,fields:ch,_label:vals.name}]); setHabitEdit(null); return; }
+      commit([{op:'upsert',table:'habits',row:Object.assign({id:uid('hb'),sort:Date.now(),archived:0,created_at:Date.now()},vals),_label:vals.name}]); setHabitEdit(null);
     }
-    function upsertHabit(row){ applyLocal(function(n){ var a=(n.habits||[]).slice(); var i=-1; for(var k=0;k<a.length;k++){if(a[k].id===row.id){i=k;break;}} if(i>=0)a[i]=row; else a.push(row); n.habits=a; }); postOp({op:'upsert',table:'habits',row:row}); }
-    function saveHabit(f,id){ var rid=id||uid('hb'); var cur=id?((habitDefs||[]).filter(function(h){return h.id===id;})[0]||{}):{}; upsertHabit({id:rid,name:f.name.trim(),kind:f.kind,owner:f.owner,unit:f.unit||'',target:(f.target===''||f.target==null)?null:Number(f.target),caption:f.caption||'',color:f.color||'#1F6FEB',sort:cur.sort||Date.now(),archived:cur.archived?1:0,created_at:cur.created_at||Date.now()}); setHabitEdit(null); }
-    function deleteHabit(id){ applyLocal(function(n){ n.habits=(n.habits||[]).filter(function(h){return h.id!==id;}); }); postOp({op:'delete',table:'habits',row:{id:id}}); setHabitEdit(null); }
-    function upsertTopic(row){ applyLocal(function(n){ var a=(n.topics||[]).slice(); var i=-1; for(var k=0;k<a.length;k++){if(a[k].id===row.id){i=k;break;}} if(i>=0)a[i]=row; else a.unshift(row); n.topics=a; }); postOp({op:'upsert',table:'topics',row:row}); }
-    function setWeekTopic(title){ var wk=ymd(startOfWeek(new Date())); var ex=(topics||[]).filter(function(t){return t.week===wk;})[0]; upsertTopic({id:ex?ex.id:uid('tp'),week:wk,title:(title||'').trim(),owner:whoami,notes:ex?ex.notes:'',sort:ex?ex.sort:Date.now(),created_at:ex?ex.created_at:Date.now()}); }
-    function addTopicLink(topicId,title,url){ var u=(url||'').trim(); if(!/^https?:\/\//i.test(u))u='https://'+u; var row={id:uid('tl'),topic_id:topicId,title:(title||'').trim()||u.replace(/^https?:\/\//,''),url:u,sort:Date.now(),created_at:Date.now()}; applyLocal(function(n){ n.topic_links=(n.topic_links||[]).concat([row]); }); postOp({op:'upsert',table:'topic_links',row:row}); }
-    function delTopicLink(id){ applyLocal(function(n){ n.topic_links=(n.topic_links||[]).filter(function(l){return l.id!==id;}); }); postOp({op:'delete',table:'topic_links',row:{id:id}}); }
-    function saveNote(text){ var key='note_'+whoami; var patch={}; patch[key]=text; applyLocal(function(n){ n.settings=Object.assign({},n.settings||{},patch); }); apiPost('/api/settings',{patch:patch}).then(scheduleRefresh,scheduleRefresh); }
-    function setTheme(kind,value){ var patch={}; patch['theme_'+kind]=value; applyLocal(function(n){ n.settings=Object.assign({},n.settings||{},patch); }); apiPost('/api/settings',{patch:patch}).then(scheduleRefresh,scheduleRefresh); }
-    function addNote(){ var row={id:uid('nt'),text:'',color:'yellow',owner:whoami,date:TODAY,created_at:Date.now()}; applyLocal(function(n){ n.notes=[row].concat(n.notes||[]); }); postOp({op:'upsert',table:'notes',row:row}); }
-    function saveNoteText(note,text){ var row=Object.assign({},note,{text:text}); applyLocal(function(n){ n.notes=(n.notes||[]).map(function(x){return x.id===note.id?row:x;}); }); postOp({op:'upsert',table:'notes',row:row}); }
-    function setNoteColor(note,color){ var row=Object.assign({},note,{color:color}); applyLocal(function(n){ n.notes=(n.notes||[]).map(function(x){return x.id===note.id?row:x;}); }); postOp({op:'upsert',table:'notes',row:row}); }
-    function deleteNote(id){ applyLocal(function(n){ n.notes=(n.notes||[]).filter(function(x){return x.id!==id;}); }); postOp({op:'delete',table:'notes',row:{id:id}}); }
+    function deleteHabit(id){
+      var hb=(habitDefs||[]).filter(function(x){return x.id===id;})[0]; setHabitEdit(null); if(!hb) return;
+      var days=(habitLogs||[]).filter(function(l){return l.habit===id && l.value>0;}).length;
+      function go(){ holdDelete([{op:'delete',table:'habits',id:id,_label:hb.name}],'Deleted “'+hb.name+'”'); }
+      if(!days){ go(); return; }
+      setConfirm({ title:'Delete “'+hb.name+'”?', body:'This removes '+days+' day'+(days>1?'s':'')+' of history.', confirmLabel:'Delete habit', onConfirm:function(){ setConfirm(null); go(); } });
+    }
+    function setWeekTopic(title){
+      var wk=ymd(startOfWeek(parseYmd(TODAY))); var ex=(topics||[]).filter(function(t){return t.week===wk;})[0]; var tt=(title||'').trim();
+      if(ex){ if(tt!==(ex.title||'')) commit([{op:'patch',table:'topics',id:ex.id,fields:{title:tt},_label:tt}]); return; }
+      commit([{op:'upsert',table:'topics',row:{id:uid('tp'),week:wk,title:tt,owner:whoami,notes:'',sort:Date.now(),created_at:Date.now()},prepend:true,_label:tt}]);
+    }
+    function addTopicLink(topicId,title,url){ var u=(url||'').trim(); if(!/^https?:\/\//i.test(u))u='https://'+u; var row={id:uid('tl'),topic_id:topicId,title:(title||'').trim()||u.replace(/^https?:\/\//,''),url:u,sort:Date.now(),created_at:Date.now()}; commit([{op:'upsert',table:'topic_links',row:row,_label:row.title}]); }
+    function delTopicLink(l){ holdDelete([{op:'delete',table:'topic_links',id:l.id,_label:l.title}],'Removed “'+(l.title||l.url)+'”'); }
+    function setTheme(kind,value){ var patch={}; patch['theme_'+kind]=value; commit([{op:'settings',patch:patch,_label:'the theme'}]); }
+    function addNote(){ var row={id:uid('nt'),text:'',color:'yellow',owner:whoami,date:TODAY,created_at:Date.now()}; commit([{op:'upsert',table:'notes',row:row,prepend:true,_label:'a note'}]); }
+    function saveNoteText(note,text){ commit([{op:'patch',table:'notes',id:note.id,fields:{text:text},_label:'a note'}]); }
+    function setNoteColor(note,color){ commit([{op:'patch',table:'notes',id:note.id,fields:{color:color},_label:'a note'}]); }
+    function deleteNote(n){ holdDelete([{op:'delete',table:'notes',id:n.id,_label:'a note'}],'Deleted a note'); }
     // shared focus / pomodoro ops — one row id='shared'
     var FOCUS_DEF={id:'shared',status:'idle',label:'',minutes:25,ends_at:0,remaining:0,started_by:''};
-    function writeFocus(patch){ var cur=(store&&store.focus)||FOCUS_DEF; var row=Object.assign({},cur,patch,{id:'shared',updated_at:Date.now()}); applyLocal(function(n){ n.focus=row; }); postOp({op:'upsert',table:'focus',row:row}); }
+    function writeFocus(patch){ var cur=(store&&store.focus)||FOCUS_DEF; var row=Object.assign({},cur,patch,{id:'shared',updated_at:Date.now()}); commit([{op:'upsert',table:'focus',row:row,_label:'the focus timer'}]); }
     function startFocus(mins,label){ var m=mins||25; writeFocus({status:'running',minutes:m,label:(label||'').trim(),ends_at:Date.now()+m*60000,remaining:0,started_by:whoami}); }
     function pauseFocus(){ var f=store&&store.focus; if(!f||f.status!=='running')return; writeFocus({status:'paused',remaining:Math.max(0,(f.ends_at||0)-Date.now())}); }
     function resumeFocus(){ var f=store&&store.focus; if(!f||f.status!=='paused')return; writeFocus({status:'running',ends_at:Date.now()+(f.remaining||0)}); }
     function resetFocus(){ writeFocus({status:'idle',label:'',ends_at:0,remaining:0,started_by:''}); }
     // wave + notifications
     var WAVE_EMOJIS=['💛','👋','✨','☕','💪','🫶'];
-    function showToast(o){ clearTimeout(toastTmr.current); setToast(Object.assign({t:Date.now()},o)); toastTmr.current=setTimeout(function(){ setToast(null); }, (o&&o.big)?4500:3400); }
+    function showToast(o){ clearTimeout(toastTmr.current); setToast(Object.assign({t:Date.now()},o)); toastTmr.current=setTimeout(function(){ setToast(null); }, (o&&o.ms)||((o&&o.big)?4500:3400)); }
     function notify(title,body){ try{ if(lsGet('sp_notif','')==='1' && typeof Notification!=='undefined' && Notification.permission==='granted'){ new Notification(title,{body:body||''}); } }catch(e){} }
-    function sendWave(emoji){ var e=emoji||'💛'; var row={id:'latest',emoji:e,sender:whoami,created_at:Date.now()}; lastWaveRef.current=row.created_at; applyLocal(function(n){ n.wave=row; }); postOp({op:'upsert',table:'waves',row:row}); var pn=(settings&&settings.partnerName)||'Partner'; showToast({emoji:e,text:'Sent '+e+' to '+pn}); setWaveOpen(false); }
+    function sendWave(emoji){ var e=emoji||'💛'; var row={id:'latest',emoji:e,sender:whoami,created_at:Date.now()}; lastWaveRef.current=row.created_at; commit([{op:'upsert',table:'waves',row:row,_label:'your wave'}]); showToast({emoji:e,text:'Sent '+e+' to '+nameOf(other)}); setWaveOpen(false); }
     useEffect(function(){
       if(!store) return;
       var w=store.wave, f=store.focus;
       var fkey=(f&&f.status==='running')?('run:'+f.ends_at+':'+f.started_by):'idle';
       if(!readyRef.current){ lastWaveRef.current=w?w.created_at:0; lastFocusKeyRef.current=fkey; readyRef.current=true; return; }
-      if(w && w.created_at>lastWaveRef.current){ lastWaveRef.current=w.created_at; if(w.sender && w.sender!==whoami){ var nm=w.sender==='me'?((settings&&settings.meName)||'They'):((settings&&settings.partnerName)||'Partner'); showToast({emoji:w.emoji||'💛',text:nm+' sent you '+(w.emoji||'💛'),big:true}); notify(nm+' waved '+(w.emoji||'💛'),'They’re here with you.'); } }
-      if(fkey!==lastFocusKeyRef.current){ var prev=lastFocusKeyRef.current; lastFocusKeyRef.current=fkey; if(f && f.status==='running' && f.started_by && f.started_by!==whoami && prev.indexOf('run:'+f.ends_at)!==0){ var fn=f.started_by==='me'?((settings&&settings.meName)||'They'):((settings&&settings.partnerName)||'Partner'); showToast({emoji:'⏳',text:fn+' started a '+(f.minutes||25)+'-min focus'}); notify(fn+' is focusing',(f.label||'Deep work')+' · '+(f.minutes||25)+' min'); } }
+      if(w && w.created_at>lastWaveRef.current){ lastWaveRef.current=w.created_at; if(w.sender && w.sender!==whoami){ var nm=nameOf(w.sender); showToast({emoji:w.emoji||'💛',text:nm+' sent you '+(w.emoji||'💛'),big:true}); notify(nm+' waved '+(w.emoji||'💛'),'They’re here with you.'); } }
+      if(fkey!==lastFocusKeyRef.current){ var prev=lastFocusKeyRef.current; lastFocusKeyRef.current=fkey; if(f && f.status==='running' && f.started_by && f.started_by!==whoami && prev.indexOf('run:'+f.ends_at)!==0){ var fn=nameOf(f.started_by); showToast({emoji:'⏳',text:fn+' started a '+(f.minutes||25)+'-min focus'}); notify(fn+' is focusing',(f.label||'Deep work')+' · '+(f.minutes||25)+' min'); } }
     },[store&&store.wave&&store.wave.created_at, store&&store.focus&&store.focus.ends_at, store&&store.focus&&store.focus.status]);
-    function saveJournal(text,tag){ var id=TODAY+'_'+whoami; var row={id:id,date:TODAY,owner:whoami,text:text,tag:tag,updated_at:Date.now()}; applyLocal(function(n){ var a=(n.journal||[]).slice(); var i=-1; for(var k=0;k<a.length;k++){if(a[k].id===id){i=k;break;}} if(i>=0)a[i]=row; else a.unshift(row); n.journal=a; }); postOp({op:'upsert',table:'journal',row:row}); }
-    function saveSettings(f){ var patch={ meName:(f.meName||'').trim(), partnerName:(f.partnerName||'').trim() }; applyLocal(function(n){ n.settings=Object.assign({},n.settings||{},patch); }); apiPost('/api/settings',{patch:patch}).then(scheduleRefresh,scheduleRefresh); }
+    function saveJournal(text,tag){ var id=TODAY+'_'+whoami; var row={id:id,date:TODAY,owner:whoami,text:text,tag:tag,updated_at:Date.now()}; commit([{op:'upsert',table:'journal',row:row,prepend:true,_label:'tonight’s journal'}]); }
+    function saveSettings(f){ commit([{op:'settings',patch:{ meName:(f.meName||'').trim(), partnerName:(f.partnerName||'').trim() },_label:'the names'}]); }
+    function pickWho(w,name){ setWho2(w); setNeedWho(false); if(name) commit([{op:'settings',patch:{partnerName:name},_label:'your name'}]); }
+    function switchWho(w){ setWho2(w); setFilter('all'); showToast({text:'This device is now '+nameOf(w)}); }
 
     // memos
-    // habit trends + streaks are computed inside Today / Journal from habitLogs now.
-    var counts=useMemo(function(){ var c={today:0}; (tasks||[]).forEach(function(t){ if(!t.parent_id&&t.date===TODAY&&!t.done)c.today++; }); return c; },[tasks]);
+    var counts=useMemo(function(){ var c={today:0}; (tasks||[]).forEach(function(t){ if(!t.parent_id&&t.date===TODAY&&!t.done)c.today++; }); c.today+=carriedFrom(tasks,function(){return true;}).length; return c; },[tasks,today]);
     var projCounts=useMemo(function(){ var m={}; (tasks||[]).forEach(function(t){ if(t.project&&!t.done)m[t.project]=(m[t.project]||0)+1; }); return m; },[tasks]);
     var upcoming=useMemo(function(){ return upcomingFrom(projects,tasks); },[projects,tasks]);
 
-    if(auth==='out'){ return html`<${Gate} onIn=${function(){ setAuth('checking'); refresh(); }} />`; }
+    if(auth==='out'){ return html`<${Gate} onIn=${function(){ authRef.current='checking'; setAuth('checking'); refresh(); }} />`; }
     var loading=!store;
     var openProj=(projects||[]).filter(function(p){return p.id===panel;})[0];
     var editingTask=modal&&modal.editing;
@@ -1791,8 +2121,13 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var gsDone=gsSteps.filter(function(s){return s.done;}).length;
     var showGS = !loading && view==='today' && gsDone<gsSteps.length && !gsHide;
 
+    var syncTxt = sync.st==='offline'?('Offline'+(sync.n?(' · '+sync.n+' change'+(sync.n>1?'s':'')+' waiting'):''))
+      : sync.st==='error'?('Couldn’t save'+(sync.n?(' · '+sync.n+' waiting'):''))
+      : sync.st==='saving'?'Saving…' : '';
+    var editingParent=(editingTask&&editingTask.parent_id)?findTask(editingTask.parent_id):null;
+    var jPending=outboxRef.current.some(function(o){ return o.table==='journal' && o.row && o.row.id===TODAY+'_'+whoami; });
     var sidebar = html`<aside class="sidebar">
-      <div class="prof"><span class="pav">${whoami==='partner'?'P':'M'}</span><span class="pname">${whoami==='partner'?((settings&&settings.partnerName)||'Partner'):((settings&&settings.meName)||'Mahesh')}</span></div>
+      <div class="prof"><span class="pav">${initialOf(whoami)}</span><span class="pname">${nameOf(whoami)}</span></div>
       <button class="addbtn" onClick=${function(){setModal({defaultDate:TODAY});}}>
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#1F6FEB"/><path d="M12 8v8M8 12h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>Add task</button>
       <button class=${'nav'+(view==='today'?' sel':'')} onClick=${function(){setView2('today');}}><span style=${{display:'flex',color:view==='today'?'#195FD0':'#54606E'}}><${Icon}>${icons.today}<//></span>Today<span class="cnt">${counts.today||''}</span></button>
@@ -1806,18 +2141,18 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       <${FocusWidget} focus=${focus} meName=${(settings&&settings.meName)||'You'} partnerName=${(settings&&settings.partnerName)||'Partner'} whoami=${whoami} onStart=${startFocus} onPause=${pauseFocus} onResume=${resumeFocus} onReset=${resetFocus} />
       <button class="helpbtn" onClick=${function(){setShowIntro(true);}}><span style=${{display:'flex',color:'#54606E'}}><${Icon}>${icons.help}<//></span>How it works</button>
       <button class="nav" onClick=${function(){setSettingsOpen(true);}}><span style=${{display:'flex',color:'#54606E'}}><${Icon}>${icons.settings}<//></span>Settings</button>
-      <div class="sfoot"><span class="av avm" style=${{background:OWNER_COLOR.me}}>M</span><span class="av avm" style=${{background:OWNER_COLOR.partner,marginLeft:'-8px',border:'2px solid var(--sidebar)'}}>P</span><span style=${{fontWeight:500,fontSize:'12px',color:'#8A93A0',marginLeft:'4px'}}>Shared planner</span></div>
+      <div class="sfoot"><span class="av avm" style=${{background:OWNER_COLOR.me}}>${initialOf('me')}</span><span class="av avm" style=${{background:OWNER_COLOR.partner,marginLeft:'-8px',border:'2px solid var(--sidebar)'}}>${initialOf('partner')}</span>${syncTxt?html`<span class=${'syncln '+sync.st} role="status"><i class="syncdot"></i>${syncTxt}${sync.st==='error'?html` · <button class="linkbtn" onClick=${retryNow}>Retry</button>`:null}</span>`:html`<span style=${{fontWeight:500,fontSize:'12px',color:'#8A93A0',marginLeft:'4px'}}>Shared planner</span>`}</div>
     </aside>`;
 
     var titleTxt = ({today:'Today',tasks:'Tasks',calendar:'Calendar',projects:'Projects',journal:'Journal',settings:'Settings'})[view]||'Today';
     var content;
     if(loading){ content=html`<div class="empty" style=${{marginTop:'60px',color:'#3C6FB0'}}><div class="big">Loading your planner…</div><div class="sub">Syncing shared data.</div></div>`; }
-    else if(view==='today'){ content=html`<${Fragment}>${showGS?html`<${GetStarted} steps=${gsSteps} done=${gsDone} onDismiss=${function(){setGsHide(true);lsSet('sp_gs_hide','1');}} />`:null}<div class="mobfocus"><${FocusWidget} focus=${focus} meName=${(settings&&settings.meName)||'You'} partnerName=${(settings&&settings.partnerName)||'Partner'} whoami=${whoami} onStart=${startFocus} onPause=${pauseFocus} onResume=${resumeFocus} onReset=${resetFocus} /></div><${Today} sel=${sel} filter=${filter} projects=${projects} tasks=${tasks} routines=${routines} upcoming=${upcoming} habits=${habitDefs} habitLogs=${habitLogs} topics=${topics} topicLinks=${topicLinks} settings=${settings} whoami=${whoami} onToggle=${toggleTask} onEdit=${function(t){setModal({editing:t});}} onAdd=${function(d){setModal({defaultDate:d});}} onSetHabit=${setHabit} onEditHabit=${function(h){setHabitEdit(h);}} onAddHabit=${function(){setHabitEdit({});}} notes=${notes} onAddNote=${addNote} onSaveNote=${saveNoteText} onSetNoteColor=${setNoteColor} onDeleteNote=${deleteNote} onGoJournal=${function(){setView2('journal');}} onShowAll=${function(){setView2('tasks');}} /><//>`; }
-    else if(view==='tasks'){ content=html`<${TasksTable} tasks=${tasks} projects=${projects} meName=${(settings&&settings.meName)||'Me'} partnerName=${(settings&&settings.partnerName)||'Partner'} onEdit=${function(t){setModal({editing:t});}} onToggle=${toggleTask} />`; }
+    else if(view==='today'){ content=html`<${Fragment}>${showGS?html`<${GetStarted} steps=${gsSteps} done=${gsDone} onDismiss=${function(){setGsHide(true);lsSet('sp_gs_hide','1');}} />`:null}<div class="mobfocus"><${FocusWidget} focus=${focus} meName=${(settings&&settings.meName)||'You'} partnerName=${(settings&&settings.partnerName)||'Partner'} whoami=${whoami} onStart=${startFocus} onPause=${pauseFocus} onResume=${resumeFocus} onReset=${resetFocus} /></div><${Today} sel=${sel} filter=${filter} projects=${projects} tasks=${tasks} routines=${routines} upcoming=${upcoming} habits=${habitDefs} habitLogs=${habitLogs} topics=${topics} topicLinks=${topicLinks} settings=${settings} whoami=${whoami} onToggle=${toggleTask} onEdit=${function(t){setModal({editing:t});}} onAdd=${function(d){setModal({defaultDate:d});}} carry=${carry} onMoveAllToday=${moveAllToday} onSetHabit=${checkHabit} onStepHabit=${stepHabit} onEditHabit=${function(h){setHabitEdit(h);}} onAddHabit=${function(){setHabitEdit({});}} notes=${notes} onAddNote=${addNote} onSaveNote=${saveNoteText} onSetNoteColor=${setNoteColor} onDeleteNote=${deleteNote} onGoJournal=${function(){setView2('journal');}} onShowAll=${function(){setView2('tasks');}} /><//>`; }
+    else if(view==='tasks'){ content=html`<${TasksTable} tasks=${tasks} projects=${projects} onEdit=${function(t){setModal({editing:t});}} onToggle=${toggleTask} />`; }
     else if(view==='calendar'){ content=html`<${Calendar} tasks=${tasks} projects=${projects} onAddDay=${function(ds){setModal({defaultDate:ds});}} onAddSlot=${function(ds,tm){setModal({defaultDate:ds,defaultTime:tm,defaultType:'event'});}} onEditTask=${function(t){setModal({editing:t});}} onOpenProject=${function(id){setPanel(id);}} onToggle=${toggleTask} onSchedule=${scheduleTask} onNewProject=${function(s,e){setPEdit({start_date:s,end_date:e});}} />`; }
     else if(view==='projects'){ content=html`<${Projects} projects=${projects} tasks=${tasks} onOpen=${function(id){setPanel(id);}} onNew=${function(){setPEdit({});}} />`; }
     // settings is a modal now (opened from the sidebar / mobile tab), not a view.
-    else { content=html`<${Journal} entries=${journal} whoami=${whoami} topics=${topics} topicLinks=${topicLinks} onSave=${saveJournal} onSetTopic=${setWeekTopic} onAddTopicLink=${addTopicLink} onDelTopicLink=${delTopicLink} />`; }
+    else { content=html`<${Journal} entries=${journal} whoami=${whoami} pending=${jPending} offline=${sync.st==='offline'} topics=${topics} topicLinks=${topicLinks} onSave=${saveJournal} onSetTopic=${setWeekTopic} onAddTopicLink=${addTopicLink} onDelTopicLink=${delTopicLink} />`; }
 
     var navBtns=['today','tasks','calendar','projects','journal','settings'];
     return html`<div class="app">
@@ -1827,8 +2162,8 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
           <div class="brandrow"><span class="brand">SP</span><div><div class="eyebrow">Shared Planner</div><h1 class="title">${titleTxt}</h1></div></div>
           <div class="ctrls">
             <button class="navcirc mobonly" style=${{width:'36px',height:'36px'}} aria-label="How it works" onClick=${function(){setShowIntro(true);}}><${Icon} s=${16}>${icons.help}<//></button>
-            <div class="seg" role="group" aria-label="Viewing as"><button class=${whoami==='me'?'on':''} onClick=${function(){setWho2('me');}}>Me</button><button class=${whoami==='partner'?'on':''} onClick=${function(){setWho2('partner');}}>Partner</button></div>
-            ${view==='today'?html`<div class="seg" role="group" aria-label="Filter"><button class=${filter==='all'?'on':''} onClick=${function(){setFilter('all');}}>All</button><button class=${filter==='me'?'on':''} onClick=${function(){setFilter('me');}}>Mine</button></div>`:null}
+            ${syncTxt?html`<button class=${'syncbtn mobonly '+sync.st} aria-label=${syncTxt} onClick=${function(){ showToast({text:syncTxt,action:sync.st==='error'?{label:'Retry',fn:retryNow}:null,ms:5000}); }}><i class="syncdot"></i><span class="syncw">${sync.st==='offline'?('Offline'+(sync.n?(' · '+sync.n):'')):sync.st==='error'?'Not saved':'Saving'}</span></button>`:null}
+            ${view==='today'?html`<div class="seg" role="group" aria-label="Filter"><button class=${filter==='all'?'on':''} onClick=${function(){setFilter('all');}}>All</button><button class=${filter==='mine'?'on':''} onClick=${function(){setFilter('mine');}}>Mine</button></div>`:null}
             ${view==='projects'?html`<button class="pillbtn" onClick=${function(){setPEdit({});}}>+ New project</button>`:null}
             ${view==='tasks'?html`<button class="pillbtn" onClick=${function(){setModal({defaultDate:TODAY});}}>+ New task</button>`:null}
           </div>
@@ -1843,17 +2178,19 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 
       <nav class="mobnav">${navBtns.map(function(v){ var lbl=v.charAt(0).toUpperCase()+v.slice(1); return html`<button key=${v} class=${view===v?'on':''} onClick=${function(){ if(v==='settings') setSettingsOpen(true); else setView2(v); }}><${Icon} s=${20}>${icons[v]}<//>${lbl}</button>`; })}</nav>
 
-      ${modal?html`<${TaskModal} editing=${modal.editing} children=${modalChildren} defaultDate=${modal.defaultDate} defaultTime=${modal.defaultTime} defaultType=${modal.defaultType} defaultProject=${modal.defaultProject} whoami=${whoami} projects=${projects} onClose=${function(){setModal(null);}} onSave=${saveTask} onDelete=${deleteTask} />`:null}
-      ${pEdit?html`<${ProjectEditor} editing=${pEdit} whoami=${whoami} onClose=${function(){setPEdit(null);}} onSave=${saveProject} onDelete=${deleteProject} />`:null}
-      ${openProj?html`<${ProjectPanel} project=${openProj} tasks=${tasks} materials=${materials} onClose=${function(){setPanel(null);}} onToggle=${toggleTask} onEdit=${function(p){setPEdit(p);}} onEditTask=${function(t){setModal({editing:t});}} onAddItem=${addProjectItem} onAddSub=${addSubtask} onAddMaterial=${addMaterial} onDelMaterial=${delMaterial} />`:null}
-      ${showIntro?html`<${Intro} onClose=${function(){setShowIntro(false);lsSet('sp_intro_v1','1');}} />`:null}
-      ${settingsOpen?html`<${SettingsModal} settings=${settings} habits=${habitDefs} whoami=${whoami} themeBg=${(settings&&settings.theme_bg)||'sky'} themeFont=${(settings&&settings.theme_font)||'inter'} themeRad=${(settings&&settings.theme_radius)||'default'} onSetTheme=${setTheme} onSaveNames=${saveSettings} onAddHabit=${function(){setHabitEdit({});}} onEditHabit=${function(h){setHabitEdit(h);}} onHowItWorks=${function(){setSettingsOpen(false);setShowIntro(true);}} onClose=${function(){setSettingsOpen(false);}} />`:null}
+      ${modal?html`<${TaskModal} key=${editingTask?editingTask.id:'new'} parent=${editingParent} onOpenParent=${function(p){setModal({editing:p});}} editing=${modal.editing} children=${modalChildren} defaultDate=${modal.defaultDate} defaultTime=${modal.defaultTime} defaultType=${modal.defaultType} defaultProject=${modal.defaultProject} whoami=${whoami} projects=${projects} onClose=${function(){setModal(null);}} onSave=${saveTask} onDelete=${deleteTask} />`:null}
+      ${pEdit?html`<${ProjectEditor} editing=${pEdit} whoami=${whoami} onClose=${function(){setPEdit(null);}} onSave=${saveProject} onDelete=${askDeleteProject} />`:null}
+      ${openProj?html`<${ProjectPanel} project=${openProj} tasks=${tasks} materials=${materials} onClose=${function(){setPanel(null);}} onToggle=${toggleTask} onEdit=${function(p){setPEdit(p);}} onEditTask=${function(t){setModal({editing:t});}} onAddItem=${addProjectItem} onAddSub=${addSubtask} onAddMaterial=${addMaterial} onDelMaterial=${delMaterial} onReopen=${reopenProject} />`:null}
+      ${needWho&&!loading?html`<${WhoModal} meName=${nameOf('me')} partnerName=${(settings&&settings.partnerName)||''} onPick=${pickWho} />`:null}
+      ${showIntro&&!needWho?html`<${Intro} onClose=${function(){setShowIntro(false);lsSet('sp_intro_v1','1');}} />`:null}
+      ${settingsOpen?html`<${SettingsModal} settings=${settings} habits=${habitDefs} whoami=${whoami} themeBg=${(settings&&settings.theme_bg)||'sky'} themeFont=${(settings&&settings.theme_font)||'inter'} themeRad=${(settings&&settings.theme_radius)||'default'} onSetTheme=${setTheme} onSaveNames=${saveSettings} onSwitchWho=${switchWho} onAddHabit=${function(){setHabitEdit({});}} onEditHabit=${function(h){setHabitEdit(h);}} onHowItWorks=${function(){setSettingsOpen(false);setShowIntro(true);}} onClose=${function(){setSettingsOpen(false);}} />`:null}
       ${habitEdit?html`<${HabitEditor} editing=${habitEdit.id?habitEdit:null} whoami=${whoami} onClose=${function(){setHabitEdit(null);}} onSave=${saveHabit} onDelete=${deleteHabit} />`:null}
       ${!loading?html`<div class="wavewrap">
         ${waveOpen?html`<div class="wavepick">${WAVE_EMOJIS.map(function(e){ return html`<button class="waveopt" key=${e} onClick=${function(){sendWave(e);}}>${e}</button>`; })}</div>`:null}
-        <button class="wavefab" aria-label=${'Send a wave to '+((settings&&settings.partnerName)||'your partner')} title=${'Wave to '+((settings&&settings.partnerName)||'your partner')} onClick=${function(){setWaveOpen(!waveOpen);}}>🫶</button>
+        <button class="wavefab" aria-label=${'Send a wave to '+nameOf(other)} title=${'Wave to '+nameOf(other)} onClick=${function(){setWaveOpen(!waveOpen);}}>🫶</button>
       </div>`:null}
-      ${toast?html`<div class=${'toast'+(toast.big?' big':'')} key=${toast.t}>${toast.emoji?html`<span class="toast-emoji">${toast.emoji}</span>`:null}<span>${toast.text}</span></div>`:null}
+      ${toast?html`<div class=${'toast'+(toast.big?' big':'')} key=${toast.t} role="status">${toast.emoji?html`<span class="toast-emoji">${toast.emoji}</span>`:null}<span>${toast.text}</span>${toast.action?html`<button class="toast-act" onClick=${function(){ var a=toast.action; clearTimeout(toastTmr.current); setToast(null); a.fn(); }}>${toast.action.label}</button>`:null}</div>`:null}
+      ${confirmBox?html`<${ConfirmModal} title=${confirmBox.title} body=${confirmBox.body} confirmLabel=${confirmBox.confirmLabel} alt=${confirmBox.alt} onConfirm=${confirmBox.onConfirm} onClose=${function(){setConfirm(null);}} />`:null}
       ${toast&&toast.big?html`<div class="wavefx" key=${'fx'+toast.t}>${toast.emoji}</div>`:null}
     </div>`;
   }

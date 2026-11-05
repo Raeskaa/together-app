@@ -2,7 +2,7 @@
 
 Sources: a hands-on run on local `wrangler dev` (desktop at 1366 and phone at 375) plus a read-only code audit.
 `H` = `public/index.html`, `W` = `src/worker.js`. **seen** = reproduced in the browser. **code** = read from the source.
-Nothing has been fixed yet. This is the list to choose from.
+**Status (2026-11-05):** tier 1 (items 1–9) is done in the Trust pass (see `DESIGN-LOG.md`), plus the project Kind fix from item 17. Tiers 2–4 are still open.
 
 ## Tier 1: breaks trust (data goes wrong or disappears)
 
