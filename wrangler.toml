@@ -1,0 +1,12 @@
+name = "shared-planner"
+main = "src/worker.js"
+compatibility_date = "2024-11-01"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "shared-planner"
+database_id = "fee0177f-0833-4f29-ae04-d28b43f0e653"

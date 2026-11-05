@@ -1,0 +1,1865 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#DCEBFF">
+<title>Shared Planner</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
+<style>
+/* Calm sky system: soft blue->white gradient pane + ink/blue accents, Todoist-style shell. Single light theme by choice. */
+:root{
+  --ink:#15171A; --body:#2B2F36; --muted:#5A616B; --faint:#878F9B; --fainter:#AEB6C1;
+  --line:#E7ECF2; --line-soft:#EEF2F7; --field:#D7DEE7;
+  --sidebar:#F7FAFE; --card:#FFFFFF; --wash:#EFF4FA;
+  --accent:#1F6FEB; --accent-deep:#195FD0; --accent-wash:#E8F1FF;
+  --primary:#15171A;
+  --me:#15171A; --partner:#5B6B86; --shared:#B4792B;
+  --grad:
+    radial-gradient(1100px 760px at 78% 12%, rgba(255,255,255,.9), transparent 60%),
+    radial-gradient(900px 680px at 12% 82%, rgba(255,255,255,.5), transparent 55%),
+    linear-gradient(162deg,#3FA0FF 0%,#6FBAFF 20%,#A6D5FF 40%,#D6ECFF 62%,#F5FAFF 85%);
+  --font:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%}
+body{margin:0;background:#EAF3FF;color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+button{font-family:inherit}
+#root{height:100%}
+.app{display:flex;height:100%;overflow:hidden;background:var(--grad)}
+
+/* sidebar */
+.sidebar{width:242px;flex:none;background:transparent;border-right:none;padding:16px 12px;overflow-y:auto;display:flex;flex-direction:column;gap:1px}
+.prof{display:flex;align-items:center;gap:9px;padding:4px 6px 12px}
+.pav{width:30px;height:30px;border-radius:999px;background:linear-gradient(135deg,#3FA0FF,#8EC5FF);color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none}
+.pname{font-weight:600;font-size:14.5px}
+.addbtn{display:flex;align-items:center;gap:10px;background:none;border:none;padding:8px;font-weight:600;font-size:14px;color:var(--accent-deep);cursor:pointer;border-radius:8px;width:100%;text-align:left}
+.addbtn:hover{background:var(--accent-wash)}
+.nav{display:flex;align-items:center;gap:11px;padding:7px 10px;border-radius:8px;font-weight:500;font-size:14px;color:#2F343B;cursor:pointer;border:none;background:none;width:100%;text-align:left}
+.nav:hover{background:#EDF2F8}
+.nav.sel{background:var(--card);color:var(--accent-deep);font-weight:600;box-shadow:0 1px 3px rgba(25,45,90,.12)}
+.cnt{margin-left:auto;font-weight:500;font-size:12px;color:#9AA3AF}
+.nav.sel .cnt{color:var(--accent-deep)}
+.sec{font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#9AA3AF;padding:12px 10px 4px}
+.dot{width:9px;height:9px;border-radius:999px;flex:none}
+.sfoot{display:flex;align-items:center;gap:8px;padding:10px;border-top:1px solid #E5EAF1}
+/* dark app-ground variant (floating white canvas on a dark ground) */
+#root[data-ground="dark"] .sidebar{color:#DCE2EC}
+#root[data-ground="dark"] .nav{color:#C7CFDD}
+#root[data-ground="dark"] .nav:hover{background:rgba(255,255,255,.07)}
+#root[data-ground="dark"] .nav:not(.sel) > span:first-child{color:#C2CBDA !important}
+#root[data-ground="dark"] .cnt{color:#8A94A6}
+#root[data-ground="dark"] .sec{color:#8792A4}
+#root[data-ground="dark"] .pname{color:#EDEFF4}
+#root[data-ground="dark"] .addbtn{color:#8FB8FF}
+#root[data-ground="dark"] .addbtn:hover{background:rgba(255,255,255,.07)}
+#root[data-ground="dark"] .helpbtn{color:#C7CFDD}
+#root[data-ground="dark"] .helpbtn:hover{background:rgba(255,255,255,.07)}
+#root[data-ground="dark"] .helpbtn > span:first-child{color:#C2CBDA !important}
+#root[data-ground="dark"] .sfoot{border-top-color:rgba(255,255,255,.12)}
+#root[data-ground="dark"] .sfoot span[style]{color:#AEB6C4 !important}
+.av{border-radius:999px;color:#fff;font-weight:600;display:flex;align-items:center;justify-content:center;flex:none}
+
+/* main */
+.main{flex:1;min-width:0;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-radius:16px;margin:10px 10px 10px 4px;box-shadow:0 1px 3px rgba(25,45,90,.06),0 18px 38px -24px rgba(25,45,90,.24)}
+.wrap{max-width:1000px;margin:0 auto;padding-block:28px 80px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.brandrow{display:flex;align-items:center;gap:13px}
+.brand{width:42px;height:42px;border-radius:12px;background:#15171A;color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}
+.eyebrow{font-weight:500;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#3C6FB0}
+h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;color:#15171A}
+.ctrls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.seg{display:inline-flex;align-items:center;gap:2px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);border-radius:999px;padding:3px;box-shadow:0 1px 2px rgba(30,70,140,.06)}
+.seg button{border:none;background:none;border-radius:999px;padding:6px 13px;font-weight:500;font-size:12.5px;color:#3A4350;cursor:pointer}
+.seg button.on{background:#fff;color:#15171A;font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.pillbtn{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.78);border:1px solid rgba(255,255,255,.8);border-radius:999px;padding:8px 13px;font-weight:600;font-size:13px;color:#2F343B;cursor:pointer}
+
+/* date selector (Today) */
+.datesel{display:flex;align-items:center;gap:6px;margin-top:24px}
+.navcirc{width:38px;height:38px;border-radius:999px;border:1px solid rgba(255,255,255,.7);background:rgba(255,255,255,.55);cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none}
+.days{flex:1;display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.daycell{text-align:center;background:none;border:none;cursor:pointer;padding:0}
+.dletter{font-weight:500;font-size:12px;color:#3C6FB0;margin-bottom:8px}
+.ddisc{margin:0 auto;width:44px;height:44px;border-radius:999px;border:1px solid rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:16px;color:#2B3440}
+.ddisc.today{color:var(--accent-deep);font-weight:700}
+.ddisc.sel{background:#fff;box-shadow:0 2px 8px rgba(40,90,160,.18);border-color:transparent}
+
+/* chips */
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.chip{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.7);border-radius:999px;padding:7px 14px;font-weight:500;font-size:13px;color:#2F343B}
+.chip b{font-weight:700}
+.chip .sub{color:#8A93A0}
+.upnext{margin-top:22px}
+.upeyebrow{font-weight:600;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#7E8894;margin:0 2px 9px}
+.upnext .chips{margin-top:0}
+.showalllink{display:inline-flex;align-items:center;font-size:12.5px;font-weight:600;color:var(--accent-deep);cursor:pointer;padding:6px 4px;white-space:nowrap}
+.showalllink:hover{text-decoration:underline}
+/* tasks table view */
+.tvbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:22px}
+.tsel{border:1px solid var(--line);border-radius:9px;padding:8px 11px;font:inherit;font-size:13px;font-weight:500;color:#2F343B;background:var(--card);cursor:pointer}
+.tvcount{margin-left:auto;font-size:12.5px;color:#9AA3AF;font-weight:500}
+.tvtable{margin-top:16px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card)}
+.tvghd{display:flex;align-items:center;gap:8px;padding:9px 16px;background:var(--wash);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#8A93A0;border-top:1px solid var(--line)}
+.tvghd:first-child{border-top:none}
+.tvghd span{font-size:11px;color:#AEB6C1}
+.tvrow{display:flex;align-items:center;gap:13px;padding:11px 16px;border-top:1px solid var(--line-soft);cursor:pointer}
+.tvrow:hover{background:#F6F8FB}
+.tvc1{flex:none;width:20px;display:flex;align-items:center;justify-content:center}
+.tvev{font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#7A5BD8}
+.tvttl{flex:1;min-width:0;font-size:14px;color:#15171A;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tvttl.done{color:#AEB6C1;text-decoration:line-through}
+.tvproj{display:flex;align-items:center;gap:6px;font-size:12px;color:#8A93A0;flex:none;max-width:160px}
+.tvpn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tvproj.none{color:#C7CDD6}
+.tvdue{font-size:12px;color:#8A93A0;font-weight:500;flex:none;width:120px;text-align:right;font-variant-numeric:tabular-nums}
+.tvdue.over{color:#C2704B;font-weight:600}
+@media(max-width:620px){.tvproj{display:none}.tvdue{width:auto;min-width:64px}}
+
+/* cards / agenda */
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 1px 3px rgba(30,70,140,.05)}
+.agenda{margin-top:26px;padding:4px 22px 8px}
+.cardhd{display:flex;justify-content:space-between;align-items:baseline;padding:16px 0 6px}
+.cardhd h2{margin:0;font-weight:700;font-size:16px;color:#15171A}
+.cardhd .meta{font-weight:500;font-size:13px;color:#8A93A0}
+.hdttl{display:flex;align-items:center;gap:9px}
+.addinline{width:25px;height:25px;border-radius:7px;border:1px solid var(--line);background:#fff;color:var(--accent);font-weight:700;font-size:17px;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none}
+.addinline:hover{background:var(--accent-wash);border-color:#B9D4F6}
+.arow{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-top:1px solid var(--line-soft)}
+.arow:first-child{border-top:none}
+.atime{width:74px;flex:none}
+.atime .t{font-weight:600;font-size:14px;color:#15171A}
+.atime .t .ap{font-weight:500;font-size:11px;color:#AEB6C1}
+.atime .d{font-weight:500;font-size:11.5px;color:#AEB6C1}
+.atime.kind{font-weight:700;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:#8A93A0}
+.atime.k-task{color:#1F6FEB}
+.atime.k-event{color:#7A5BD8}
+.abody{flex:1;min-width:0}
+.atitle{font-weight:600;font-size:15px;color:#15171A}
+.atitle.done{color:#AEB6C1;text-decoration:line-through}
+.atitle.block{font-weight:600;color:#8A93A0}
+.ameta{display:flex;align-items:center;gap:10px;margin-top:4px;flex-wrap:wrap}
+.tag{display:inline-flex;align-items:center;gap:6px;font-weight:500;font-size:12.5px;color:#8A93A0}
+.view{font-weight:500;font-size:12.5px;color:var(--accent-deep);cursor:pointer;background:none;border:none;padding:0}
+.aright{display:flex;align-items:center;gap:10px;flex:none}
+.pill{font-weight:500;font-size:11.5px;color:#5A616B;background:#EEF2F7;border-radius:999px;padding:3px 10px}
+.pill.now{font-weight:600;color:var(--accent-deep);background:var(--accent-wash)}
+.pill.due{font-weight:600;color:#B4792B;background:#FBF1E6}
+.check{width:20px;height:20px;border-radius:999px;border:1.5px solid #C2CAD6;background:#fff;cursor:pointer;flex:none;margin-top:1px;display:flex;align-items:center;justify-content:center;padding:0}
+.check.on{background:var(--accent);border-color:var(--accent)}
+.check.sm{width:16px;height:16px}
+.subs{margin-top:9px;border-left:1px solid #E7ECF2;padding-left:14px;display:flex;flex-direction:column;gap:5px}
+.subrow{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted)}
+.subrow.done .slabel{color:#AEB6C1;text-decoration:line-through}
+.slabel{flex:1;min-width:0}
+.avm{width:26px;height:26px;font-size:11px}
+.empty{padding:34px 10px;text-align:center}
+.empty .big{font-weight:700;font-size:17px;color:#2B3440}
+.empty .sub{font-weight:400;font-size:12.5px;color:#8A93A0;margin-top:5px}
+
+/* habit cards */
+.habs{display:flex;gap:14px;flex-wrap:wrap;margin-top:18px}
+.habcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px}
+.big{font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stepbtn{width:44px;height:44px;border-radius:999px;border:1px solid var(--field);background:#fff;font-size:20px;color:#15171A;cursor:pointer;line-height:1}
+.bars{display:flex;align-items:flex-end;gap:6px;height:42px;margin-top:14px}
+.bars > div{flex:1;border-radius:3px 3px 0 0;background:#E6ECF3}
+.bars > div.now{background:var(--accent)}
+.hhr{border:none;border-top:1px solid var(--line-soft);margin:16px 0}
+.streakdots{display:inline-flex;gap:4px}
+.sd{width:7px;height:7px;border-radius:999px;background:#DDE4EC}
+.sd.on{background:var(--accent)}
+
+/* calendar */
+.calbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:22px}
+.calbar h2{margin:0;font-weight:700;font-size:20px;color:#15171A;min-width:150px;letter-spacing:-.01em}
+.calnav{display:inline-flex;gap:4px}
+.cal-tl{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.cal-tl .tlrow{display:flex;align-items:center;gap:10px;margin:6px 0}
+.cal-tl .tlname{width:120px;flex:none;font-weight:600;font-size:11.5px;color:#2F343B;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cal-tl .track{position:relative;flex:1;height:18px;background:#F2F6FB;border-radius:6px}
+.cal-tl .bar{position:absolute;top:0;height:18px;border-radius:6px;cursor:pointer}
+.cal-tl .tllabel{font-weight:600;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#AEB6C1;margin-bottom:2px}
+.calgrid{margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.dowrow{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--line)}
+.dowrow div{padding:9px 10px;font-weight:600;font-size:11px;color:#9AA3AF}
+.weeks{display:block}
+.wkrow{display:grid;grid-template-columns:repeat(7,1fr)}
+.daycellm{min-height:98px;border-left:1px solid var(--line-soft);border-top:1px solid var(--line-soft);padding:6px 7px;cursor:pointer;overflow:hidden}
+.wkrow:first-child .daycellm{border-top:none}
+.daycellm:first-child{border-left:none}
+.daycellm.out{background:#FBFCFE}
+.daycellm.out .dn{color:#C8D0DB}
+.daycellm .dn{font-weight:600;font-size:12px;color:#5A616B}
+.daycellm.today .dn{display:inline-flex;min-width:20px;height:20px;padding:0 5px;border-radius:7px;background:var(--accent);color:#fff;align-items:center;justify-content:center}
+.daycellm.inrange{background:var(--accent-wash)}
+.daycellm.rgend{background:var(--accent-wash);box-shadow:inset 0 0 0 2px var(--accent)}
+.rgbar{display:flex;align-items:center;gap:12px;margin-top:12px;padding:9px 14px;background:var(--accent-wash);border:1px solid #BCD6F8;border-radius:12px;font-size:13px;color:var(--accent-deep);flex-wrap:wrap}
+.rgbar .rgt b{color:var(--accent-deep);font-weight:700}
+.pillbtn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.rp{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#F7F9FC}
+.rphd{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:8px}
+.rpm{font-weight:700;font-size:13.5px;color:#15171A}
+.rpnav{border:none;background:none;cursor:pointer;display:flex;padding:4px;border-radius:6px}
+.rpnav:hover{background:#E8EEF6}
+.rpdow{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px}
+.rpdow span{text-align:center;font-size:10px;font-weight:600;color:#AEB6C1}
+.rpgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.rpd{border:none;background:none;cursor:pointer;font:inherit;font-size:12.5px;color:#2F343B;height:30px;border-radius:7px}
+.rpd:hover{background:#E8F1FF}
+.rpd.out{color:#C8D0DB}
+.rpd.t{font-weight:700;color:var(--accent-deep)}
+.rpd.inr{background:var(--accent-wash);border-radius:0}
+.rpd.ise{background:var(--accent);color:#fff;border-radius:7px;font-weight:600}
+.rpsummary{font-size:12px;color:#8A93A0;margin-top:8px;font-weight:500}
+.celI{display:block;width:100%;text-align:left;border:none;background:var(--wash);border-radius:5px;padding:2px 6px;margin-top:3px;font-weight:500;font-size:10.5px;color:#2B2F36;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.celI.ev{background:var(--accent-wash);color:var(--accent-deep)}
+.celI.due{background:#FBF1E6;color:#9A6418}
+.celI.proj{background:#EDEAFB;color:#5A4FAE}
+.celI.done{opacity:.5;text-decoration:line-through}
+.cmore{font-weight:600;font-size:10px;color:#9AA3AF;margin-top:3px;padding-left:2px}
+/* week calendar */
+.wkcal{margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.wkcalhd{display:grid;grid-template-columns:52px repeat(7,1fr);border-bottom:1px solid var(--line)}
+.wkcalhd .wd{padding:8px 6px;text-align:center;font-weight:600;font-size:11px;color:#5A616B;border-left:1px solid var(--line-soft)}
+.wkcalhd .wd .num{display:block;font-size:16px;color:#15171A;font-weight:700;margin-top:2px}
+.wkcalhd .wd.today .num{color:#fff;background:var(--accent);width:26px;height:26px;border-radius:999px;line-height:26px;margin:2px auto 0}
+.allday{display:grid;grid-template-columns:52px repeat(7,1fr);border-bottom:1px solid var(--line)}
+.allday .lab{font-weight:600;font-size:9px;color:#AEB6C1;padding:7px 4px;text-transform:uppercase;letter-spacing:.04em;text-align:right}
+.allday .adc{border-left:1px solid var(--line-soft);padding:4px;min-height:34px;cursor:pointer}
+.adi{display:block;width:100%;text-align:left;border:none;background:var(--wash);border-radius:5px;padding:2px 6px;margin-bottom:3px;font-weight:500;font-size:10px;color:#2B2F36;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.adi.due{background:#FBF1E6;color:#9A6418}
+.hwrap{position:relative;max-height:520px;overflow-y:auto}
+.hgrid{display:grid;grid-template-columns:52px repeat(7,1fr)}
+.htcol{display:flex;flex-direction:column}
+.htime{height:46px;font-weight:500;font-size:10px;color:#AEB6C1;text-align:right;padding:0 6px;transform:translateY(-6px)}
+.hcol{position:relative;border-left:1px solid var(--line-soft)}
+.hcell{height:46px;border-top:1px solid var(--line-soft);cursor:pointer}
+.evb{position:absolute;left:3px;right:3px;background:var(--accent-wash);border:1px solid #B9D3FF;border-left:3px solid var(--accent);border-radius:6px;padding:3px 6px;font-weight:600;font-size:10.5px;color:var(--accent-deep);overflow:hidden;cursor:pointer;z-index:2}
+
+/* calendar v2 */
+.calfilters{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:22px;margin-bottom:12px}
+.fsel{border:1px solid var(--field);background:#fff;border-radius:999px;padding:7px 12px;font-weight:600;font-size:12.5px;color:#2F343B;cursor:pointer;-webkit-appearance:none;appearance:none}
+.calsplit{display:flex;gap:16px;align-items:flex-start}
+.calrail{width:236px;flex:none;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 14px 10px;max-height:640px;overflow-y:auto}
+.railhd{font-weight:700;font-size:13px;color:#15171A;display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.railn{font-weight:600;font-size:11px;color:#8A93A0;background:#EEF2F7;border-radius:999px;padding:1px 7px}
+.railhint{font-weight:500;font-size:11.5px;color:var(--accent-deep);background:var(--accent-wash);border-radius:8px;padding:8px 9px;margin-bottom:8px;line-height:1.45}
+.urow{display:flex;align-items:center;gap:9px;padding:8px 7px;border-radius:9px;cursor:pointer;border:1px solid transparent}
+.urow:hover{background:var(--wash)}
+.urow.sel{border-color:var(--accent);background:var(--accent-wash)}
+.urow .ut{flex:1;min-width:0;font-weight:500;font-size:13px;color:#15171A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.railadd{margin-top:8px;border:none;background:none;color:var(--accent-deep);font-weight:600;font-size:12.5px;cursor:pointer;padding:6px 2px}
+.calmain{flex:1;min-width:0}
+.wkcal{overflow-x:auto;overflow-y:hidden}
+.wkinner{min-width:660px}
+.evchk{width:14px;height:14px;border-radius:999px;border:1.5px solid rgba(20,30,50,.28);flex:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background:#fff}
+.evchk.on{background:var(--accent);border-color:var(--accent)}
+.evb{display:flex;align-items:center;gap:5px}
+.evb .evtt{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.evb .evtm{font-weight:500;opacity:.65;margin-left:auto;padding-left:4px}
+.adi{display:flex;align-items:center;gap:6px}
+.hgrid{position:relative}
+.nowline{position:absolute;left:52px;right:0;height:2px;background:#E5484D;z-index:4;pointer-events:none}
+.nowline::before{content:'';position:absolute;left:-4px;top:-3px;width:8px;height:8px;border-radius:999px;background:#E5484D}
+@media(max-width:820px){ .calsplit{flex-direction:column} .calrail{width:100%;max-height:none;order:2} .calmain{order:1;width:100%} }
+/* timeline */
+.tlwrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px}
+.tlhead{display:flex;border-bottom:1px solid var(--line);background:var(--card)}
+.tlcorner{width:140px;flex:none;padding:9px 12px;font-weight:600;font-size:10px;color:#9AA3AF;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:flex-end}
+.tlday{flex:none;text-align:center;padding:5px 0 6px;font-weight:600;font-size:12px;color:#5A616B;border-left:1px solid var(--line-soft)}
+.tlday .tldow{display:block;font-weight:500;font-size:9px;color:#AEB6C1}
+.tlday.we{background:#FAFBFD}
+.tlday.today{background:var(--accent);color:#fff}
+.tlday.today .tldow{color:rgba(255,255,255,.8)}
+.tlbody{position:relative}
+.tlrow{display:flex;align-items:center;border-top:1px solid var(--line-soft);height:44px}
+.tlrow:first-child{border-top:none}
+.tlname2{width:140px;flex:none;padding:0 12px;font-weight:600;font-size:12.5px;color:#15171A;display:flex;align-items:center;gap:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tltrack{position:relative;height:44px;cursor:pointer}
+.tlbar2{position:absolute;top:11px;height:22px;border-radius:7px;border:none;color:#fff;font-weight:600;font-size:11px;padding:0 9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;display:flex;align-items:center}
+.tlnodate{position:absolute;left:8px;top:14px;font-size:11px;color:#C2CAD6}
+.tldot{position:absolute;top:30px;width:8px;height:8px;border-radius:999px;background:#B4792B;border:1.5px solid #fff}
+.tltoday{position:absolute;top:0;bottom:0;width:2px;background:#E5484D;z-index:3;pointer-events:none}
+
+/* projects */
+.projgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(264px,1fr));gap:16px;margin-top:22px}
+.projcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:0;overflow:hidden;cursor:pointer;box-shadow:0 1px 2px rgba(30,70,140,.04);text-align:left;transition:transform .13s cubic-bezier(.16,1,.3,1),box-shadow .13s,border-color .13s}
+.projcard:hover{border-color:#C7D3E4;box-shadow:0 10px 26px rgba(30,70,140,.11);transform:translateY(-2px)}
+.pc-band{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 15px;background:var(--accent-wash)}
+.pc-glyph{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:17px;background:var(--accent);box-shadow:0 2px 7px rgba(31,111,235,.28)}
+.pc-ring{position:relative;width:44px;height:44px}
+.pc-ring .arc{stroke:var(--accent)}
+.pc-ring .pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10.5px;color:#15171A;font-variant-numeric:tabular-nums}
+.pc-body{padding:12px 16px 15px}
+.pc-name{font-weight:700;font-size:15.5px;letter-spacing:-.01em;color:#15171A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pc-kind{font-weight:600;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:#9AA3AF;margin-top:3px}
+.pc-tl{margin-top:12px}
+.pc-notl{font-weight:500;font-size:11px;color:#AEB6C1}
+.pc-tlbar{height:5px;border-radius:999px;background:#EAEFF5;overflow:hidden}
+.pc-tlbar>i{display:block;height:100%;border-radius:999px;background:var(--accent)}
+.pc-tldates{display:flex;justify-content:space-between;margin-top:6px;font-weight:500;font-size:10.5px;color:#9AA3AF}
+.pbar{height:6px;border-radius:999px;background:#EAEFF5;margin-top:11px;overflow:hidden}
+.pbar>i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.pc-foot{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:8px}
+.pc-due{font-weight:600;font-size:11px;padding:4px 10px;border-radius:999px;background:#F1F4F8;color:#5A616B;white-space:nowrap}
+.pc-due.soon{background:#FFF2E2;color:#B4792B}
+.pc-due.none{background:#F1F4F8;color:#9AA3AF}
+.pc-open{display:flex;align-items:center;gap:7px;min-width:0}
+.pc-count{font-weight:600;font-size:11.5px;color:#5A616B;white-space:nowrap}
+.newproj{border:1.5px dashed #C7D3E4;background:rgba(255,255,255,.45);border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-weight:600;font-size:14px;color:var(--accent-deep);cursor:pointer;min-height:150px}
+
+/* project side panel */
+.pov{position:fixed;inset:0;background:rgba(16,38,77,.22);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);z-index:60;display:flex;justify-content:flex-end;padding:18px;align-items:stretch}
+.ppanel{width:452px;max-width:100%;height:100%;background:#fff;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 28px 80px rgba(16,40,82,.34);animation:slidein .22s cubic-bezier(.16,1,.3,1)}
+.pmeta{display:flex;align-items:center;gap:10px;margin-top:10px}
+.pmeta-t{font-weight:500;font-size:12.5px;color:#5A616B}
+.pprog{font-weight:500;font-size:11.5px;color:#8A93A0;margin-top:6px}
+.prail{margin-top:16px;border-top:1px solid var(--line)}
+.prow{display:grid;grid-template-columns:106px 1fr;gap:8px;padding:9px 0;border-bottom:1px solid var(--line-soft);font-size:13px}
+.prow:last-child{border-bottom:none}
+.prow .k{color:#8A93A0;font-weight:500}
+.prow .v{color:#15171A;font-weight:500;display:flex;align-items:center;gap:7px}
+.pvtoggle{display:inline-flex;border:1px solid var(--field);border-radius:8px;overflow:hidden}
+.pvtoggle button{border:none;background:#fff;font:inherit;font-size:12.5px;font-weight:600;color:#8A93A0;padding:6px 15px;cursor:pointer}
+.pvtoggle button.on{background:var(--accent-wash);color:var(--accent-deep)}
+.tline{position:relative;margin-top:18px}
+.tlrow{position:relative;padding:0 0 20px 32px;min-height:22px}
+.tlrow:before{content:"";position:absolute;left:7px;top:5px;height:100%;width:2px;background:#E1E7F0}
+.tlrow:last-child:before{display:none}
+.tldot{position:absolute;left:1px;top:2px;width:15px;height:15px;border-radius:50%;background:#fff;border:2px solid var(--accent);box-sizing:border-box;z-index:1}
+.tldot.done{background:var(--accent)}
+.tldot.open{border-color:#C7D3E4}
+.tldot.bookend{background:#15171A;border-color:#15171A}
+.tldot.today{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-wash)}
+.tlc{min-width:0}
+.tlhead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tlc .tt{font-size:14px;font-weight:600;color:#15171A;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tlc .tt.done{color:#AEB6C1;text-decoration:line-through}
+.tlc .tt.now{color:var(--accent-deep)}
+.tlc .dd{font-size:12px;color:#8A93A0;margin-top:2px}
+.tlc .gap{font-size:10.5px;color:#C0C6D0;font-weight:500;margin-top:9px}
+.tlempty{font-size:13px;color:#8A93A0;margin-top:22px;line-height:1.55}
+@keyframes slidein{from{transform:translateX(34px);opacity:0}to{transform:none;opacity:1}}
+.phd{padding:20px 22px 16px;border-bottom:1px solid var(--line);flex:none}
+.phtop{display:flex;align-items:flex-start;gap:10px}
+.ptitle{font-weight:700;font-size:21px;color:#15171A;letter-spacing:-.01em;flex:1;min-width:0}
+.pbody{padding:16px 22px 40px;flex:1;overflow-y:auto}
+.pstrip{height:26px;background:#F2F6FB;border-radius:8px;position:relative;margin:10px 0 4px}
+.pstrip>i{position:absolute;top:0;bottom:0;border-radius:8px;opacity:.85}
+.pstrip .tick{position:absolute;top:-4px;width:2px;height:34px;background:#15171A;border-radius:2px}
+.pstrip .mk{position:absolute;top:-3px;width:8px;height:8px;border-radius:999px;background:#B4792B;transform:translateX(-4px);border:1.5px solid #fff}
+.psec{margin-top:24px}
+.psec h4{margin:0 0 6px;font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#9AA3AF}
+.irow{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-top:1px solid var(--line-soft)}
+.irow:first-child{border-top:none}
+.ibody{flex:1;min-width:0}
+.ititle{font-weight:600;font-size:14px;color:#15171A}
+.ititle.done{color:#AEB6C1;text-decoration:line-through}
+.matrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line-soft)}
+.matrow:first-child{border-top:none}
+.matrow a{color:var(--accent-deep);font-weight:600;font-size:13px;text-decoration:none;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.addrow{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.addrow input{border:1px solid var(--field);border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;background:#fff}
+.addrow input.grow{flex:1;min-width:120px}
+.mini{border:none;background:var(--accent);color:#fff;border-radius:8px;padding:0 13px;font-weight:600;font-size:13px;cursor:pointer}
+.mini.ghost{background:#fff;border:1px solid var(--field);color:#2F343B}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.sw{width:26px;height:26px;border-radius:999px;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px var(--field);padding:0}
+.sw.on{box-shadow:0 0 0 2px var(--accent)}
+
+/* journal */
+.cols{display:flex;flex-wrap:wrap;gap:22px;margin-top:24px;align-items:flex-start}
+.colmain{flex:999 1 500px;min-width:0}
+.colside{flex:1 1 320px;min-width:280px}
+.jwrite{padding:22px 24px}
+.jprompt{margin:8px 0 14px;font-weight:500;font-size:15px;color:#3A4350}
+.ta{width:100%;min-height:120px;border:1px solid var(--field);border-radius:12px;background:#FBFDFF;padding:14px;font-family:inherit;font-size:14px;color:#15171A;resize:vertical}
+.tags{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px}
+.tagchip{font-weight:500;font-size:11.5px;color:#49505A;border:1px solid var(--field);border-radius:999px;padding:5px 12px;cursor:pointer;background:#fff}
+.tagchip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.savebtn{margin-left:auto;background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-weight:600;font-size:13px;cursor:pointer}
+.jentry{padding:16px 20px;margin-bottom:12px}
+.jentry .jh{display:flex;justify-content:space-between;align-items:baseline}
+.jentry p{margin:7px 0 0;font-size:14px;line-height:1.55;color:#39414C}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(16,38,77,.40);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px;z-index:70}
+.modal{background:#fff;border-radius:22px;width:100%;max-width:482px;max-height:92vh;overflow-y:auto;padding:24px 26px 22px;box-shadow:0 30px 90px rgba(16,40,82,.34);animation:pop .2s cubic-bezier(.16,1,.3,1)}
+@keyframes pop{from{transform:translateY(10px) scale(.985);opacity:0}to{transform:none;opacity:1}}
+.mhd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.mhd h3{margin:0;font-weight:700;font-size:19px;letter-spacing:-.01em;color:#15171A}
+.meyebrow{font-weight:600;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-deep);margin-bottom:3px}
+.x{width:30px;height:30px;border-radius:999px;display:flex;align-items:center;justify-content:center;border:none;background:#F1F5FA;color:#6A7382;font-size:18px;cursor:pointer;line-height:1;flex:none}
+.x:hover{background:#E6ECF3;color:#3A4350}
+.lbl{display:block;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#9AA3AF;margin:14px 0 6px}
+.fld{width:100%;border:1px solid var(--field);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14px;color:#15171A;background:#FBFDFF;transition:border-color .12s,box-shadow .12s,background .12s}
+.fld:focus,.subedit input:focus,.addrow input:focus,.gate input:focus,.ta:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash);background:#fff}
+.ownerseg{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--field);border-radius:10px;overflow:hidden}
+.ownerseg button{border:none;background:#fff;padding:9px 0;font-weight:500;font-size:12.5px;color:#5A616B;cursor:pointer;border-left:1px solid var(--field)}
+.ownerseg button:first-child{border-left:none}
+.ownerseg button.on{background:var(--ink);color:#fff}
+.subedit{display:flex;align-items:center;gap:7px;margin:5px 0}
+.subedit input[type=text]{flex:1;border:1px solid var(--field);border-radius:8px;padding:7px 9px;font-size:13px;font-family:inherit;min-width:0}
+.subedit input[type=date]{border:1px solid var(--field);border-radius:8px;padding:7px 8px;font-size:12px;font-family:inherit;color:#5A616B;flex:none;width:122px}
+.subedit input[type=time]{border:1px solid var(--field);border-radius:8px;padding:7px 8px;font-size:12px;font-family:inherit;color:#5A616B;flex:none;width:92px}
+.linkbtn{border:none;background:none;color:var(--accent-deep);font-weight:600;font-size:12.5px;cursor:pointer;padding:5px 0}
+.mactions{display:flex;gap:10px;margin-top:18px;align-items:center}
+.btn{border-radius:11px;padding:11px 18px;font-weight:600;font-size:13.5px;cursor:pointer;flex:1;text-align:center;transition:transform .1s,box-shadow .12s,background .12s}
+.btn:active{transform:scale(.985)}
+.btn.ghost{background:#fff;border:1px solid var(--field);color:#15171A}
+.btn.ghost:hover{background:#F6F9FC}
+.btn.primary{background:var(--primary);border:none;color:#fff;box-shadow:0 3px 12px rgba(18,30,55,.22)}
+.btn.primary:hover{box-shadow:0 6px 18px rgba(18,30,55,.3)}
+.btn.del{flex:none;background:none;border:none;color:#C64A3B;font-weight:600;font-size:12.5px;padding:10px 4px;cursor:pointer}
+
+/* gate */
+.gate{height:100%;display:flex;align-items:center;justify-content:center;background:var(--grad);padding:24px}
+.gatecard{background:#fff;border:1px solid var(--line);border-radius:20px;padding:30px 28px;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(30,70,140,.18);text-align:center}
+.gatecard .brand{margin:0 auto 14px}
+.gate h1{font-size:20px;margin:0 0 4px;letter-spacing:-.01em}
+.gate .lead{font-size:13px;color:#8A93A0;margin:0 0 18px}
+.gate input{width:100%;text-align:center;font-size:17px;letter-spacing:.08em;border:1px solid var(--field);border-radius:12px;padding:12px;font-family:inherit;margin-bottom:12px;background:#FBFDFF}
+.gate .err{color:#C64A3B;font-weight:500;font-size:12.5px;margin:0 0 10px;min-height:16px}
+
+/* sticky note */
+.notecard{background:linear-gradient(180deg,#FFF3BE,#FFEEA6);border:1px solid #F1DE84;border-radius:18px;padding:15px 18px;box-shadow:0 1px 3px rgba(120,100,20,.08)}
+.notehd{font-weight:700;font-size:11px;color:#8A6D10;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+.notearea{width:100%;min-height:118px;border:none;background:transparent;resize:vertical;font-family:inherit;font-size:14px;color:#5A4A12;outline:none;line-height:1.5}
+.notearea::placeholder{color:#B79B3E}
+.notesgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:14px;margin-top:12px}
+.notecd{border:1px solid;border-radius:16px;padding:13px 14px 9px;min-height:148px;display:flex;flex-direction:column;box-shadow:0 2px 8px rgba(80,70,20,.06);transition:transform .12s,box-shadow .12s}
+.notecd:hover{transform:translateY(-2px) rotate(-.4deg);box-shadow:0 8px 18px rgba(80,70,20,.14)}
+.notearea2{flex:1;width:100%;border:none;background:transparent;resize:none;font-family:inherit;font-size:14px;line-height:1.5;outline:none;min-height:78px}
+.notearea2::placeholder{opacity:.45}
+.notefoot{display:flex;align-items:center;justify-content:space-between;margin-top:6px;opacity:0;transition:opacity .12s}
+.notecd:hover .notefoot,.notecd:focus-within .notefoot{opacity:1}
+.notecolors{display:flex;gap:5px}
+.ncol{width:15px;height:15px;border-radius:999px;border:1px solid;cursor:pointer;padding:0}
+.ncol.on{box-shadow:0 0 0 2px rgba(0,0,0,.28)}
+.noterm{border:none;background:none;font-size:18px;cursor:pointer;line-height:1;opacity:.55}
+.noterm:hover{opacity:1}
+.addnote{border:1.5px dashed #CBD6E6;background:rgba(255,255,255,.5);border-radius:16px;min-height:148px;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:14px;color:var(--accent-deep);cursor:pointer}
+.addnote:hover{background:rgba(255,255,255,.75);border-color:#B9CBE4}
+/* shared focus / pomodoro */
+.focuscard{background:#fff;border:1px solid var(--line,#E7EBF0);border-radius:18px;padding:18px 20px;margin:0 0 18px;box-shadow:0 4px 18px rgba(20,40,80,.05)}
+.focuscard.done{border-color:#BfE6CF;background:linear-gradient(180deg,#F4FCF7,#fff)}
+.fcrow{display:flex;gap:20px;align-items:center}
+.fcring{position:relative;width:128px;height:128px;flex:0 0 128px}
+.fcring svg{display:block;transform:rotate(-90deg)}
+.fcclock{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:27px;letter-spacing:-.02em;color:#15171A;font-variant-numeric:tabular-nums}
+.fcbody{flex:1 1 auto;min-width:0}
+.fctitle{font-weight:700;font-size:16px;letter-spacing:-.01em;color:#15171A}
+.fcsub{font-weight:400;font-size:12.5px;line-height:1.45;color:#8A93A0;margin-top:3px}
+.fcwho{color:#5A616B}
+.fclabel{width:100%;margin-top:11px;border:1px solid #E7EBF0;border-radius:10px;padding:9px 12px;font:inherit;font-size:13px;background:#F8FAFC;color:#15171A;box-sizing:border-box}
+.fclabel:focus{outline:none;border-color:#B9D4F6;background:#fff}
+.fclabel::placeholder{color:#A8B0BC}
+.fcpresets{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}
+.fcchip{border:1px solid #E7EBF0;background:#fff;border-radius:999px;padding:6px 14px;font:inherit;font-size:12.5px;font-weight:600;color:#5A616B;cursor:pointer}
+.fcchip.on{background:var(--accent-wash,#E8F1FF);border-color:#B9D4F6;color:var(--accent,#1F6FEB)}
+.fcstart{margin-top:13px;max-width:210px}
+.fcbtns{display:flex;gap:9px;margin-top:14px}
+@media(max-width:560px){.fcrow{flex-direction:column;align-items:center;text-align:center}.fcbody{width:100%}.fcpresets{justify-content:center}.fcbtns{justify-content:center}.fcstart{margin-left:auto;margin-right:auto}}
+/* compact sidebar focus widget */
+.focusw{margin-top:auto;border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden;box-shadow:0 1px 2px rgba(30,70,140,.04)}
+.focusw.active{border-color:#C7DCF6;box-shadow:0 2px 10px rgba(31,111,235,.10)}
+.fw-head{display:flex;align-items:center;gap:8px;width:100%;padding:9px 11px;border:none;background:none;cursor:pointer;text-align:left;font:inherit}
+.fw-head:hover{background:#F4F8FD}
+.fw-ic{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;flex:none}
+.fw-dot{width:8px;height:8px;border-radius:50%}
+.fw-label{flex:1;min-width:0;font-weight:600;font-size:13px;color:#2F343B;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fw-time{font-weight:700;font-size:13px;color:#15171A;font-variant-numeric:tabular-nums}
+.fw-mut{flex:1;min-width:0;font-weight:500;font-size:11.5px;color:#8A93A0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fw-chev{font-size:10px;color:#AEB6C1;transition:transform .15s;flex:none}
+.fw-chev.up{transform:rotate(180deg)}
+.fw-mini{height:3px;background:#EAEFF5}
+.fw-mini>i{display:block;height:100%}
+.fw-body{padding:10px 11px 12px;border-top:1px solid var(--line)}
+.fw-lab{width:100%;border:1px solid #E7EBF0;border-radius:8px;padding:7px 9px;font:inherit;font-size:12.5px;background:#F8FAFC;color:#15171A;box-sizing:border-box}
+.fw-lab:focus{outline:none;border-color:#B9D4F6;background:#fff}
+.fw-presets{display:flex;gap:6px;margin-top:9px}
+.fw-chip{flex:1;border:1px solid #E7EBF0;background:#fff;border-radius:8px;padding:6px 0;font:inherit;font-size:12px;font-weight:600;color:#5A616B;cursor:pointer}
+.fw-chip.on{background:var(--accent-wash);border-color:#B9D4F6;color:var(--accent)}
+.fw-start{width:100%;margin-top:10px}
+.fw-sub{font-size:11.5px;color:#8A93A0;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fw-btns{display:flex;gap:6px;margin-top:9px}
+.fw-btns .btn{flex:1;padding:8px 0;font-size:12.5px}
+.mobfocus{display:none}
+@media(max-width:820px){.mobfocus{display:block;margin-bottom:14px}.mobfocus .focusw{margin-top:0}}
+/* wave + toasts + notifications */
+.wavewrap{position:fixed;right:20px;bottom:20px;z-index:61;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+@media(max-width:820px){.wavewrap{bottom:76px}}
+.wavefab{width:50px;height:50px;border-radius:50%;background:#fff;border:1px solid var(--line);box-shadow:0 8px 22px rgba(20,40,80,.16);font-size:23px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .12s}
+.wavefab:hover{transform:scale(1.07)}
+.wavefab:active{transform:scale(.96)}
+.wavepick{display:flex;gap:3px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 8px;box-shadow:0 10px 28px rgba(20,40,80,.18);animation:toastin .18s ease}
+.waveopt{border:none;background:none;font-size:21px;cursor:pointer;padding:4px 5px;border-radius:9px;line-height:1}
+.waveopt:hover{background:var(--accent-wash);transform:scale(1.12)}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:92;display:flex;align-items:center;gap:10px;background:#15171A;color:#fff;border-radius:12px;padding:11px 16px;box-shadow:0 12px 34px rgba(0,0,0,.26);font-weight:600;font-size:13.5px;animation:toastin .25s cubic-bezier(.16,1,.3,1);max-width:calc(100vw - 32px)}
+.toast-emoji{font-size:18px;line-height:1}
+.wavefx{position:fixed;left:50%;top:50%;z-index:90;font-size:120px;pointer-events:none;animation:wavepop 1.7s ease forwards}
+@keyframes toastin{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes wavepop{0%{opacity:0;transform:translate(-50%,-30%) scale(.3)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}55%{opacity:1;transform:translate(-50%,-60%) scale(1)}100%{opacity:0;transform:translate(-50%,-128%) scale(.9)}}
+.notifrow{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0;border-top:1px solid var(--line-soft)}
+.switch{width:44px;height:26px;border-radius:999px;background:#D7DEE8;border:none;position:relative;cursor:pointer;flex:none;transition:background .15s;padding:0}
+.switch.on{background:var(--accent)}
+.switch .knob{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .15s}
+.switch.on .knob{transform:translateX(18px)}
+/* habit editor + settings modal */
+.setnav{display:flex;flex-direction:column;gap:2px}
+.setnav button{border:none;background:none;text-align:left;padding:9px 11px;border-radius:9px;font-weight:600;font-size:13.5px;color:#2F343B;cursor:pointer}
+.setnav button.on{background:var(--accent-wash);color:var(--accent-deep)}
+.setmodal{display:flex;gap:0;max-width:760px;width:100%;max-height:92vh;background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 30px 90px rgba(16,40,82,.34);animation:pop .2s cubic-bezier(.16,1,.3,1)}
+.setside{width:188px;flex:none;background:#F7FAFE;border-right:1px solid var(--line);padding:18px 12px}
+.setbody{flex:1;min-width:0;padding:22px 24px;overflow-y:auto}
+.hrowe{display:flex;align-items:center;gap:11px;padding:10px 0;border-top:1px solid var(--line-soft)}
+.hrowe:first-child{border-top:none}
+.hrowe .hn{flex:1;min-width:0;font-weight:600;font-size:14px;color:#15171A}
+.hkind{font-weight:600;font-size:10.5px;color:#8A93A0;background:#EEF2F7;border-radius:999px;padding:2px 9px}
+.sheetfoot{flex:none;border-top:1px solid var(--line);padding:14px 22px;display:flex;gap:10px;align-items:center;background:#fff}
+.setgrp{font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#AEB6C1;padding:14px 11px 4px}
+.aptitle{font-weight:600;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#8A93A0;margin:18px 0 8px}
+.aptitle:first-child{margin-top:4px}
+.bgswatches{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.bgsw{aspect-ratio:1;border-radius:12px;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px var(--field);padding:0}
+.bgsw.on{box-shadow:0 0 0 2px var(--accent)}
+.fontopts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.fontopt{border:1px solid var(--field);background:#fff;border-radius:12px;padding:11px 13px;cursor:pointer;text-align:left}
+.fontopt.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-wash)}
+.fontopt .fn{font-size:19px;color:#15171A;line-height:1.1}
+.fontopt .fl{font-size:10px;color:#8A93A0;margin-top:3px;letter-spacing:.04em;text-transform:uppercase}
+.radopts{display:flex;gap:10px}
+.radopt{flex:1;border:1px solid var(--field);background:#fff;padding:12px 0;cursor:pointer;font-weight:600;font-size:13px;color:#2F343B;text-align:center}
+.radopt.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-wash);color:var(--accent-deep)}
+.radopt.r0{border-radius:5px}.radopt.r1{border-radius:11px}.radopt.r2{border-radius:20px}
+#root[data-radius="sharp"] .card,#root[data-radius="sharp"] .habcard,#root[data-radius="sharp"] .projcard,#root[data-radius="sharp"] .modal,#root[data-radius="sharp"] .ppanel,#root[data-radius="sharp"] .setmodal,#root[data-radius="sharp"] .gstart,#root[data-radius="sharp"] .notecard,#root[data-radius="sharp"] .calgrid,#root[data-radius="sharp"] .wkcal,#root[data-radius="sharp"] .tlwrap,#root[data-radius="sharp"] .cal-tl,#root[data-radius="sharp"] .jwrite,#root[data-radius="sharp"] .jentry,#root[data-radius="sharp"] .calrail,#root[data-radius="sharp"] .gatecard{border-radius:6px}
+#root[data-radius="sharp"] .btn,#root[data-radius="sharp"] .fld,#root[data-radius="sharp"] .mini,#root[data-radius="sharp"] .ownerseg,#root[data-radius="sharp"] .ta{border-radius:7px}
+#root[data-radius="round"] .card,#root[data-radius="round"] .habcard,#root[data-radius="round"] .projcard,#root[data-radius="round"] .modal,#root[data-radius="round"] .ppanel,#root[data-radius="round"] .setmodal,#root[data-radius="round"] .gstart,#root[data-radius="round"] .notecard,#root[data-radius="round"] .calgrid,#root[data-radius="round"] .wkcal,#root[data-radius="round"] .tlwrap,#root[data-radius="round"] .cal-tl,#root[data-radius="round"] .jwrite,#root[data-radius="round"] .jentry,#root[data-radius="round"] .calrail,#root[data-radius="round"] .gatecard{border-radius:24px}
+#root[data-radius="round"] .btn,#root[data-radius="round"] .fld,#root[data-radius="round"] .mini,#root[data-radius="round"] .ownerseg,#root[data-radius="round"] .ta{border-radius:15px}
+@media(max-width:680px){ .setmodal{flex-direction:column;max-height:94vh} .setside{width:100%;border-right:none;border-bottom:1px solid var(--line);padding:12px} .setnav{flex-direction:row;overflow-x:auto} }
+
+/* onboarding */
+.ibadge{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:none}
+.gstart{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 1px 3px rgba(30,70,140,.05);padding:18px 20px;margin-top:24px}
+.gstart .gh{display:flex;align-items:flex-start;justify-content:space-between}
+.gstart .gt{font-weight:700;font-size:15px;color:#15171A}
+.gstart .gsub{font-weight:500;font-size:12.5px;color:#8A93A0;margin-top:2px}
+.gprog{height:6px;border-radius:999px;background:#EAEFF5;margin:12px 0 2px;overflow:hidden}
+.gprog>i{display:block;height:100%;background:var(--accent);border-radius:999px;transition:width .3s}
+.gstep{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line-soft)}
+.gnum{width:26px;height:26px;border-radius:999px;border:1.5px solid var(--field);color:#8A93A0;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none}
+.gnum.done{background:var(--accent);border-color:var(--accent);color:#fff}
+.gstep .gl{flex:1;min-width:0}
+.gstep .gll{font-weight:600;font-size:14px;color:#15171A}
+.gstep.done .gll{color:#8A93A0;text-decoration:line-through}
+.gstep .gld{font-weight:400;font-size:12px;color:#8A93A0;margin-top:1px}
+.gbtn{border:none;background:var(--accent-wash);color:var(--accent-deep);font-weight:600;font-size:12.5px;border-radius:9px;padding:8px 13px;cursor:pointer;flex:none}
+.gbtn:hover{background:#DCEAFF}
+.introrow{display:flex;align-items:flex-start;gap:13px;padding:10px 0}
+.introrow .it{font-weight:600;font-size:14px;color:#15171A}
+.introrow .id{font-weight:400;font-size:12.5px;color:#5A616B;margin-top:1px;line-height:1.45}
+.helpbtn{display:flex;align-items:center;gap:11px;padding:7px 10px;border-radius:8px;font-weight:500;font-size:14px;color:#2F343B;cursor:pointer;border:none;background:none;width:100%;text-align:left}
+.helpbtn:hover{background:#EDF2F8}
+.mobonly{display:none}
+
+/* mobile */
+.mobnav{display:none}
+@media(max-width:820px){
+  .sidebar{display:none}
+  .main{margin:0;border:none;border-radius:0;box-shadow:none;padding-bottom:66px}
+  .wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  h1.title{font-size:25px}
+  .atime{width:60px}
+  .cal-tl .tlname{width:92px}
+  .daycellm{min-height:74px}
+  .pov{padding:0}
+  .ppanel{width:100%;border-radius:0}
+  .mobnav{display:flex;position:fixed;left:0;right:0;bottom:0;background:#FBFDFF;border-top:1px solid #E5EAF1;padding:7px 0 calc(9px + env(safe-area-inset-bottom,0px));z-index:50}
+  .mobnav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:none;font-weight:500;font-size:9.5px;color:#9AA3AF;cursor:pointer}
+  .mobnav button.on{color:var(--accent-deep);font-weight:600}
+  .mobonly{display:inline-flex!important}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/preact/10.24.3/preact.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/preact/10.24.3/hooks.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/htm/3.1.1/htm.umd.js"></script>
+<script>
+(function(){
+  var h=preact.h, render=preact.render, Fragment=preact.Fragment;
+  var useState=preactHooks.useState, useEffect=preactHooks.useEffect, useMemo=preactHooks.useMemo, useRef=preactHooks.useRef;
+  var html=htm.bind(h);
+
+  // ---- date helpers ----
+  function pad2(n){ return String(n).padStart(2,'0'); }
+  function ymd(d){ return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
+  function parseYmd(s){ var p=s.split('-'); return new Date(+p[0],+p[1]-1,+p[2]); }
+  function addDays(d,n){ var x=new Date(d); x.setDate(x.getDate()+n); return x; }
+  function addMonths(d,n){ return new Date(d.getFullYear(), d.getMonth()+n, 1); }
+  function startOfWeek(d){ return addDays(d, -d.getDay()); }
+  var DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var DOWL=['S','M','T','W','T','F','S'];
+  var MON=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  function longDay(d){ var n=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']; return n[d.getDay()]+', '+d.getDate()+' '+MON[d.getMonth()]; }
+  function shortDate(s){ if(!s) return ''; var d=parseYmd(s); return DOW[d.getDay()]+' '+d.getDate()+' '+MON[d.getMonth()].slice(0,3); }
+  function monthY(d){ return MON[d.getMonth()]+' '+d.getFullYear(); }
+  function to12(t){ if(!t) return ''; var p=t.split(':'); var hh=+p[0]; var ap=hh<12?'am':'pm'; var h12=hh%12; if(h12===0)h12=12; return h12+(p[1]!=='00'?(':'+p[1]):'')+ap; }
+  var TODAY = ymd(new Date());
+  function daysUntil(s){ return Math.round((parseYmd(s)-parseYmd(TODAY))/86400000); }
+  function fmtUntil(s){ var n=daysUntil(s); return n<0?(-n+'d ago'):(n===0?'today':n+'d'); }
+  function uid(pre){ return pre+'_'+Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36); }
+
+  var OWNER_COLOR={me:'#15171A',partner:'#5B6B86',shared:'#B4792B'};
+  var OWNER_LETTER={me:'M',partner:'P',shared:'·'};
+  var PROJ_COLORS=['#1F6FEB','#5B6B86','#2E9E6B','#B0529E','#C2704B','#B4792B','#4F5B76','#7A5BD8'];
+  var TASK_TYPES=[
+    {id:'task',label:'Task',color:'#1F6FEB',event:false},
+    {id:'reminder',label:'Reminder',color:'#B4792B',event:false},
+    {id:'milestone',label:'Milestone',color:'#B0506B',event:false},
+    {id:'event',label:'Event',color:'#7A5BD8',event:true},
+    {id:'meeting',label:'Meeting',color:'#2E9E6B',event:true}
+  ];
+  function typeDef(t){ for(var i=0;i<TASK_TYPES.length;i++){ if(TASK_TYPES[i].id===t) return TASK_TYPES[i]; } return TASK_TYPES[0]; }
+  function isEventType(t){ return typeDef(t).event; }
+  var DEFAULT_GRAD="radial-gradient(1100px 760px at 78% 12%, rgba(255,255,255,.9), transparent 60%),radial-gradient(900px 680px at 12% 82%, rgba(255,255,255,.5), transparent 55%),linear-gradient(162deg,#3FA0FF 0%,#6FBAFF 20%,#A6D5FF 40%,#D6ECFF 62%,#F5FAFF 85%)";
+  var DEFAULT_FONT="'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif";
+  var BG_PRESETS=[
+    {id:'sky',label:'Sky',css:DEFAULT_GRAD,sw:'linear-gradient(135deg,#3FA0FF,#BFE0FF)'},
+    {id:'lavender',label:'Lavender',css:"radial-gradient(900px 680px at 80% 10%, rgba(255,255,255,.85), transparent 60%),linear-gradient(160deg,#B49BFF 0%,#D7C9FF 30%,#ECE4FF 55%,#FBFAFF 85%)",sw:'linear-gradient(135deg,#B49BFF,#E6DCFF)'},
+    {id:'peach',label:'Peach',css:"radial-gradient(900px 680px at 80% 10%, rgba(255,255,255,.85), transparent 60%),linear-gradient(160deg,#FFB38A 0%,#FFD0B0 30%,#FFE8DC 55%,#FFFBF8 85%)",sw:'linear-gradient(135deg,#FFB38A,#FFE0CE)'},
+    {id:'mint',label:'Mint',css:"radial-gradient(900px 680px at 80% 10%, rgba(255,255,255,.85), transparent 60%),linear-gradient(160deg,#6FD6A8 0%,#A9E6CB 30%,#D7F3E6 55%,#F7FFFB 85%)",sw:'linear-gradient(135deg,#6FD6A8,#CFF0E2)'},
+    {id:'rose',label:'Rose',css:"radial-gradient(900px 680px at 80% 10%, rgba(255,255,255,.85), transparent 60%),linear-gradient(160deg,#FF9DBE 0%,#FFC4D7 30%,#FFE2EC 55%,#FFF9FB 85%)",sw:'linear-gradient(135deg,#FF9DBE,#FFD6E2)'},
+    {id:'slate',label:'Slate',css:"linear-gradient(160deg,#AEBDD4 0%,#CAD6E6 30%,#E4ECF5 55%,#F7FAFE 85%)",sw:'linear-gradient(135deg,#AEBDD4,#DCE6F2)'},
+    {id:'cream',label:'Cream',css:"#FBF7EF",sw:'#FBF7EF'},
+    {id:'ice',label:'Ice',css:"#EDF3FB",sw:'#EDF3FB'},
+    {id:'white',label:'White',css:"#FFFFFF",sw:'#FFFFFF'},
+    {id:'ink',label:'Ink',css:"#14161c",sw:'#14161c',dark:true},
+    {id:'midnight',label:'Midnight',css:"radial-gradient(900px 680px at 80% 8%, rgba(60,90,160,.35), transparent 60%),linear-gradient(160deg,#0E1322 0%,#141B2D 60%,#0F1420 100%)",sw:'linear-gradient(135deg,#1c2440,#0e1322)',dark:true}
+  ];
+  var FONTS=[
+    {id:'inter',label:'Inter',stack:DEFAULT_FONT},
+    {id:'fraunces',label:'Fraunces',stack:"'Fraunces',Georgia,'Times New Roman',serif"},
+    {id:'jakarta',label:'Jakarta',stack:"'Plus Jakarta Sans','Inter',system-ui,sans-serif"},
+    {id:'grotesk',label:'Grotesk',stack:"'Space Grotesk','Inter',system-ui,sans-serif"}
+  ];
+  var NOTE_COLORS=[
+    {id:'yellow',bg:'#FFF3BE',bd:'#F1DE84',fg:'#6E5810'},
+    {id:'pink',bg:'#FFE1EC',bd:'#F6C0D4',fg:'#8A2F55'},
+    {id:'blue',bg:'#DCEBFF',bd:'#B9D4F6',fg:'#1C4E8A'},
+    {id:'green',bg:'#DCF3E4',bd:'#B6E3C6',fg:'#1E6B3C'},
+    {id:'purple',bg:'#ECE4FF',bd:'#D3C4F6',fg:'#4E3A8A'},
+    {id:'peach',bg:'#FFE6D6',bd:'#F6CDB4',fg:'#8A4A22'}
+  ];
+  function noteColor(id){ for(var i=0;i<NOTE_COLORS.length;i++){if(NOTE_COLORS[i].id===id)return NOTE_COLORS[i];} return NOTE_COLORS[0]; }
+
+  function lsGet(k,d){ try{ var v=localStorage.getItem(k); return v==null?d:v; }catch(e){ return d; } }
+  function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+
+  // ---- api ----
+  function apiGet(p){ return fetch(p,{headers:{'accept':'application/json'}}); }
+  function apiPost(p,b){ return fetch(p,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(b||{})}); }
+
+  // ---- icons ----
+  function Icon(props){ return html`<svg width=${props.s||18} height=${props.s||18} viewBox="0 0 24 24" fill="none" aria-hidden="true">${props.children}</svg>`; }
+  var icons={
+    today:html`<path d="M4 11.5 12 4.5l8 7M6 10v9a1 1 0 001 1h10a1 1 0 001-1v-9" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/>`,
+    tasks:html`<path d="M9 6h11M9 12h11M9 18h7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4 5.6l1.3 1.4L7.7 4M4 11.6l1.3 1.4L7.7 10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5" cy="18" r="1.2" fill="currentColor"/>`,
+    calendar:html`<rect x="4" y="5" width="16" height="15" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M4 9.5h16M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>`,
+    projects:html`<path d="M4 7.5A1.5 1.5 0 015.5 6h3.2a1.5 1.5 0 011.2.6l.9 1.2a1.5 1.5 0 001.2.6H18.5A1.5 1.5 0 0120 9.9V18a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 014 18V7.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`,
+    journal:html`<path d="M5 4.5h10a2 2 0 012 2V20l-6-2.5V4.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M5 4.5a2 2 0 00-2 2V18l2-.8" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>`,
+    settings:html`<circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>`,
+    help:html`<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M9.3 9.2a2.8 2.8 0 015.3 1c0 1.9-2.6 2-2.6 3.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="17.2" r="1" fill="currentColor"/>`
+  };
+  var chevL=html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M14 6l-6 6 6 6" stroke="#3A4350" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  var chevR=html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M10 6l6 6-6 6" stroke="#3A4350" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  var checkMark=html`<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6.2l2.2 2.2 4.8-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+  function Avatar(props){ var o=props.owner; if(o==='shared'){ return html`<span style=${{display:'inline-flex'}}>
+      <span class=${'av '+(props.cls||'avm')} style=${{background:OWNER_COLOR.me,border:'2px solid #fff'}}>M</span>
+      <span class=${'av '+(props.cls||'avm')} style=${{background:OWNER_COLOR.partner,marginLeft:'-8px',border:'2px solid #fff'}}>P</span></span>`; }
+    return html`<span class=${'av '+(props.cls||'avm')} style=${{background:OWNER_COLOR[o]||'#8A847C'}}>${OWNER_LETTER[o]||'?'}</span>`; }
+  function Check(props){ return html`<button class=${'check'+(props.sm?' sm':'')+(props.done?' on':'')} aria-pressed=${!!props.done} aria-label=${props.label||'Toggle done'} onClick=${props.onClick}>${props.done?checkMark:null}</button>`; }
+
+  function OwnerSeg(props){ return html`<div class="ownerseg">
+    <button class=${props.value==='me'?'on':''} onClick=${function(){props.onChange('me');}}>Me</button>
+    <button class=${props.value==='partner'?'on':''} onClick=${function(){props.onChange('partner');}}>Partner</button>
+    <button class=${props.value==='shared'?'on':''} onClick=${function(){props.onChange('shared');}}>Shared</button>
+  </div>`; }
+
+  // ---- derived helpers ----
+  function childrenOf(tasks,id){ return (tasks||[]).filter(function(t){return t.parent_id===id;}); }
+  function upcomingFrom(projects,tasks){
+    var out=[];
+    (projects||[]).forEach(function(p){ if(p.end_date && !p.archived) out.push({id:'p_'+p.id,title:p.name,date:p.end_date,owner:p.owner,color:p.color,isproj:true,pid:p.id}); });
+    (tasks||[]).forEach(function(t){ if(t.due && !t.done) out.push({id:'t_'+t.id,title:t.title,date:t.due,owner:t.owner,ref:t}); });
+    out.sort(function(a,b){return a.date<b.date?-1:1;});
+    return out;
+  }
+  function projStats(projId,tasks){
+    var all=(tasks||[]).filter(function(t){return t.project===projId;});
+    var done=all.filter(function(t){return t.done;}).length;
+    return {total:all.length,done:done,pct:all.length?Math.round(done/all.length*100):0};
+  }
+
+  // ---- Task row (Today / lists) ----
+  function TaskRow(props){
+    var t=props.t, proj=props.proj, tasks=props.tasks;
+    var exp=useState(false); var open=exp[0], setOpen=exp[1];
+    var subs=childrenOf(tasks,t.id);
+    var done=subs.filter(function(s){return s.done;}).length;
+    return html`<div class="arow">
+      <div class="atime kind" style=${{color:typeDef(t.type).color}}>${typeDef(t.type).label}</div>
+      ${isEventType(t.type)?html`<span style=${{width:'20px',flex:'none'}}></span>`:html`<${Check} done=${t.done} label=${t.title} onClick=${function(){props.onToggle(t);}} />`}
+      <div class="abody">
+        <div class=${'atitle'+(t.done?' done':'')}>${t.title}</div>
+        <div class="ameta">
+          ${proj?html`<span class="tag"><span class="dot" style=${{background:proj.color}}></span>${proj.name}</span>`:null}
+          ${isEventType(t.type)&&t.time?html`<span class="pill">${to12(t.time)}</span>`:null}
+          ${t.due?html`<span class="pill due">Due ${shortDate(t.due)}${t.due_time?(' · '+to12(t.due_time)):''}</span>`:null}
+          ${subs.length?html`<button class="view" onClick=${function(){setOpen(!open);}}>${done}/${subs.length} subtasks ${open?'▴':'▾'}</button>`:null}
+          <button class="view" onClick=${function(){props.onEdit(t);}}>Edit</button>
+        </div>
+        ${open&&subs.length?html`<div class="subs">${subs.map(function(s){return html`
+          <div class=${'subrow'+(s.done?' done':'')} key=${s.id}>
+            <${Check} sm=${true} done=${s.done} label=${s.title} onClick=${function(){props.onToggle(s);}} />
+            <span class="slabel">${s.title}</span>
+            ${s.due?html`<span class="pill due">${shortDate(s.due)}${s.due_time?(' · '+to12(s.due_time)):''}</span>`:null}
+          </div>`;})}</div>`:null}
+      </div>
+      <${Avatar} owner=${t.owner} cls="avm" />
+    </div>`;
+  }
+
+  function Block(props){ var r=props.r; return html`<div class="arow">
+      <div class="atime"><div class="t">${to12(r.start).replace(/am|pm/,'')}<span class="ap">${(+r.start.split(':')[0])<12?'am':'pm'}</span></div><div class="d">${props.dur}</div></div>
+      <div class="abody"><div class="atitle block">${r.title}</div></div>
+      <div class="aright">${props.now?html`<span class="pill now">Now</span>`:html`<span class="pill">Block</span>`}<${Avatar} owner=${r.owner||'me'} cls="avm" /></div>
+    </div>`; }
+  function durOf(r){ if(!r.start||!r.end) return ''; var a=r.start.split(':'),b=r.end.split(':'); var m=(+b[0]*60+ +b[1])-(+a[0]*60+ +a[1]); var hh=Math.floor(m/60),mm=m%60; return hh+'h'+(mm?' '+mm+'m':''); }
+
+  // ---- shared focus / pomodoro ----
+  function fmtClock(ms){ var s=Math.max(0,Math.round(ms/1000)); var m=Math.floor(s/60), ss=s%60; return m+':'+(ss<10?'0':'')+ss; }
+  function FocusCard(props){
+    var f=props.focus||{status:'idle',minutes:25,label:'',ends_at:0,remaining:0,started_by:''};
+    var st=f.status||'idle'; var running=st==='running', paused=st==='paused', active=running||paused;
+    var tS=useState(0); var setTick=tS[1];
+    var mS=useState(f.minutes||25); var selMin=mS[0], setSelMin=mS[1];
+    var lS=useState(''); var lab=lS[0], setLab=lS[1];
+    useEffect(function(){ if(st!=='running') return; var iv=setInterval(function(){ setTick(function(x){return x+1;}); },500); return function(){ clearInterval(iv); }; },[st,f.ends_at]);
+    var total=((active?f.minutes:selMin)||25)*60000;
+    var remMs = running?Math.max(0,(f.ends_at||0)-Date.now()) : paused?Math.max(0,f.remaining||0) : total;
+    var done = running && remMs<=0;
+    var prog = done?1:(total>0?Math.min(1,Math.max(0,1-remMs/total)):0);
+    var R=54, C=2*Math.PI*R, off=C*(1-prog);
+    var who = f.started_by==='me'?(props.meName||'You') : f.started_by==='partner'?(props.partnerName||'Partner') : '';
+    var ring = html`<div class="fcring">
+      <svg viewBox="0 0 128 128" width="128" height="128">
+        <circle cx="64" cy="64" r="54" fill="none" stroke="#E7EDF5" stroke-width="9" />
+        <circle cx="64" cy="64" r="54" fill="none" stroke=${done?'#2E9E6B':'#1F6FEB'} stroke-width="9" stroke-linecap="round" stroke-dasharray=${C} stroke-dashoffset=${off} style=${{transition:'stroke-dashoffset .5s linear'}} />
+      </svg>
+      <div class="fcclock">${fmtClock(remMs)}</div>
+    </div>`;
+    if(!active){
+      return html`<section class="focuscard"><div class="fcrow">
+        ${ring}
+        <div class="fcbody">
+          <div class="fctitle">Focus together</div>
+          <div class="fcsub">Set a timer and settle in — you'll both see the same countdown, live.</div>
+          <input class="fclabel" placeholder="What are you working on?" value=${lab} onInput=${function(e){setLab(e.target.value);}} />
+          <div class="fcpresets">${[25,50,15].map(function(p){ return html`<button class=${'fcchip'+(selMin===p?' on':'')} key=${p} onClick=${function(){setSelMin(p);}}>${p} min</button>`; })}</div>
+          <button class="btn primary fcstart" onClick=${function(){props.onStart(selMin,lab);}}>Start ${selMin} min</button>
+        </div>
+      </div></section>`;
+    }
+    return html`<section class=${'focuscard'+(done?' done':'')}><div class="fcrow">
+      ${ring}
+      <div class="fcbody">
+        <div class="fctitle">${done?"Time's up ✨":running?'Focusing':'Paused'}</div>
+        <div class="fcsub">${f.label||'Deep work'}${who?html`<span class="fcwho"> · started by ${who}</span>`:null}</div>
+        <div class="fcbtns">
+          ${done?html`<button class="btn primary" onClick=${function(){props.onReset();}}>Start again</button>`
+            :running?html`<${Fragment}><button class="btn ghost" onClick=${function(){props.onPause();}}>Pause</button><button class="btn ghost" onClick=${function(){props.onReset();}}>Reset</button><//>`
+            :html`<${Fragment}><button class="btn primary" onClick=${function(){props.onResume();}}>Resume</button><button class="btn ghost" onClick=${function(){props.onReset();}}>Reset</button><//>`}
+        </div>
+      </div>
+    </div></section>`;
+  }
+
+  function FocusWidget(props){
+    var f=props.focus||{status:'idle',minutes:25,label:'',ends_at:0,remaining:0,started_by:''};
+    var st=f.status||'idle'; var running=st==='running', paused=st==='paused', active=running||paused;
+    var eS=useState(false); var open=eS[0], setOpen=eS[1];
+    var tS=useState(0); var setTick=tS[1];
+    var mS=useState(f.minutes||25); var selMin=mS[0], setSelMin=mS[1];
+    var lS=useState(''); var lab=lS[0], setLab=lS[1];
+    useEffect(function(){ if(st!=='running') return; var iv=setInterval(function(){ setTick(function(x){return x+1;}); },500); return function(){ clearInterval(iv); }; },[st,f.ends_at]);
+    var total=((active?f.minutes:selMin)||25)*60000;
+    var remMs = running?Math.max(0,(f.ends_at||0)-Date.now()) : paused?Math.max(0,f.remaining||0) : total;
+    var done = running && remMs<=0;
+    var prog = done?1:(total>0?Math.min(1,Math.max(0,1-remMs/total)):0);
+    var who = f.started_by==='me'?(props.meName||'You') : f.started_by==='partner'?(props.partnerName||'Partner') : '';
+    var dotc = done?'#2E9E6B':running?'#1F6FEB':paused?'#C2873B':'#9AA3AF';
+    var clockSvg=html`<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    return html`<div class=${'focusw'+(active?' active':'')}>
+      <button class="fw-head" onClick=${function(){setOpen(!open);}}>
+        <span class="fw-ic" style=${{color:dotc}}>${active?html`<span class="fw-dot" style=${{background:dotc}}></span>`:clockSvg}</span>
+        ${active?html`<span class="fw-time">${done?"Time's up":fmtClock(remMs)}</span><span class="fw-mut">${running?(f.label||'Focusing'):'Paused'}</span>`
+               :html`<span class="fw-label">Focus timer</span>`}
+        <span class=${'fw-chev'+(open?' up':'')}>▾</span>
+      </button>
+      ${active&&!done?html`<div class="fw-mini"><i style=${{width:(prog*100)+'%',background:dotc}}></i></div>`:null}
+      ${open?html`<div class="fw-body">
+        ${!active?html`<${Fragment}>
+          <input class="fw-lab" placeholder="What are you working on?" value=${lab} onInput=${function(e){setLab(e.target.value);}} />
+          <div class="fw-presets">${[25,50,15].map(function(p){ return html`<button class=${'fw-chip'+(selMin===p?' on':'')} key=${p} onClick=${function(){setSelMin(p);}}>${p}m</button>`; })}</div>
+          <button class="btn primary fw-start" onClick=${function(){props.onStart(selMin,lab);setOpen(true);}}>Start ${selMin} min</button>
+        <//>`:html`<${Fragment}>
+          <div class="fw-sub">${done?"Time's up ✨":(f.label||'Deep work')}${who?(' · '+who):''}</div>
+          <div class="fw-btns">
+            ${done?html`<button class="btn primary" onClick=${function(){props.onReset();}}>Start again</button>`
+              :running?html`<${Fragment}><button class="btn ghost" onClick=${function(){props.onPause();}}>Pause</button><button class="btn ghost" onClick=${function(){props.onReset();}}>Reset</button><//>`
+              :html`<${Fragment}><button class="btn primary" onClick=${function(){props.onResume();}}>Resume</button><button class="btn ghost" onClick=${function(){props.onReset();}}>Reset</button><//>`}
+          </div>
+        <//>`}
+      </div>`:null}
+    </div>`;
+  }
+
+  // ---- Today ----
+  function Today(props){
+    var sel=props.sel, projects=props.projects, tasks=props.tasks, routines=props.routines, upcoming=props.upcoming;
+    var habits=props.habits, habitLogs=props.habitLogs, topics=props.topics, topicLinks=props.topicLinks, settings=props.settings, whoami=props.whoami, notes=props.notes;
+    var projMap={}; (projects||[]).forEach(function(p){projMap[p.id]=p;});
+    var isToday = sel===TODAY;
+    var fpass=function(t){ return props.filter==='all'||t.owner===props.filter||t.owner==='shared'; };
+    var scheduled=(tasks||[]).filter(function(t){ return !t.parent_id && t.date===sel && fpass(t); });
+    var schedIds={}; scheduled.forEach(function(t){ schedIds[t.id]=1; });
+    var dueHere=(tasks||[]).filter(function(t){ return t.due===sel && !t.done && fpass(t) && !schedIds[t.id]; });
+    var dayTasks=scheduled.concat(dueHere);
+    var dayRoutines=(routines||[]).filter(function(r){ return (!r.days||r.days==='daily'); });
+    var nowHour=new Date().getHours();
+    var upAll=(upcoming||[]).filter(function(d){ return d.date>TODAY; });
+    var up=upAll.slice(0,4);
+
+    var myHabits=(habits||[]).filter(function(h){return !h.archived && (h.owner===whoami||h.owner==='shared');});
+    var countH=myHabits.filter(function(h){return h.kind==='count';});
+    var checkH=myHabits.filter(function(h){return h.kind!=='count';});
+    function logVal(id,ds){ var a=habitLogs||[]; for(var i=0;i<a.length;i++){if(a[i].habit===id&&a[i].date===ds)return a[i].value;} return undefined; }
+    function streak(id){ var m={}; (habitLogs||[]).forEach(function(l){if(l.habit===id)m[l.date]=l.value;}); var c=0,d=new Date(); for(var i=0;i<60;i++){var k=ymd(addDays(d,-i)); if(m[k]&&m[k]>0)c++; else if(i===0)continue; else break;} return c; }
+    function trend(id){ return (habitLogs||[]).filter(function(l){return l.habit===id;}).slice().sort(function(a,b){return a.date<b.date?-1:1;}).slice(-7); }
+    var curWeek=ymd(startOfWeek(new Date()));
+    var curTopic=(topics||[]).filter(function(t){return t.week===curWeek;})[0];
+    var topicN=curTopic?(topicLinks||[]).filter(function(l){return l.topic_id===curTopic.id;}).length:0;
+    var myNotes=(notes||[]).filter(function(n){return n.owner===whoami;});
+
+    return html`<${Fragment}>
+      ${up.length?html`<div class="upnext">
+        <div class="upeyebrow">Coming up · soonest first</div>
+        <div class="chips">
+        ${up.map(function(d){ var c=d.isproj?(d.color||'#1F6FEB'):(OWNER_COLOR[d.owner]||'#5B6B86');
+          return html`<span class="chip" key=${d.id}><span class="dot" style=${{background:c}}></span>${d.title} <b>${fmtUntil(d.date)}</b> <span class="sub">${shortDate(d.date)}</span></span>`; })}
+        <span class="showalllink" onClick=${function(){props.onShowAll&&props.onShowAll();}}>${upAll.length>up.length?('Show all '+upAll.length):'All tasks'} →</span>
+        </div>
+      </div>`:null}
+
+      <div class="card agenda">
+        <div class="cardhd"><div class="hdttl"><h2>${longDay(parseYmd(sel))}</h2><button class="addinline" aria-label="Add something for this day" onClick=${function(){props.onAdd(sel);}}>+</button></div><span class="meta">${dayTasks.length+(isToday?dayRoutines.length:0)} items</span></div>
+        ${isToday ? dayRoutines.map(function(r){ var sh=+r.start.split(':')[0]; var eh=+r.end.split(':')[0]; var now=nowHour>=sh&&nowHour<eh; return html`<${Block} r=${r} dur=${durOf(r)} now=${now} key=${r.id} />`; }) : null}
+        ${dayTasks.map(function(t){ return html`<${TaskRow} t=${t} tasks=${tasks} proj=${projMap[t.project]} onToggle=${props.onToggle} onEdit=${props.onEdit} key=${t.id} />`; })}
+        ${(dayTasks.length===0 && !(isToday&&dayRoutines.length))?html`<div class="empty"><div class="big">A clear day ✨</div><div class="sub">Nothing planned — enjoy the space, and add something whenever you like.</div><button class="btn primary" style=${{maxWidth:'220px',margin:'14px auto 4px'}} onClick=${function(){props.onAdd(sel);}}>+ Add a task</button></div>`:null}
+      </div>
+
+      <div style=${{display:'flex',justifyContent:'space-between',alignItems:'baseline',margin:'26px 2px 0'}}>
+        <h3 style=${{fontWeight:700,fontSize:'15px',color:'#15171A',margin:0}}>Habits & focus</h3>
+        <button class="view" onClick=${function(){props.onAddHabit();}}>+ Add habit</button>
+      </div>
+      <div class="habs" style=${{marginTop:'12px'}}>
+        ${countH.map(function(h){ var v=logVal(h.id,TODAY); var tr=trend(h.id); var mx=Math.max.apply(null,tr.map(function(x){return x.value||0;}).concat([1]));
+          return html`<section class="habcard" style=${{flex:'2 1 300px',minWidth:'260px'}} key=${h.id}>
+            <div style=${{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}><span style=${{fontWeight:600,fontSize:'14px'}}>${h.name}</span><button class="view" onClick=${function(){props.onEditHabit(h);}}>Edit</button></div>
+            ${h.caption?html`<div style=${{fontWeight:500,fontSize:'11.5px',color:'#8A93A0',marginTop:'2px'}}>${h.caption}</div>`:null}
+            <div style=${{display:'flex',alignItems:'flex-end',gap:'12px',marginTop:'8px'}}>
+              <div><span class="big" style=${{fontSize:'34px'}}>${v==null?'—':v}</span><span style=${{fontWeight:500,fontSize:'12px',color:'#8A93A0',marginLeft:'6px'}}>today${h.target!=null?(' · aim ≤ '+h.target):''}${h.unit?(' '+h.unit):''}</span></div>
+              <div style=${{marginLeft:'auto',display:'flex',gap:'8px'}}>
+                <button class="stepbtn" aria-label="One fewer" onClick=${function(){props.onSetHabit(h.id,Math.max(0,(v||0)-1));}}>−</button>
+                <button class="stepbtn" aria-label="One more" onClick=${function(){props.onSetHabit(h.id,(v||0)+1);}}>+</button>
+              </div>
+            </div>
+            <div class="bars" aria-hidden="true">${tr.map(function(x,i){ return html`<div key=${i} class=${x.date===TODAY?'now':''} style=${{height:Math.max(8,Math.round((x.value||0)/mx*100))+'%'}}></div>`; })}</div>
+            <div style=${{fontWeight:400,fontSize:'11.5px',color:'#8A93A0',marginTop:'7px'}}>${tr.length?('last '+tr.length+' days'):'log a few days to see the trend'}</div>
+          </section>`;
+        })}
+        ${checkH.length?html`<section class="habcard" style=${{flex:'1 1 240px',minWidth:'220px'}}>
+          <span style=${{fontWeight:600,fontSize:'14px'}}>Daily</span>
+          ${checkH.map(function(h){ var done=(logVal(h.id,TODAY)||0)>0; var st=streak(h.id);
+            return html`<div style=${{display:'flex',alignItems:'center',gap:'11px',padding:'8px 0'}} key=${h.id}>
+              <${Check} done=${done} label=${h.name} onClick=${function(){props.onSetHabit(h.id,done?0:1);}} />
+              <span style=${{flex:1,minWidth:0}}><span style=${{fontWeight:500,fontSize:'13.5px'}}>${h.name}</span>${st>0?html`<span style=${{display:'block',fontWeight:400,fontSize:'11.5px',color:'#8A93A0'}}>${st}-day streak</span>`:null}</span>
+              <button class="view" onClick=${function(){props.onEditHabit(h);}}>Edit</button>
+            </div>`; })}
+        </section>`:null}
+        ${myHabits.length===0?html`<section class="habcard" style=${{flex:'1 1 260px',minWidth:'240px'}}><div style=${{fontWeight:600,fontSize:'14px'}}>No habits yet</div><div style=${{fontWeight:400,fontSize:'12.5px',color:'#8A93A0',margin:'6px 0 10px'}}>Pick one small thing to tend each day — reading, cutting back, making.</div><button class="gbtn" onClick=${function(){props.onAddHabit();}}>+ Add a habit</button></section>`:null}
+        <section class="habcard" style=${{flex:'1 1 200px',minWidth:'190px'}}>
+          <div style=${{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}><span style=${{fontWeight:600,fontSize:'14px'}}>This week's topic</span><button class="view" onClick=${props.onGoJournal}>Edit</button></div>
+          <div style=${{fontWeight:600,fontSize:'17px',letterSpacing:'-.01em',marginTop:'8px'}}>${curTopic&&curTopic.title?curTopic.title:'Pick a topic'}</div>
+          <div style=${{fontWeight:400,fontSize:'12px',color:'#8A93A0',marginTop:'4px'}}>${topicN?(topicN+' link'+(topicN>1?'s':'')+' saved'):'One thing to go deep on this week.'}</div>
+        </section>
+      </div>
+      <div style=${{display:'flex',justifyContent:'space-between',alignItems:'baseline',margin:'26px 2px 0'}}>
+        <h3 style=${{fontWeight:700,fontSize:'15px',color:'#15171A',margin:0}}>On your mind</h3>
+        <button class="view" onClick=${function(){props.onAddNote();}}>+ Add note</button>
+      </div>
+      <div class="notesgrid">
+        ${myNotes.map(function(n){ return html`<${NoteCard} key=${n.id} note=${n} onSave=${props.onSaveNote} onColor=${props.onSetNoteColor} onDelete=${props.onDeleteNote} />`; })}
+        <button class="addnote" onClick=${function(){props.onAddNote();}}><span style=${{fontSize:'18px',lineHeight:1}}>+</span> ${myNotes.length?'Add a note':'Jot your first note'}</button>
+      </div>
+    <//>`;
+  }
+
+  // ---- Calendar ----
+  function Calendar(props){
+    var tasks=props.tasks, projects=props.projects;
+    var modeS=useState('week'); var mode=modeS[0], setMode=modeS[1];
+    var curS=useState(new Date()); var cur=curS[0], setCur=curS[1];
+    var foS=useState('all'); var fo=foS[0], setFo=foS[1];
+    var fpS=useState('all'); var fp=fpS[0], setFp=fpS[1];
+    var selS=useState(null); var selId=selS[0], setSel=selS[1];
+    var rgS=useState(null); var rg=rgS[0], setRg=rgS[1];
+    var projMap={}; (projects||[]).forEach(function(p){projMap[p.id]=p;});
+    var active=(projects||[]).filter(function(p){return !p.archived;});
+    var H0=7,H1=22,ROW=48;
+
+    function pass(t){ var o=(fo==='all')||(t.owner===fo)||(fo!=='shared'&&t.owner==='shared'); var p=(fp==='all')||(t.project===fp); return o&&p; }
+    function projPass(p){ var o=(fo==='all')||(p.owner===fo)||(fo!=='shared'&&p.owner==='shared'); return o&&((fp==='all')||(p.id===fp)); }
+    function colorOf(t){ return (t.project&&projMap[t.project])?(projMap[t.project].color||'#1F6FEB'):(OWNER_COLOR[t.owner]||'#5B6B86'); }
+    function dayItems(ds){
+      var items=[];
+      (tasks||[]).forEach(function(t){ if(!pass(t))return; if(isEventType(t.type)&&t.date===ds) items.push({k:'ev',label:(t.time?to12(t.time)+' ':'')+t.title,t:t}); else if(!isEventType(t.type)&&t.date===ds) items.push({k:'task',label:t.title,done:t.done,t:t}); });
+      (tasks||[]).forEach(function(t){ if(pass(t)&&t.due===ds&&!t.done&&t.date!==ds) items.push({k:'due',label:'⚑ '+t.title,t:t}); });
+      (projects||[]).forEach(function(p){ if(p.archived||!projPass(p))return; if(p.end_date===ds) items.push({k:'proj',label:'◆ '+p.name,pid:p.id}); else if(p.start_date===ds) items.push({k:'proj',label:'▸ '+p.name,pid:p.id}); });
+      return items;
+    }
+    function clickItem(it){ if(it.pid) props.onOpenProject(it.pid); else if(it.t) props.onEditTask(it.t); }
+    function timed(ds){ return (tasks||[]).filter(function(t){ return t.date===ds && t.time && pass(t); }); }
+    function allday(ds){ return (tasks||[]).filter(function(t){ return !t.parent_id && t.date===ds && !t.time && pass(t); }); }
+    function dues(ds){ return (tasks||[]).filter(function(t){ return t.due===ds && !t.done && t.date!==ds && pass(t); }); }
+
+    var unsched=(tasks||[]).filter(function(t){ return !t.parent_id && !t.date && !t.done && pass(t); });
+    var selTask=(tasks||[]).filter(function(t){return t.id===selId;})[0];
+    function slotClick(ds,time){ if(selTask){ props.onSchedule(selTask,ds,time); setSel(null); } else { props.onAddSlot(ds,time); } }
+    function dayAreaClick(ds){ if(selTask){ props.onSchedule(selTask,ds,''); setSel(null); } else { props.onAddDay(ds); } }
+    function rangePick(ds){ if(!rg)return; if(!rg.start){ setRg({start:ds,end:null}); } else if(!rg.end){ var a=rg.start,b=ds; if(b<a){var t=a;a=b;b=t;} setRg({start:a,end:b}); } else { setRg({start:ds,end:null}); } }
+    function inRange(ds){ return !!(rg&&rg.start&&rg.end&&ds>=rg.start&&ds<=rg.end); }
+    function rgEnd(ds){ return !!(rg&&(ds===rg.start||ds===rg.end)); }
+
+    var toolbar = html`<div class="calfilters">
+      <div class="seg"><button class=${mode==='week'?'on':''} onClick=${function(){setMode('week');}}>Week</button><button class=${mode==='month'?'on':''} onClick=${function(){setMode('month');}}>Month</button><button class=${mode==='timeline'?'on':''} onClick=${function(){setMode('timeline');}}>Timeline</button></div>
+      <button class="navcirc" aria-label="Previous" onClick=${function(){setCur(mode==='week'?addDays(cur,-7):addMonths(cur,-1));}}>${chevL}</button>
+      <button class="navcirc" aria-label="Next" onClick=${function(){setCur(mode==='week'?addDays(cur,7):addMonths(cur,1));}}>${chevR}</button>
+      <button class="pillbtn" onClick=${function(){setCur(new Date());}}>Today</button>
+      <button class=${'pillbtn'+(rg?' on':'')} onClick=${function(){ setMode('month'); setRg(rg?null:{start:null,end:null}); }}>${rg?'Picking dates…':'+ Project from dates'}</button>
+      <span style=${{fontWeight:700,fontSize:'16px',color:'#15171A',letterSpacing:'-.01em'}}>${mode==='week'?('Week of '+shortDate(ymd(startOfWeek(cur)))):monthY(cur)}</span>
+      <div style=${{marginLeft:'auto',display:'flex',gap:'8px',flexWrap:'wrap'}}>
+        <select class="fsel" aria-label="Owner" value=${fo} onChange=${function(e){setFo(e.target.value);}}><option value="all">Everyone</option><option value="me">Me</option><option value="partner">Partner</option><option value="shared">Shared</option></select>
+        <select class="fsel" aria-label="Project" value=${fp} onChange=${function(e){setFp(e.target.value);}}><option value="all">All projects</option>${active.map(function(p){return html`<option key=${p.id} value=${p.id}>${p.name}</option>`;})}</select>
+      </div>
+    </div>`;
+
+    var rail = html`<aside class="calrail">
+      <div class="railhd">To schedule <span class="railn">${unsched.length}</span></div>
+      ${selTask?html`<div class="railhint">Now click a day or time to place “${selTask.title}”. <button class="linkbtn" style=${{padding:0}} onClick=${function(){setSel(null);}}>cancel</button></div>`:null}
+      ${unsched.length===0?html`<p style=${{color:'#8A93A0',fontSize:'12.5px',margin:'6px 2px'}}>Nice — every task has a day. ✨</p>`:unsched.map(function(t){ var p=projMap[t.project];
+        return html`<div class=${'urow'+(selId===t.id?' sel':'')} key=${t.id} onClick=${function(){setSel(selId===t.id?null:t.id);}}>
+          <${Check} sm=${true} done=${t.done} onClick=${function(e){e.stopPropagation();props.onToggle(t);}} />
+          <span class="ut">${t.title}</span>
+          ${p?html`<span class="dot" style=${{background:p.color}}></span>`:null}
+        </div>`; })}
+      <button class="railadd" onClick=${function(){props.onAddDay('');}}>+ New task</button>
+    </aside>`;
+
+    var main;
+    if(mode==='month'){
+      var first=new Date(cur.getFullYear(),cur.getMonth(),1);
+      var gstart=startOfWeek(first);
+      var weeks=[]; var d=gstart; for(var w=0;w<6;w++){ var row=[]; for(var i=0;i<7;i++){ row.push(new Date(d)); d=addDays(d,1);} weeks.push(row); }
+      var gend=addDays(gstart,41); var span=42;
+      var tlProjects=(projects||[]).filter(function(p){ return !p.archived && p.start_date && p.end_date && projPass(p) && !(p.end_date<ymd(gstart)||p.start_date>ymd(gend)); });
+      main = html`<${Fragment}>
+        ${tlProjects.length?html`<div class="cal-tl"><div class="tllabel">Project timelines</div>${tlProjects.map(function(p){ var s=Math.max(0,Math.round((parseYmd(p.start_date)-gstart)/86400000)); var e=Math.min(span-1,Math.round((parseYmd(p.end_date)-gstart)/86400000)); return html`<div class="tlrow" key=${p.id}><span class="tlname">${p.name}</span><div class="track"><button class="bar" style=${{left:(s/span*100)+'%',width:((e-s+1)/span*100)+'%',background:p.color||'#1F6FEB'}} title=${p.name} onClick=${function(){props.onOpenProject(p.id);}}></button></div></div>`; })}</div>`:null}
+        <div class="calgrid">
+          <div class="dowrow">${DOW.map(function(n){return html`<div key=${n}>${n}</div>`;})}</div>
+          <div class="weeks">${weeks.map(function(row,wi){ return html`<div class="wkrow" key=${wi}>${row.map(function(dd){ var ds=ymd(dd); var out=dd.getMonth()!==cur.getMonth(); var isT=ds===TODAY; var its=dayItems(ds);
+            return html`<div class=${'daycellm'+(out?' out':'')+(isT?' today':'')+(inRange(ds)?' inrange':'')+(rgEnd(ds)?' rgend':'')} key=${ds} onClick=${function(){ if(rg){rangePick(ds);}else{dayAreaClick(ds);} }}>
+              <div class="dn">${dd.getDate()}</div>
+              ${its.slice(0,3).map(function(it,ii){ return html`<button class=${'celI '+it.k+(it.done?' done':'')} key=${ii} onClick=${function(e){e.stopPropagation();clickItem(it);}}>${it.label}</button>`; })}
+              ${its.length>3?html`<div class="cmore">+${its.length-3} more</div>`:null}
+            </div>`;
+          })}</div>`; })}</div>
+        </div>
+      <//>`;
+    } else if(mode==='timeline'){
+      var mstart=new Date(cur.getFullYear(),cur.getMonth(),1);
+      var ndays=new Date(cur.getFullYear(),cur.getMonth()+1,0).getDate();
+      var DW=34;
+      var rows=active.filter(projPass);
+      var off=function(ds){ return Math.round((parseYmd(ds)-mstart)/86400000); };
+      var todayOff=(TODAY>=ymd(mstart)&&TODAY<=ymd(addDays(mstart,ndays-1)))?off(TODAY):-1;
+      var dcells=[]; for(var di=0;di<ndays;di++){ dcells.push(addDays(mstart,di)); }
+      main = html`<div class="tlwrap"><div class="tlinner" style=${{width:(140+ndays*DW)+'px'}}>
+        <div class="tlhead"><div class="tlcorner">Projects</div>${dcells.map(function(d){ var isT=ymd(d)===TODAY; var we=(d.getDay()===0||d.getDay()===6); return html`<div class=${'tlday'+(isT?' today':'')+(we?' we':'')} key=${ymd(d)} style=${{width:DW+'px'}}><span class="tldow">${DOWL[d.getDay()]}</span>${d.getDate()}</div>`; })}</div>
+        <div class="tlbody">
+          ${rows.length===0?html`<div style=${{padding:'20px',color:'#8A93A0',fontSize:'13px'}}>No projects yet — create one to see its timeline.</div>`:rows.map(function(p){
+            var hasTl=p.start_date&&p.end_date;
+            var s=hasTl?Math.max(0,off(p.start_date)):0; var e=hasTl?Math.min(ndays-1,off(p.end_date)):-1;
+            var pdue=(tasks||[]).filter(function(t){return t.project===p.id && t.due && pass(t);});
+            return html`<div class="tlrow" key=${p.id}>
+              <div class="tlname2"><span class="dot" style=${{background:p.color}}></span>${p.name}</div>
+              <div class="tltrack" style=${{width:(ndays*DW)+'px'}} onClick=${function(){props.onOpenProject(p.id);}}>
+                ${(hasTl&&e>=0&&s<=ndays-1)?html`<button class="tlbar2" style=${{left:(s*DW)+'px',width:((e-s+1)*DW)+'px',background:p.color||'#1F6FEB'}} onClick=${function(ev){ev.stopPropagation();props.onOpenProject(p.id);}}>${p.name}</button>`:html`<span class="tlnodate">no dates set</span>`}
+                ${pdue.map(function(t){ var o=off(t.due); if(o<0||o>ndays-1)return null; return html`<span class="tldot" key=${t.id} title=${t.title+' · '+shortDate(t.due)} style=${{left:(o*DW+DW/2-4)+'px'}}></span>`; })}
+              </div>
+            </div>`;
+          })}
+          ${todayOff>=0?html`<div class="tltoday" style=${{left:(140+todayOff*DW+DW/2)+'px'}}></div>`:null}
+        </div>
+      </div></div>`;
+    } else {
+      var wsd=startOfWeek(cur); var days=[]; for(var k=0;k<7;k++){ days.push(addDays(wsd,k)); }
+      var hours=[]; for(var hh=H0;hh<=H1;hh++){ hours.push(hh); }
+      var now=new Date(); var nowFrac=now.getHours()+now.getMinutes()/60;
+      var showNow = (ymd(wsd)<=TODAY && TODAY<=ymd(addDays(wsd,6)) && nowFrac>=H0 && nowFrac<=H1);
+      main = html`<div class="wkcal"><div class="wkinner">
+        <div class="wkcalhd"><div class="wd corner"></div>${days.map(function(dd){ var isT=ymd(dd)===TODAY; return html`<div class=${'wd'+(isT?' today':'')} key=${ymd(dd)}>${DOW[dd.getDay()]}<span class="num">${dd.getDate()}</span></div>`; })}</div>
+        <div class="allday"><div class="lab">all-day</div>${days.map(function(dd){ var ds=ymd(dd);
+          return html`<div class="adc" key=${ds} onClick=${function(){dayAreaClick(ds);}}>
+            ${allday(ds).map(function(t){ var c=colorOf(t); return html`<button class=${'adi'+(t.done?' done':'')} key=${t.id} style=${{borderLeft:'3px solid '+c,background:hexA(c,.1)}} onClick=${function(e){e.stopPropagation();props.onEditTask(t);}}><span class=${'evchk'+(t.done?' on':'')} onClick=${function(e){e.stopPropagation();props.onToggle(t);}}>${t.done?checkMark:''}</span><span class="evtt">${t.title}</span></button>`; })}
+            ${dues(ds).map(function(t){ return html`<button class="adi due" key=${'d'+t.id} onClick=${function(e){e.stopPropagation();props.onEditTask(t);}}>⚑ ${t.title}</button>`; })}
+          </div>`;
+        })}</div>
+        <div class="hwrap"><div class="hgrid">
+          <div class="htcol">${hours.map(function(x){return html`<div class="htime" key=${x} style=${{height:ROW+'px'}}>${to12(pad2(x)+':00')}</div>`;})}</div>
+          ${days.map(function(dd){ var ds=ymd(dd);
+            return html`<div class="hcol" key=${ds}>
+              ${hours.map(function(x){ return html`<div class="hcell" key=${x} style=${{height:ROW+'px'}} onClick=${function(){slotClick(ds,pad2(x)+':00');}}></div>`; })}
+              ${timed(ds).map(function(t){ var pp=t.time.split(':'); var top=((+pp[0]-H0)+(+pp[1])/60)*ROW; var c=colorOf(t); return html`<button class="evb" key=${t.id} style=${{top:Math.max(0,top)+'px',height:(ROW-6)+'px',borderLeftColor:c,background:hexA(c,.14),color:'#2B2F36'}} onClick=${function(e){e.stopPropagation();props.onEditTask(t);}}>${!isEventType(t.type)?html`<span class=${'evchk'+(t.done?' on':'')} onClick=${function(e){e.stopPropagation();props.onToggle(t);}}>${t.done?checkMark:''}</span>`:null}<span class="evtt">${t.title}</span><span class="evtm">${to12(t.time)}</span></button>`; })}
+            </div>`;
+          })}
+          ${showNow?html`<div class="nowline" style=${{top:((nowFrac-H0)*ROW)+'px'}}></div>`:null}
+        </div></div>
+      </div></div>`;
+    }
+
+    return html`<${Fragment}>
+      ${toolbar}
+      ${rg?html`<div class="rgbar">
+        <span class="rgt">${!rg.start?'Click the project’s start day on the calendar…':(!rg.end?('Start '+shortDate(rg.start)+' — now click the deadline day…'):html`<b>${shortDate(rg.start)} → ${shortDate(rg.end)}</b> · ${Math.round((parseYmd(rg.end)-parseYmd(rg.start))/86400000)+1} days`)}</span>
+        <span style=${{marginLeft:'auto',display:'flex',gap:'8px'}}>
+          ${rg.start&&rg.end?html`<button class="btn primary" style=${{padding:'7px 16px'}} onClick=${function(){ props.onNewProject(rg.start,rg.end); setRg(null); }}>Create project</button>`:null}
+          <button class="btn ghost" style=${{padding:'7px 14px'}} onClick=${function(){setRg(null);}}>Cancel</button>
+        </span>
+      </div>`:null}
+      <div class="calsplit">${rail}<div class="calmain">${main}</div></div>
+      <p style=${{fontWeight:400,fontSize:'12px',color:'#3C6FB0',margin:'12px 2px 0'}}>${selTask?'Now pick a day or time for it.':'Pick a task on the left to give it a day, or tap any day to add something. Select two days to start a project across them.'}</p>
+    <//>`;
+  }
+
+  // ---- Projects ----
+  function Projects(props){
+    var projects=props.projects, tasks=props.tasks;
+    var active=(projects||[]).filter(function(p){return !p.archived;});
+    return html`<div class="projgrid">
+      ${active.map(function(p){ var st=projStats(p.id,tasks);
+        var open=Math.max(0,(st.total||0)-(st.done||0));
+        var hasTl=!!(p.start_date&&p.end_date);
+        var tpct=0; if(hasTl){ var a=parseYmd(p.start_date),b=parseYmd(p.end_date),x=parseYmd(TODAY); tpct=Math.max(0,Math.min(1,(x-a)/((b-a)||1)))*100; }
+        var dleft = p.end_date?daysUntil(p.end_date):null;
+        var R=18,C=2*Math.PI*R,off=C*(1-(st.pct||0)/100);
+        var initial=(((p.name||'').trim().charAt(0))||'·').toUpperCase();
+        return html`<button class="projcard" key=${p.id} onClick=${function(){props.onOpen(p.id);}}>
+          <div class="pc-band">
+            <span class="pc-glyph">${initial}</span>
+            <div class="pc-ring">
+              <svg viewBox="0 0 44 44" width="44" height="44"><circle cx="22" cy="22" r=${R} fill="none" stroke="#E2E8F1" stroke-width="4"/><circle class="arc" cx="22" cy="22" r=${R} fill="none" stroke-width="4" stroke-linecap="round" stroke-dasharray=${C} stroke-dashoffset=${off} transform="rotate(-90 22 22)"/></svg>
+              <span class="pct">${st.pct||0}%</span>
+            </div>
+          </div>
+          <div class="pc-body">
+            <div class="pc-name">${p.name||'Untitled project'}</div>
+            <div class="pc-kind">${(p.kind&&p.kind!=='plain')?p.kind:'Project'}</div>
+            ${hasTl?html`<div class="pc-tl">
+              <div class="pc-tlbar"><i style=${{width:tpct+'%'}}></i></div>
+              <div class="pc-tldates"><span>${shortDate(p.start_date)}</span><span>${shortDate(p.end_date)}</span></div>
+            </div>`:html`<div class="pc-tl pc-notl">No timeline yet</div>`}
+            <div class="pc-foot">
+              ${p.end_date?html`<span class=${'pc-due'+(dleft!=null&&dleft<=14?' soon':'')}>${dleft<0?(-dleft+'d over'):(dleft===0?'Due today':dleft+'d left')}</span>`:html`<span class="pc-due none">No due date</span>`}
+              <span class="pc-open"><${Avatar} owner=${p.owner} cls="avm" /><span class="pc-count">${open?(open+' open'):(st.total?'All done':'No tasks')}</span></span>
+            </div>
+          </div>
+        </button>`;
+      })}
+      <button class="newproj" onClick=${function(){props.onNew();}}><span style=${{fontSize:'24px',lineHeight:1}}>+</span>New project</button>
+    </div>`;
+  }
+
+  // ---- Tasks table (the "Show all" destination) ----
+  function TasksTable(props){
+    var tasks=props.tasks, projects=props.projects;
+    var projMap={}; (projects||[]).forEach(function(p){projMap[p.id]=p;});
+    var oS=useState('all'); var fo=oS[0], setFo=oS[1];
+    var pS=useState('all'); var fp=pS[0], setFp=pS[1];
+    var sS=useState('open'); var fsv=sS[0], setFs=sS[1];
+    function bucket(t){
+      if(t.done) return {k:'done',l:'Done',o:6};
+      if(!t.due) return {k:'nodate',l:'No deadline',o:5};
+      var d=daysUntil(t.due);
+      if(d<0) return {k:'over',l:'Overdue',o:0};
+      if(d===0) return {k:'today',l:'Today',o:1};
+      if(d<=7) return {k:'week',l:'This week',o:2};
+      return {k:'later',l:'Later',o:3};
+    }
+    var list=(tasks||[]).filter(function(t){
+      if(fo!=='all' && t.owner!==fo) return false;
+      if(fp!=='all' && t.project!==fp) return false;
+      if(fsv==='open' && t.done) return false;
+      if(fsv==='done' && !t.done) return false;
+      return true;
+    });
+    var groups={};
+    list.forEach(function(t){ var b=bucket(t); if(!groups[b.k])groups[b.k]={l:b.l,o:b.o,items:[]}; groups[b.k].items.push(t); });
+    var order=Object.keys(groups).sort(function(a,b){return groups[a].o-groups[b].o;});
+    order.forEach(function(k){ groups[k].items.sort(function(a,b){ var ad=a.due||'9999-99',bd=b.due||'9999-99'; return ad<bd?-1:ad>bd?1:0; }); });
+    return html`<${Fragment}>
+      <div class="tvbar">
+        <select class="tsel" value=${fo} onChange=${function(e){setFo(e.target.value);}}>
+          <option value="all">Everyone</option><option value="me">${props.meName||'Me'}</option><option value="partner">${props.partnerName||'Partner'}</option><option value="shared">Shared</option>
+        </select>
+        <select class="tsel" value=${fp} onChange=${function(e){setFp(e.target.value);}}>
+          <option value="all">All projects</option>${(projects||[]).filter(function(p){return !p.archived;}).map(function(p){return html`<option key=${p.id} value=${p.id}>${p.name}</option>`;})}
+        </select>
+        <select class="tsel" value=${fsv} onChange=${function(e){setFs(e.target.value);}}>
+          <option value="open">To do</option><option value="done">Done</option><option value="all">Everything</option>
+        </select>
+        <span class="tvcount">${list.length} task${list.length===1?'':'s'}</span>
+      </div>
+      ${order.length===0?html`<div class="empty" style=${{marginTop:'46px'}}><div class="big">Nothing here</div><div class="sub">No tasks match these filters — widen them, or add a task.</div></div>`
+      :html`<div class="tvtable">
+        ${order.map(function(k){ var g=groups[k];
+          return html`<${Fragment} key=${k}>
+            <div class="tvghd">${g.l}<span>${g.items.length}</span></div>
+            ${g.items.map(function(t){ var p=projMap[t.project]; var ov=bucket(t).k==='over';
+              return html`<div class="tvrow" key=${t.id} onClick=${function(){props.onEdit(t);}}>
+                <span class="tvc1" onClick=${function(e){e.stopPropagation();}}>${isEventType(t.type)?html`<span class="tvev" style=${{color:typeDef(t.type).color}}>${typeDef(t.type).label}</span>`:html`<${Check} done=${t.done} label=${t.title} onClick=${function(){props.onToggle(t);}} />`}</span>
+                <span class=${'tvttl'+(t.done?' done':'')}>${t.title||'Untitled task'}</span>
+                ${p?html`<span class="tvproj"><span class="dot" style=${{background:p.color,width:'7px',height:'7px'}}></span><span class="tvpn">${p.name}</span></span>`:html`<span class="tvproj none">—</span>`}
+                <${Avatar} owner=${t.owner} cls="avm" />
+                <span class=${'tvdue'+(ov?' over':'')}>${t.due?(shortDate(t.due)+(t.due_time?(' · '+to12(t.due_time)):'')):'—'}</span>
+              </div>`;
+            })}
+          <//>`;
+        })}
+      </div>`}
+    <//>`;
+  }
+
+  // ---- Project timeline (itinerary of deadlines) ----
+  function ProjectTimeline(props){
+    var p=props.project, tasks=props.tasks;
+    function wk(ds){ return shortDate(ds); }
+    function between(a,b){ return Math.round((parseYmd(b)-parseYmd(a))/86400000); }
+    var dated=(tasks||[]).filter(function(t){return t.project===p.id && t.due;});
+    if(dated.length===0 && !p.start_date && !p.end_date){
+      return html`<p class="tlempty">Give this project a start and a deadline — and tasks with due dates — to see it drawn as a timeline.</p>`;
+    }
+    var nodes=[];
+    if(p.start_date) nodes.push({kind:'start',date:p.start_date,label:'Started'});
+    dated.forEach(function(t){ nodes.push({kind:'task',date:t.due,task:t}); });
+    if(p.end_date) nodes.push({kind:'end',date:p.end_date,label:'Deadline'});
+    var inRange=(!p.start_date||TODAY>=p.start_date)&&(!p.end_date||TODAY<=p.end_date);
+    if(inRange) nodes.push({kind:'today',date:TODAY,label:'Today'});
+    var ord={start:0,today:1,task:2,end:3};
+    nodes.sort(function(a,b){ if(a.date!==b.date) return a.date<b.date?-1:1; return ord[a.kind]-ord[b.kind]; });
+    return html`<div class="tline">
+      ${nodes.map(function(n,i){
+        var gap = i<nodes.length-1 ? between(n.date, nodes[i+1].date) : 0;
+        var dotcls = n.kind==='today'?'today':(n.kind==='start'||n.kind==='end')?'bookend':(n.task&&n.task.done?'done':'open');
+        return html`<div class="tlrow" key=${i}>
+          <span class=${'tldot '+dotcls}></span>
+          <div class="tlc">
+            <div class="tlhead">
+              <span class=${'tt'+(n.task&&n.task.done?' done':'')+(n.kind==='today'?' now':'')}>${n.kind==='task'?n.task.title:n.label}</span>
+              ${n.kind==='task'?html`<${Avatar} owner=${n.task.owner} cls="avm" />`:null}
+            </div>
+            <div class="dd">${wk(n.date)}${n.kind==='task'&&n.task.due_time?(' · '+to12(n.task.due_time)):''}</div>
+            ${gap>0?html`<div class="gap">${gap} day${gap>1?'s':''}</div>`:null}
+          </div>
+        </div>`;
+      })}
+    </div>`;
+  }
+
+  // ---- Project side panel ----
+  function ProjectPanel(props){
+    var p=props.project; var tasks=props.tasks, materials=props.materials;
+    var itemS=useState({title:'',due:''}); var ni=itemS[0], setNi=itemS[1];
+    var matS=useState({title:'',url:''}); var nm=matS[0], setNm=matS[1];
+    var subForS=useState(null); var subFor=subForS[0], setSubFor=subForS[1]; // item id to add subtask to
+    var subS=useState({title:'',due:''}); var ns=subS[0], setNs=subS[1];
+    var viewS=useState('list'); var pview=viewS[0], setPview=viewS[1];
+    if(!p) return null;
+    var items=(tasks||[]).filter(function(t){return t.project===p.id && !t.parent_id;});
+    var mats=(materials||[]).filter(function(m){return m.project_id===p.id;});
+    var st=projStats(p.id,tasks);
+    var hasTl=p.start_date&&p.end_date;
+    function sPos(ds){ if(!hasTl) return 0; var a=parseYmd(p.start_date),b=parseYmd(p.end_date),x=parseYmd(ds); var f=(x-a)/((b-a)||1); return Math.max(0,Math.min(1,f))*100; }
+    return html`<div class="pov" onClick=${function(e){if(e.target===e.currentTarget)props.onClose();}}>
+      <div class="ppanel" role="dialog" aria-modal="true">
+        <div class="phd">
+          <div class="phtop">
+            <span class="dot" style=${{background:p.color,width:'12px',height:'12px',marginTop:'7px'}}></span>
+            <h2 class="ptitle">${p.name}</h2>
+            <button class="x" aria-label="Close" onClick=${props.onClose}>×</button>
+          </div>
+          <div class="pmeta">
+            <${Avatar} owner=${p.owner} cls="avm" />
+            <span class="pmeta-t">${p.owner==='shared'?'Shared':(p.owner==='partner'?'Partner':'You')} · ${p.kind&&p.kind!=='plain'?p.kind:'project'}</span>
+            <button class="view" style=${{marginLeft:'auto'}} onClick=${function(){props.onEdit(p);}}>Edit</button>
+          </div>
+          <div class="pbar" style=${{marginTop:'14px'}}><i style=${{width:st.pct+'%'}}></i></div>
+          <div class="pprog">${st.done} of ${st.total} done · ${st.pct}%</div>
+          <div class="prail">
+            <div class="prow"><span class="k">Deadline</span><span class="v">${p.end_date?shortDate(p.end_date):'—'}</span></div>
+            <div class="prow"><span class="k">Days left</span><span class="v">${p.end_date?(daysUntil(p.end_date)>=0?(daysUntil(p.end_date)+'d'):(-daysUntil(p.end_date)+'d over')):'—'}</span></div>
+            <div class="prow"><span class="k">Started</span><span class="v">${p.start_date?shortDate(p.start_date):'—'}</span></div>
+            <div class="prow"><span class="k">Owner</span><span class="v"><${Avatar} owner=${p.owner} cls="avm" />${p.owner==='shared'?'Shared':(p.owner==='partner'?'Partner':'You')}</span></div>
+          </div>
+        </div>
+        <div class="pbody">
+          <div class="pvtoggle">
+            <button class=${pview==='list'?'on':''} onClick=${function(){setPview('list');}}>List</button>
+            <button class=${pview==='timeline'?'on':''} onClick=${function(){setPview('timeline');}}>Timeline</button>
+          </div>
+          ${pview==='timeline'?html`<${ProjectTimeline} project=${p} tasks=${tasks} />`:html`<${Fragment}>
+          <div class="psec">
+            <h4>Tasks${items.length?html` · ${items.length}`:''}</h4>
+            ${items.length===0?html`<p style=${{color:'#8A93A0',fontSize:'13px',margin:'2px 0'}}>No tasks yet. Add the pieces of this project below.</p>`:null}
+            ${items.map(function(it){ var subs=childrenOf(tasks,it.id); var sdone=subs.filter(function(s){return s.done;}).length;
+              return html`<div class="irow" key=${it.id}>
+                <${Check} done=${it.done} label=${it.title} onClick=${function(){props.onToggle(it);}} />
+                <div class="ibody">
+                  <div class=${'ititle'+(it.done?' done':'')}>${it.title}</div>
+                  <div class="ameta">
+                    ${it.due?html`<span class="pill due">Due ${shortDate(it.due)}</span>`:null}
+                    <button class="view" onClick=${function(){ setSubFor(subFor===it.id?null:it.id); setNs({title:'',due:''}); }}>${subs.length?(sdone+'/'+subs.length+' subtasks'):'+ subtask'}</button>
+                    <button class="view" onClick=${function(){props.onEditTask(it);}}>Edit</button>
+                  </div>
+                  ${subs.length?html`<div class="subs">${subs.map(function(s){return html`<div class=${'subrow'+(s.done?' done':'')} key=${s.id}><${Check} sm=${true} done=${s.done} onClick=${function(){props.onToggle(s);}} /><span class="slabel">${s.title}</span>${s.due?html`<span class="pill due">${shortDate(s.due)}</span>`:null}</div>`;})}</div>`:null}
+                  ${subFor===it.id?html`<div class="addrow">
+                    <input class="grow" type="text" placeholder="Subtask" value=${ns.title} onInput=${function(e){setNs(Object.assign({},ns,{title:e.target.value}));}} />
+                    <input type="date" value=${ns.due} onInput=${function(e){setNs(Object.assign({},ns,{due:e.target.value}));}} />
+                    <button class="mini" onClick=${function(){ if(ns.title.trim()){ props.onAddSub(it.id,p.id,ns.title,ns.due); setNs({title:'',due:''}); } }}>Add</button>
+                  </div>`:null}
+                </div>
+                <${Avatar} owner=${it.owner} cls="avm" />
+              </div>`;
+            })}
+            <div class="addrow">
+              <input class="grow" type="text" placeholder="New task (e.g. Case study 1)" value=${ni.title} onInput=${function(e){setNi(Object.assign({},ni,{title:e.target.value}));}} />
+              <input type="date" value=${ni.due} onInput=${function(e){setNi(Object.assign({},ni,{due:e.target.value}));}} />
+              <button class="mini" onClick=${function(){ if(ni.title.trim()){ props.onAddItem(p.id,ni.title,ni.due); setNi({title:'',due:''}); } }}>Add</button>
+            </div>
+          </div>
+
+          <div class="psec">
+            <h4>Materials${mats.length?html` · ${mats.length}`:''}</h4>
+            ${mats.length===0?html`<p style=${{color:'#8A93A0',fontSize:'13px',margin:'2px 0'}}>No links yet.</p>`:null}
+            ${mats.map(function(m){ return html`<div class="matrow" key=${m.id}>
+              <span style=${{color:'#AEB6C1'}}>🔗</span>
+              <a href=${m.url} target="_blank" rel="noreferrer noopener">${m.title||m.url}</a>
+              <button class="x" aria-label="Remove" onClick=${function(){props.onDelMaterial(m.id);}}>×</button>
+            </div>`; })}
+            <div class="addrow">
+              <input type="text" placeholder="Label" style=${{width:'110px'}} value=${nm.title} onInput=${function(e){setNm(Object.assign({},nm,{title:e.target.value}));}} />
+              <input class="grow" type="url" placeholder="https://…" value=${nm.url} onInput=${function(e){setNm(Object.assign({},nm,{url:e.target.value}));}} />
+              <button class="mini" onClick=${function(){ if((nm.url||'').trim()){ props.onAddMaterial(p.id,nm.title,nm.url); setNm({title:'',url:''}); } }}>Add</button>
+            </div>
+          </div>
+
+          ${p.description?html`<div class="psec"><h4>Description</h4><p style=${{fontSize:'14px',lineHeight:1.55,color:'#39414C',margin:0,whiteSpace:'pre-wrap'}}>${p.description}</p></div>`:null}
+          <//>`}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ---- inline date-range picker (Airbnb-style) ----
+  function RangePicker(props){
+    var start=props.start, end=props.end;
+    var cmS=useState(function(){ return start?parseYmd(start):new Date(); }); var cm=cmS[0], setCm=cmS[1];
+    var first=new Date(cm.getFullYear(),cm.getMonth(),1);
+    var gstart=startOfWeek(first);
+    var cells=[]; for(var i=0;i<42;i++) cells.push(addDays(gstart,i));
+    function pick(ds){ if(!start||(start&&end)){ props.onChange(ds,''); } else { var a=start,b=ds; if(b<a){var t=a;a=b;b=t;} props.onChange(a,b); } }
+    return html`<div class="rp">
+      <div class="rphd">
+        <button type="button" class="rpnav" aria-label="Previous month" onClick=${function(){setCm(addMonths(cm,-1));}}>${chevL}</button>
+        <span class="rpm">${monthY(cm)}</span>
+        <button type="button" class="rpnav" aria-label="Next month" onClick=${function(){setCm(addMonths(cm,1));}}>${chevR}</button>
+      </div>
+      <div class="rpdow">${DOW.map(function(n){return html`<span key=${n}>${n.charAt(0)}</span>`;})}</div>
+      <div class="rpgrid">${cells.map(function(d){ var ds=ymd(d); var out=d.getMonth()!==cm.getMonth(); var inr=!!(start&&end&&ds>=start&&ds<=end); var ise=(ds===start||ds===end); var isT=ds===TODAY;
+        return html`<button type="button" key=${ds} class=${'rpd'+(out?' out':'')+(inr?' inr':'')+(ise?' ise':'')+(isT?' t':'')} onClick=${function(){pick(ds);}}>${d.getDate()}</button>`;
+      })}</div>
+    </div>`;
+  }
+
+  // ---- Project editor modal ----
+  function ProjectEditor(props){
+    var ed=props.editing||{};
+    var st=useState({ name:ed.name||'', owner:ed.owner||props.whoami||'me', color:ed.color||PROJ_COLORS[0], kind:ed.kind||'project', start_date:ed.start_date||'', end_date:ed.end_date||'', description:ed.description||'' });
+    var f=st[0], set=st[1];
+    function upd(k,v){ var o=Object.assign({},f); o[k]=v; set(o); }
+    return html`<div class="pov" style=${{zIndex:62}} onClick=${function(e){if(e.target===e.currentTarget)props.onClose();}}>
+      <div class="ppanel" role="dialog" aria-modal="true">
+        <div class="phd"><div style=${{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}><div><div class="meyebrow">${ed.id?'Edit':'Create'}</div><h3 style=${{margin:0,fontWeight:700,fontSize:'19px',letterSpacing:'-.01em'}}>${ed.id?'Edit project':'New project'}</h3></div><button class="x" aria-label="Close" onClick=${props.onClose}>×</button></div></div>
+        <div class="pbody">
+          <label class="lbl">Name</label>
+          <input class="fld" type="text" value=${f.name} placeholder="e.g. Portfolio — Pardesi" onInput=${function(e){upd('name',e.target.value);}} />
+          <label class="lbl">Whose</label>
+          <${OwnerSeg} value=${f.owner} onChange=${function(v){upd('owner',v);}} />
+          <label class="lbl">Timeline</label>
+          <${RangePicker} start=${f.start_date} end=${f.end_date} onChange=${function(s,e){ set(Object.assign({},f,{start_date:s,end_date:e})); }} />
+          <div class="rpsummary">${f.start_date?(shortDate(f.start_date)+(f.end_date?(' → '+shortDate(f.end_date)+' · '+(Math.round((parseYmd(f.end_date)-parseYmd(f.start_date))/86400000)+1)+' days'):' — now pick the deadline')):'Pick the start day, then the deadline'}</div>
+          <label class="lbl">Colour</label>
+          <div class="swatches">${PROJ_COLORS.map(function(c){ return html`<button class=${'sw'+(f.color===c?' on':'')} key=${c} style=${{background:c}} aria-label="colour" onClick=${function(){upd('color',c);}}></button>`; })}</div>
+          <label class="lbl">Kind</label>
+          <select class="fld" value=${f.kind} onChange=${function(e){upd('kind',e.target.value);}}>
+            <option value="project">Project</option><option value="course">Course</option><option value="branding">Branding / portfolio</option>
+          </select>
+          <label class="lbl">Notes (optional)</label>
+          <textarea class="fld" style=${{minHeight:'64px',resize:'vertical'}} value=${f.description} onInput=${function(e){upd('description',e.target.value);}}></textarea>
+        </div>
+        <div class="sheetfoot">
+          ${ed.id?html`<button class="btn del" onClick=${function(){props.onDelete(ed.id);}}>Delete</button>`:null}
+          <button class="btn ghost" onClick=${props.onClose}>Cancel</button>
+          <button class="btn primary" onClick=${function(){ if(f.name.trim()) props.onSave(f,ed.id); }}>Save</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ---- Add / Edit task modal (first-class subtasks w/ deadlines) ----
+  function TaskModal(props){
+    var ed=props.editing||{};
+    var st=useState({
+      title:ed.title||'', project:ed.project||(props.defaultProject||''), owner:ed.owner||props.whoami||'me',
+      type:ed.type||props.defaultType||'task', date:ed.date||props.defaultDate||'', time:ed.time||props.defaultTime||'', due:ed.due||'', due_time:ed.due_time||''
+    });
+    var f=st[0], set=st[1];
+    var subsInit=(props.children||[]).map(function(s){return {id:s.id,title:s.title,due:s.due||'',due_time:s.due_time||'',done:!!s.done,owner:s.owner,created_at:s.created_at,exists:true};});
+    var subS=useState(subsInit); var subs=subS[0], setSubs=subS[1];
+    var rmS=useState([]); var removed=rmS[0], setRemoved=rmS[1];
+    function upd(k,v){ var o=Object.assign({},f); o[k]=v; set(o); }
+    function addSub(){ setSubs(subs.concat([{id:uid('tk'),title:'',due:'',done:false,exists:false}])); }
+    function setSub(i,k,v){ setSubs(subs.map(function(s,j){ if(j!==i)return s; var p={}; p[k]=v; return Object.assign({},s,p); })); }
+    function rmSub(i){ var s=subs[i]; if(s.exists) setRemoved(removed.concat([s.id])); setSubs(subs.filter(function(_,j){return j!==i;})); }
+    return html`<div class="pov" style=${{zIndex:62}} onClick=${function(e){if(e.target===e.currentTarget)props.onClose();}}>
+      <div class="ppanel" role="dialog" aria-modal="true" aria-label=${ed.id?'Edit':'New'}>
+        <div class="phd"><div style=${{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}><div><div class="meyebrow">${ed.id?'Edit':'Create'}</div><h3 style=${{margin:0,fontWeight:700,fontSize:'19px',letterSpacing:'-.01em'}}>${ed.id?'Edit':'New'} ${typeDef(f.type).label.toLowerCase()}</h3></div><button class="x" aria-label="Close" onClick=${props.onClose}>×</button></div></div>
+        <div class="pbody">
+          <label class="lbl">Title</label>
+          <input class="fld" type="text" value=${f.title} onInput=${function(e){upd('title',e.target.value);}} placeholder=${isEventType(f.type)?'e.g. Call with Ari':'e.g. Draft the intro'} />
+          <div style=${{display:'flex',gap:'10px'}}>
+            <div style=${{flex:1}}><label class="lbl">Type</label>
+              <select class="fld" value=${f.type} onChange=${function(e){upd('type',e.target.value);}}>${TASK_TYPES.map(function(ty){return html`<option key=${ty.id} value=${ty.id}>${ty.label}</option>`;})}</select>
+            </div>
+            <div style=${{flex:1}}><label class="lbl">Date</label><input class="fld" type="date" value=${f.date} onInput=${function(e){upd('date',e.target.value);}} /></div>
+          </div>
+          <div style=${{display:'flex',gap:'10px'}}>
+            <div style=${{flex:1}}><label class="lbl">Time ${!isEventType(f.type)?'(optional)':''}</label><input class="fld" type="time" value=${f.time} onInput=${function(e){upd('time',e.target.value);}} /></div>
+            <div style=${{flex:1}}>${!isEventType(f.type)?html`<${Fragment}><label class="lbl">Deadline</label><div style=${{display:'flex',gap:'8px'}}><input class="fld" type="date" value=${f.due} onInput=${function(e){upd('due',e.target.value);}} /><input class="fld" type="time" title="Deadline time (optional)" style=${{maxWidth:'112px'}} value=${f.due_time} onInput=${function(e){upd('due_time',e.target.value);}} /></div><//>`:html`<${Fragment}><label class="lbl" style=${{opacity:0}}>.</label><div style=${{height:'40px'}}></div><//>`}</div>
+          </div>
+          <label class="lbl">Project</label>
+          <select class="fld" value=${f.project} onChange=${function(e){upd('project',e.target.value);}}>
+            <option value="">No project</option>
+            ${(props.projects||[]).filter(function(p){return !p.archived;}).map(function(p){return html`<option key=${p.id} value=${p.id}>${p.name}</option>`;})}
+          </select>
+          <label class="lbl">Whose</label>
+          <${OwnerSeg} value=${f.owner} onChange=${function(v){upd('owner',v);}} />
+          ${!isEventType(f.type)?html`<${Fragment}>
+            <label class="lbl">Subtasks (each can have a deadline)</label>
+            ${subs.map(function(s,i){ return html`<div class="subedit" key=${s.id}>
+              <input type="text" value=${s.title} placeholder="Subtask" onInput=${function(e){setSub(i,'title',e.target.value);}} />
+              <input type="date" value=${s.due} onInput=${function(e){setSub(i,'due',e.target.value);}} />
+              <input type="time" title="Deadline time (optional)" value=${s.due_time} onInput=${function(e){setSub(i,'due_time',e.target.value);}} />
+              <button class="x" aria-label="Remove" onClick=${function(){rmSub(i);}}>×</button>
+            </div>`; })}
+            <button class="linkbtn" onClick=${addSub}>+ add subtask</button>
+          <//>`:null}
+        </div>
+        <div class="sheetfoot">
+          ${ed.id?html`<button class="btn del" onClick=${function(){props.onDelete(ed.id);}}>Delete</button>`:null}
+          <button class="btn ghost" onClick=${props.onClose}>Cancel</button>
+          <button class="btn primary" onClick=${function(){ if(f.title.trim()) props.onSave(f, ed.id, subs, removed); }}>Save</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ---- Journal ----
+  function Journal(props){
+    var entries=props.entries, whoami=props.whoami, topics=props.topics, topicLinks=props.topicLinks;
+    var draftS=useState(''); var draft=draftS[0], setDraft=draftS[1];
+    var tagS=useState(''); var tag=tagS[0], setTag=tagS[1];
+    var todayEntry=(entries||[]).filter(function(e){return e.date===TODAY && e.owner===whoami;})[0];
+    useEffect(function(){ if(todayEntry){ setDraft(todayEntry.text||''); setTag(todayEntry.tag||''); } },[todayEntry&&todayEntry.id]);
+    var TAGS=[['good','Good day'],['hard','Hard day'],['shipped','Shipped something'],['rest','Rest']];
+    var earlier=(entries||[]).slice().sort(function(a,b){return a.date<b.date?1:-1;}).filter(function(e){return !(e.date===TODAY&&e.owner===whoami);});
+    var curWeek=ymd(startOfWeek(new Date()));
+    var curTopic=(topics||[]).filter(function(t){return t.week===curWeek;})[0];
+    var curLinks=curTopic?(topicLinks||[]).filter(function(l){return l.topic_id===curTopic.id;}):[];
+    var pastTopics=(topics||[]).filter(function(t){return t.week!==curWeek && t.title;}).slice(0,6);
+    var ttlS=useState(''); var ttl=ttlS[0], setTtl=ttlS[1];
+    useEffect(function(){ setTtl((curTopic&&curTopic.title)||''); },[curTopic&&curTopic.id]);
+    var nlS=useState({title:'',url:''}); var nl=nlS[0], setNl=nlS[1];
+    return html`<div class="cols">
+      <div class="colmain">
+        <section class="card jwrite">
+          <div style=${{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}><h2 style=${{margin:0,fontWeight:700,fontSize:'18px'}}>Tonight's entry</h2><span style=${{fontWeight:500,fontSize:'12px',color:'#8A93A0'}}>${shortDate(TODAY)}</span></div>
+          <p class="jprompt">How did today feel? What lifted you, what weighed on you?</p>
+          <textarea class="ta" placeholder="Start writing…" value=${draft} onInput=${function(e){setDraft(e.target.value);}}></textarea>
+          <div class="tags">
+            ${TAGS.map(function(tg){ return html`<button key=${tg[0]} class=${'tagchip'+(tag===tg[0]?' on':'')} onClick=${function(){setTag(tag===tg[0]?'':tg[0]);}}>${tg[1]}</button>`; })}
+            <button class="savebtn" onClick=${function(){props.onSave(draft,tag);}}>Save entry</button>
+          </div>
+        </section>
+        <h3 style=${{fontWeight:600,fontSize:'11px',letterSpacing:'.07em',textTransform:'uppercase',color:'#3C6FB0',margin:'24px 2px 10px'}}>Earlier</h3>
+        ${earlier.map(function(e){ var tl=({good:'Good day',hard:'Hard day',shipped:'Shipped something',rest:'Rest'})[e.tag]||''; var tc=e.tag==='hard'?'#C64A3B':(e.tag==='shipped'?'#2E9E6B':'#8A93A0');
+          return html`<section class="card jentry" key=${e.id}><div class="jh"><span style=${{fontWeight:600,fontSize:'13px'}}>${shortDate(e.date)}${e.owner==='partner'?' · Partner':''}</span>${tl?html`<span style=${{fontWeight:500,fontSize:'11px',color:tc}}>${tl}</span>`:null}</div><p>${e.text}</p></section>`;
+        })}
+        ${earlier.length===0?html`<p style=${{color:'#8A93A0',fontSize:'13px',padding:'0 2px'}}>Nothing here yet — your first entry is waiting.</p>`:null}
+      </div>
+      <div class="colside">
+        <section class="card" style=${{padding:'18px 20px',marginBottom:'16px'}}>
+          <h2 style=${{margin:'0 0 3px',fontWeight:700,fontSize:'15px'}}>This week's topic</h2>
+          <div style=${{fontWeight:400,fontSize:'12px',color:'#8A93A0',marginBottom:'10px'}}>One thing to go deep on this week.</div>
+          <input class="fld" type="text" placeholder="e.g. Type design history" value=${ttl} onInput=${function(e){setTtl(e.target.value);}} onBlur=${function(){ if(ttl.trim()) props.onSetTopic(ttl); }} />
+          ${curTopic?html`<${Fragment}>
+            <div style=${{fontWeight:600,fontSize:'10px',letterSpacing:'.06em',textTransform:'uppercase',color:'#9AA3AF',margin:'14px 0 4px'}}>Links studied</div>
+            ${curLinks.map(function(l){ return html`<div class="matrow" key=${l.id}><span style=${{color:'#AEB6C1'}}>🔗</span><a href=${l.url} target="_blank" rel="noreferrer noopener">${l.title||l.url}</a><button class="x" aria-label="Remove" onClick=${function(){props.onDelTopicLink(l.id);}}>×</button></div>`; })}
+            <div class="addrow"><input type="text" placeholder="Label" style=${{width:'80px'}} value=${nl.title} onInput=${function(e){setNl(Object.assign({},nl,{title:e.target.value}));}} /><input class="grow" type="url" placeholder="https://…" value=${nl.url} onInput=${function(e){setNl(Object.assign({},nl,{url:e.target.value}));}} /><button class="mini" onClick=${function(){ if((nl.url||'').trim()){ props.onAddTopicLink(curTopic.id,nl.title,nl.url); setNl({title:'',url:''}); } }}>Add</button></div>
+          <//>`:html`<div style=${{fontSize:'12px',color:'#8A93A0',marginTop:'10px'}}>Name a topic above to start saving links to it.</div>`}
+        </section>
+        ${pastTopics.length?html`<section class="card" style=${{padding:'18px 20px'}}>
+          <h2 style=${{margin:'0 0 8px',fontWeight:700,fontSize:'15px'}}>Earlier topics</h2>
+          ${pastTopics.map(function(t){ var n=(topicLinks||[]).filter(function(l){return l.topic_id===t.id;}).length; return html`<div style=${{display:'flex',alignItems:'baseline',gap:'10px',padding:'6px 0'}} key=${t.id}><span style=${{fontWeight:500,fontSize:'11px',color:'#9AA3AF',flex:'none'}}>${shortDate(t.week)}</span><span style=${{fontWeight:500,fontSize:'13px',flex:1,minWidth:0}}>${t.title}</span>${n?html`<span style=${{fontSize:'11px',color:'#8A93A0'}}>${n} link${n>1?'s':''}</span>`:null}</div>`; })}
+        </section>`:null}
+      </div>
+    </div>`;
+  }
+
+  // ---- Settings (modal) ----
+  function SettingsModal(props){
+    var tabS=useState('people'); var tab=tabS[0], setTab=tabS[1];
+    var s=props.settings||{};
+    var nmS=useState({meName:s.meName||'',partnerName:s.partnerName||''}); var nm=nmS[0], setNm=nmS[1];
+    var savedS=useState(false); var saved=savedS[0], setSaved=savedS[1];
+    var notifS=useState((function(){try{return lsGet('sp_notif','')==='1';}catch(e){return false;}})()); var notifOn=notifS[0], setNotifOn=notifS[1];
+    function toggleNotif(){ if(notifOn){ setNotifOn(false); lsSet('sp_notif','0'); return; } try{ if(typeof Notification==='undefined'){ setNotifOn(true); lsSet('sp_notif','1'); return; } if(Notification.permission==='granted'){ setNotifOn(true); lsSet('sp_notif','1'); } else { Notification.requestPermission().then(function(p){ var ok=p==='granted'; setNotifOn(ok); lsSet('sp_notif',ok?'1':'0'); }); } }catch(e){} }
+    function updNm(k,v){ var o=Object.assign({},nm); o[k]=v; setNm(o); setSaved(false); }
+    var meLabel=(nm.meName||'').trim()||'Mahesh', pLabel=(nm.partnerName||'').trim()||'Partner';
+    var habits=(props.habits||[]).filter(function(h){return !h.archived;});
+    return html`<div class="overlay" onClick=${function(e){if(e.target===e.currentTarget)props.onClose();}}>
+      <div class="setmodal" role="dialog" aria-modal="true">
+        <div class="setside">
+          <div class="meyebrow" style=${{padding:'2px 11px 2px'}}>Settings</div>
+          <div class="setgrp">General</div>
+          <div class="setnav">
+            <button class=${tab==='people'?'on':''} onClick=${function(){setTab('people');}}>People</button>
+            <button class=${tab==='habits'?'on':''} onClick=${function(){setTab('habits');}}>Habits</button>
+            <button class=${tab==='notifs'?'on':''} onClick=${function(){setTab('notifs');}}>Notifications</button>
+          </div>
+          <div class="setgrp">Personalize</div>
+          <div class="setnav">
+            <button class=${tab==='appearance'?'on':''} onClick=${function(){setTab('appearance');}}>Appearance</button>
+          </div>
+          <div class="setgrp">About</div>
+          <div class="setnav">
+            <button class=${tab==='about'?'on':''} onClick=${function(){setTab('about');}}>About & sharing</button>
+          </div>
+        </div>
+        <div class="setbody">
+          <div class="mhd"><h3>${({people:'People',habits:'Habits',notifs:'Notifications',appearance:'Appearance',about:'About & sharing'})[tab]||'Settings'}</h3><button class="x" aria-label="Close" onClick=${props.onClose}>×</button></div>
+          ${tab==='people'?html`<${Fragment}>
+            <p style=${{margin:'0 0 14px',fontWeight:400,fontSize:'13px',color:'#8A93A0'}}>Names shown on tasks, projects, journal and the “Viewing as” switch.</p>
+            <label class="lbl">Your name</label>
+            <div style=${{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}}><span class="av avm" style=${{background:OWNER_COLOR.me}}>${meLabel.charAt(0).toUpperCase()}</span><input class="fld" type="text" value=${nm.meName} placeholder="Mahesh" onInput=${function(e){updNm('meName',e.target.value);}} /></div>
+            <label class="lbl">Partner’s name</label>
+            <div style=${{display:'flex',alignItems:'center',gap:'10px'}}><span class="av avm" style=${{background:OWNER_COLOR.partner}}>${pLabel.charAt(0).toUpperCase()}</span><input class="fld" type="text" value=${nm.partnerName} placeholder="Partner" onInput=${function(e){updNm('partnerName',e.target.value);}} /></div>
+            <div style=${{display:'flex',alignItems:'center',gap:'14px',marginTop:'18px'}}><button class="btn primary" style=${{flex:'none',padding:'10px 22px'}} onClick=${function(){props.onSaveNames(nm);setSaved(true);}}>Save</button>${saved?html`<span style=${{fontWeight:600,fontSize:'13px',color:'#2E9E6B'}}>Saved ✓</span>`:null}</div>
+          <//>`:null}
+          ${tab==='habits'?html`<${Fragment}>
+            <p style=${{margin:'0 0 10px',fontWeight:400,fontSize:'13px',color:'#8A93A0'}}>Daily habits — a checkbox, or a counter with a goal. They show on Today.</p>
+            ${habits.length===0?html`<p style=${{color:'#8A93A0',fontSize:'13px'}}>No habits yet.</p>`:habits.map(function(h){ return html`<div class="hrowe" key=${h.id}><span class="dot" style=${{background:h.color}}></span><span class="hn">${h.name}</span><span class="hkind">${h.kind==='count'?'counter':'check'}</span><${Avatar} owner=${h.owner} cls="avm" /><button class="view" onClick=${function(){props.onEditHabit(h);}}>Edit</button></div>`; })}
+            <button class="gbtn" style=${{marginTop:'12px'}} onClick=${function(){props.onAddHabit();}}>+ Add habit</button>
+          <//>`:null}
+          ${tab==='notifs'?html`<${Fragment}>
+            <p style=${{margin:'0 0 16px',fontWeight:400,fontSize:'13px',color:'#8A93A0'}}>A nudge when ${pLabel} waves at you or starts a focus session — even when this tab is in the background.</p>
+            <div class="notifrow" style=${{borderTop:'none',paddingTop:0}}>
+              <div style=${{minWidth:0}}><div style=${{fontWeight:600,fontSize:'14px',color:'#15171A'}}>Browser notifications</div><div style=${{fontWeight:400,fontSize:'12.5px',color:'#8A93A0',marginTop:'2px'}}>A small desktop or phone alert. You'll be asked to allow it once.</div></div>
+              <button class=${'switch'+(notifOn?' on':'')} role="switch" aria-checked=${notifOn} aria-label="Browser notifications" onClick=${toggleNotif}><span class="knob"></span></button>
+            </div>
+            <p style=${{fontWeight:400,fontSize:'12px',color:'#AEB6C1',margin:'12px 0 0',lineHeight:1.55}}>The little in-app pop-up always shows while the app is open — this adds a system alert on top.</p>
+          <//>`:null}
+          ${tab==='appearance'?html`<${Fragment}>
+            <p style=${{margin:'0 0 4px',fontWeight:400,fontSize:'13px',color:'#8A93A0'}}>Make it yours — changes apply instantly, for both of you.</p>
+            <div class="aptitle">Background</div>
+            <div class="bgswatches">${BG_PRESETS.map(function(p){ return html`<button class=${'bgsw'+(props.themeBg===p.id?' on':'')} key=${p.id} title=${p.label} style=${{background:p.sw}} onClick=${function(){props.onSetTheme('bg',p.id);}}></button>`; })}</div>
+            <div class="aptitle">Font</div>
+            <div class="fontopts">${FONTS.map(function(fo){ return html`<button class=${'fontopt'+(props.themeFont===fo.id?' on':'')} key=${fo.id} onClick=${function(){props.onSetTheme('font',fo.id);}}><div class="fn" style=${{fontFamily:fo.stack}}>${fo.label}</div><div class="fl">The quick fox</div></button>`; })}</div>
+            <div class="aptitle">Corners</div>
+            <div class="radopts">
+              <button class=${'radopt r0'+(props.themeRad==='sharp'?' on':'')} onClick=${function(){props.onSetTheme('radius','sharp');}}>Sharp</button>
+              <button class=${'radopt r1'+(props.themeRad==='default'||!props.themeRad?' on':'')} onClick=${function(){props.onSetTheme('radius','default');}}>Default</button>
+              <button class=${'radopt r2'+(props.themeRad==='round'?' on':'')} onClick=${function(){props.onSetTheme('radius','round');}}>Round</button>
+            </div>
+          <//>`:null}
+          ${tab==='about'?html`<${Fragment}>
+            <p style=${{fontWeight:400,fontSize:'13px',color:'#5A616B',lineHeight:1.65,margin:'0 0 14px'}}>One private space for the two of you — projects, a calendar, habits, a journal and notes, live on both your phones.</p>
+            <label class="lbl">Sharing</label>
+            <p style=${{fontWeight:400,fontSize:'13px',color:'#5A616B',lineHeight:1.6,margin:'0 0 14px'}}>Anyone with the link and the shared passcode can open it. To change the passcode, run <code style=${{background:'#EEF2F7',padding:'1px 6px',borderRadius:'6px',fontSize:'12px'}}>npx wrangler secret put PLANNER_PASSCODE</code> in the project.</p>
+            <button class="gbtn" onClick=${props.onHowItWorks}>Show “How it works” again</button>
+          <//>`:null}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function HabitEditor(props){
+    var ed=props.editing||{};
+    var st=useState({ name:ed.name||'', kind:ed.kind||'check', owner:ed.owner||props.whoami||'me', unit:ed.unit||'', target:(ed.target!=null?ed.target:''), caption:ed.caption||'', color:ed.color||PROJ_COLORS[0] });
+    var f=st[0], set=st[1];
+    function upd(k,v){ var o=Object.assign({},f); o[k]=v; set(o); }
+    return html`<div class="overlay" style=${{zIndex:80}} onClick=${function(e){if(e.target===e.currentTarget)props.onClose();}}>
+      <div class="modal" role="dialog" aria-modal="true" style=${{maxWidth:'440px'}}>
+        <div class="mhd"><div><div class="meyebrow">${ed.id?'Edit':'Create'}</div><h3>${ed.id?'Edit habit':'New habit'}</h3></div><button class="x" aria-label="Close" onClick=${props.onClose}>×</button></div>
+        <label class="lbl">Name</label>
+        <input class="fld" type="text" value=${f.name} placeholder="e.g. Read · 1 hour" onInput=${function(e){upd('name',e.target.value);}} />
+        <label class="lbl">Type</label>
+        <div class="ownerseg" style=${{gridTemplateColumns:'repeat(2,1fr)'}}><button class=${f.kind==='check'?'on':''} onClick=${function(){upd('kind','check');}}>Checkbox</button><button class=${f.kind==='count'?'on':''} onClick=${function(){upd('kind','count');}}>Counter</button></div>
+        ${f.kind==='count'?html`<div style=${{display:'flex',gap:'10px'}}><div style=${{flex:1}}><label class="lbl">Daily target</label><input class="fld" type="number" min="0" value=${f.target} onInput=${function(e){upd('target',e.target.value);}} /></div><div style=${{flex:1}}><label class="lbl">Unit</label><input class="fld" type="text" value=${f.unit} placeholder="e.g. cigs" onInput=${function(e){upd('unit',e.target.value);}} /></div></div>`:null}
+        <label class="lbl">Caption (optional)</label>
+        <input class="fld" type="text" value=${f.caption} placeholder="e.g. 4 → 1 pack by 30 Nov" onInput=${function(e){upd('caption',e.target.value);}} />
+        <label class="lbl">Whose</label>
+        <${OwnerSeg} value=${f.owner} onChange=${function(v){upd('owner',v);}} />
+        <label class="lbl">Colour</label>
+        <div class="swatches">${PROJ_COLORS.map(function(c){ return html`<button class=${'sw'+(f.color===c?' on':'')} key=${c} style=${{background:c}} aria-label="colour" onClick=${function(){upd('color',c);}}></button>`; })}</div>
+        <div class="mactions">${ed.id?html`<button class="btn del" onClick=${function(){props.onDelete(ed.id);}}>Delete</button>`:null}<button class="btn ghost" onClick=${props.onClose}>Cancel</button><button class="btn primary" onClick=${function(){ if(f.name.trim()) props.onSave(f,ed.id); }}>Save</button></div>
+      </div>
+    </div>`;
+  }
+
+  // ---- Gate ----
+  function Gate(props){
+    var pS=useState(''); var pass=pS[0], setPass=pS[1];
+    var eS=useState(''); var err=eS[0], setErr=eS[1];
+    var bS=useState(false); var busy=bS[0], setBusy=bS[1];
+    function submit(e){ if(e)e.preventDefault(); if(!pass.trim())return; setBusy(true); setErr('');
+      apiPost('/api/login',{passcode:pass}).then(function(r){ return r.json().then(function(j){return {ok:r.ok,j:j};}); })
+      .then(function(res){ setBusy(false); if(res.ok&&res.j&&res.j.ok){ props.onIn(); } else { setErr((res.j&&res.j.error)||'Wrong passcode.'); setPass(''); } })
+      .catch(function(){ setBusy(false); setErr('Network error — try again.'); });
+    }
+    return html`<div class="gate"><form class="gatecard" onSubmit=${submit}>
+      <span class="brand">SP</span><h1>Shared Planner</h1><p class="lead">Pop in the passcode you two share.</p>
+      <input type="password" autofocus value=${pass} onInput=${function(e){setPass(e.target.value);}} placeholder="Passcode" />
+      <div class="err">${err}</div>
+      <button class="btn primary" style=${{width:'100%'}} disabled=${busy} type="submit">${busy?'Checking…':'Enter'}</button>
+    </form></div>`;
+  }
+
+  // ---- onboarding bits ----
+  function hexA(h,a){ h=(h||'#1F6FEB').replace('#',''); if(h.length===3)h=h.split('').map(function(x){return x+x;}).join(''); var n=parseInt(h,16); return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')'; }
+  var svgCheck2=html`<path d="M4 12.5l5 5 11-11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+  var svgFlame=html`<path d="M12 3.5c1.2 3-2 4.2-2 7.2a2 2 0 104 0c0-.9-.4-1.7-.4-1.7 1.9 1 3.2 2.9 3.2 5.2A4.8 4.8 0 017.2 14c0-3.2 3-4.3 4.8-10.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`;
+  var svgPeople=html`<circle cx="9" cy="9" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 19a5.5 5.5 0 0111 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M15.5 6.4a3 3 0 010 5.6M16 19a5.5 5.5 0 00-1.1-3.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>`;
+  function IconBadge(props){ var c=props.color||'#1F6FEB'; return html`<span class="ibadge" style=${{background:hexA(c,.14),color:c}}><${Icon} s=${props.s||20}>${props.children}<//></span>`; }
+
+  var INTRO=[
+    {c:'#1F6FEB',g:svgCheck2,t:'Tasks & subtasks',d:'Jot what needs doing, break it into little steps, each with its own due date.'},
+    {c:'#B4792B',g:icons.projects,t:'Projects & timelines',d:'Gather the big things — your book, a portfolio — on their own timeline, with links and pieces.'},
+    {c:'#2E9E6B',g:icons.calendar,t:'Calendar',d:'See your days at a glance. Tap any day to drop in a task or a plan.'},
+    {c:'#C2704B',g:svgFlame,t:'Habits',d:'Keep the small daily promises — reading, cutting back — and watch the streak grow.'},
+    {c:'#7A5BD8',g:icons.journal,t:'Journal & notes',d:'End the day with a few honest words, and keep little notes as they come.'},
+    {c:'#5B6B86',g:svgPeople,t:'Me · Partner · Shared',d:'Mark anything as yours, theirs, or shared — you\'ll both see it, live.'}
+  ];
+  function Intro(props){
+    return html`<div class="overlay" onClick=${function(e){if(e.target===e.currentTarget)props.onClose();}}>
+      <div class="modal" role="dialog" aria-modal="true" style=${{maxWidth:'460px'}}>
+        <div class="mhd"><div><div class="meyebrow">Welcome</div><h3>How Shared Planner works</h3></div><button class="x" aria-label="Close" onClick=${props.onClose}>×</button></div>
+        <p style=${{margin:'2px 0 8px',fontWeight:400,fontSize:'13px',color:'#5A616B'}}>Your little shared corner, just the two of you. Here's the gist:</p>
+        ${INTRO.map(function(r){ return html`<div class="introrow" key=${r.t}><${IconBadge} color=${r.c}>${r.g}<//><div><div class="it">${r.t}</div><div class="id">${r.d}</div></div></div>`; })}
+        <div class="mactions" style=${{marginTop:'16px'}}><button class="btn primary" onClick=${props.onClose}>Got it</button></div>
+      </div>
+    </div>`;
+  }
+
+  function GetStarted(props){
+    var steps=props.steps, done=props.done;
+    return html`<section class="gstart">
+      <div class="gh"><div><div class="gt">Get started</div><div class="gsub">${done} of ${steps.length} — let's make it yours</div></div><button class="x" aria-label="Dismiss" onClick=${props.onDismiss}>×</button></div>
+      <div class="gprog"><i style=${{width:(done/steps.length*100)+'%'}}></i></div>
+      ${steps.map(function(s,i){ return html`<div class=${'gstep'+(s.done?' done':'')} key=${s.k}>
+        <span class=${'gnum'+(s.done?' done':'')}>${s.done?checkMark:(i+1)}</span>
+        <div class="gl"><div class="gll">${s.label}</div><div class="gld">${s.desc}</div></div>
+        ${s.done?null:html`<button class="gbtn" onClick=${s.action}>${s.cta}</button>`}
+      </div>`; })}
+    </section>`;
+  }
+
+  function NoteCard(props){
+    var n=props.note; var c=noteColor(n.color);
+    var s=useState(n.text||''); var v=s[0], setV=s[1];
+    return html`<div class="notecd" style=${{background:c.bg,borderColor:c.bd}}>
+      <textarea class="notearea2" style=${{color:c.fg}} placeholder="Jot a thought, a feeling…" value=${v} onInput=${function(e){setV(e.target.value);}} onBlur=${function(){props.onSave(n,v);}}></textarea>
+      <div class="notefoot">
+        <div class="notecolors">${NOTE_COLORS.map(function(cc){ return html`<button class=${'ncol'+(n.color===cc.id?' on':'')} key=${cc.id} style=${{background:cc.bg,borderColor:cc.bd}} aria-label=${cc.id} onClick=${function(){props.onColor(n,cc.id);}}></button>`; })}</div>
+        <button class="noterm" style=${{color:c.fg}} aria-label="Delete note" onClick=${function(){props.onDelete(n.id);}}>×</button>
+      </div>
+    </div>`;
+  }
+
+  // ---- App ----
+  function App(){
+    var authS=useState('checking'); var auth=authS[0], setAuth=authS[1];
+    var stS=useState(null); var store=stS[0], setStore=stS[1];
+    var vS=useState((function(){var v=lsGet('sp_view','today'); return v==='settings'?'today':v;})()); var view=vS[0], setView=vS[1];
+    var wS=useState(lsGet('sp_who','me')); var whoami=wS[0], setWho=wS[1];
+    var fS=useState('all'); var filter=fS[0], setFilter=fS[1];
+    var selS=useState(TODAY); var sel=selS[0], setSel=selS[1];
+    var modalS=useState(null); var modal=modalS[0], setModal=modalS[1];
+    var panelS=useState(null); var panel=panelS[0], setPanel=panelS[1];       // project id
+    var pEditS=useState(null); var pEdit=pEditS[0], setPEdit=pEditS[1];        // null | {} | project
+    var introS=useState(false); var showIntro=introS[0], setShowIntro=introS[1];
+    var gsHideS=useState(lsGet('sp_gs_hide','')==='1'); var gsHide=gsHideS[0], setGsHide=gsHideS[1];
+    var habitEditS=useState(null); var habitEdit=habitEditS[0], setHabitEdit=habitEditS[1];
+    var setOpenS=useState(false); var settingsOpen=setOpenS[0], setSettingsOpen=setOpenS[1];
+    var refTimer=useRef(null);
+    var toastS=useState(null); var toast=toastS[0], setToast=toastS[1];
+    var waveOpenS=useState(false); var waveOpen=waveOpenS[0], setWaveOpen=waveOpenS[1];
+    var toastTmr=useRef(null); var readyRef=useRef(false); var lastWaveRef=useRef(0); var lastFocusKeyRef=useRef('');
+
+    function refresh(){ return apiGet('/api/state').then(function(r){ if(r.status===401){ setAuth('out'); return null; } return r.json(); }).then(function(j){ if(j){ setStore(j); setAuth('in'); } }).catch(function(){}); }
+    useEffect(function(){ refresh();
+      function onVis(){ if(document.visibilityState!=='hidden') refresh(); }
+      window.addEventListener('focus',onVis); document.addEventListener('visibilitychange',onVis);
+      var iv=setInterval(function(){ if(document.visibilityState!=='hidden') refresh(); },20000);
+      return function(){ window.removeEventListener('focus',onVis); document.removeEventListener('visibilitychange',onVis); clearInterval(iv); };
+    },[]);
+    useEffect(function(){ try{ if(localStorage.getItem('sp_intro_v1')!=='1') setShowIntro(true); }catch(e){} },[]);
+    function scheduleRefresh(){ clearTimeout(refTimer.current); refTimer.current=setTimeout(refresh,600); }
+    function applyLocal(fn){ setStore(function(s){ if(!s) return s; var n=Object.assign({},s); fn(n); return n; }); }
+    function postOp(b){ return apiPost('/api/op',b).then(scheduleRefresh,scheduleRefresh); }
+    function setView2(v){ setView(v); lsSet('sp_view',v); }
+    function setWho2(w){ setWho(w); lsSet('sp_who',w); }
+
+    var projects=store?store.projects:null;
+    var tasks=store?store.tasks:null;
+    var materials=store?store.project_materials:null;
+    var routines=store?store.routines:null;
+    var journal=store?store.journal:null;
+    var habitDefs=store?store.habits:null;
+    var habitLogs=store?store.habit_logs:null;
+    var topics=store?store.topics:null;
+    var topicLinks=store?store.topic_links:null;
+    var settings=store?store.settings:null;
+    var notes=store?store.notes:null;
+    var focus=store?store.focus:null;
+    var wave=store?store.wave:null;
+    useEffect(function(){ try{
+      var bg=(settings&&settings.theme_bg)||'sky', ft=(settings&&settings.theme_font)||'inter', rd=(settings&&settings.theme_radius)||'default';
+      var bgp=BG_PRESETS.filter(function(p){return p.id===bg;})[0];
+      document.documentElement.style.setProperty('--grad', bgp?bgp.css:DEFAULT_GRAD);
+      var fo=FONTS.filter(function(f){return f.id===ft;})[0];
+      document.documentElement.style.setProperty('--font', fo?fo.stack:DEFAULT_FONT);
+      var r=document.getElementById('root'); if(r){ r.setAttribute('data-radius', rd); if(bgp&&bgp.dark) r.setAttribute('data-ground','dark'); else r.removeAttribute('data-ground'); }
+    }catch(e){} },[settings]);
+    // while a focus session runs, sync faster so both people see start/pause/reset within a few seconds
+    useEffect(function(){ var f=store&&store.focus; if(!f||f.status!=='running') return; var iv=setInterval(function(){ if(document.visibilityState!=='hidden') refresh(); },5000); return function(){ clearInterval(iv); }; },[store&&store.focus&&store.focus.status]);
+
+    // task ops
+    function upsertTask(row){ applyLocal(function(n){ var a=(n.tasks||[]).slice(); var i=-1; for(var k=0;k<a.length;k++){if(a[k].id===row.id){i=k;break;}} if(i>=0)a[i]=row; else a.push(row); n.tasks=a; }); postOp({op:'upsert',table:'tasks',row:row}); }
+    function toggleTask(t){ upsertTask(Object.assign({},t,{done:!t.done})); }
+    function scheduleTask(t,ds,time){ upsertTask(Object.assign({},t,{date:ds,time:(time!=null?time:(t.time||''))})); }
+    function deleteTaskRow(id){ applyLocal(function(n){ n.tasks=(n.tasks||[]).filter(function(t){return t.id!==id;}); }); postOp({op:'delete',table:'tasks',row:{id:id}}); }
+    function deleteTask(id){ var kids=(tasks||[]).filter(function(t){return t.parent_id===id;}); applyLocal(function(n){ n.tasks=(n.tasks||[]).filter(function(t){return t.id!==id && t.parent_id!==id;}); }); kids.forEach(function(k){ postOp({op:'delete',table:'tasks',row:{id:k.id}}); }); postOp({op:'delete',table:'tasks',row:{id:id}}); setModal(null); }
+    function baseTask(o){ return Object.assign({ id:uid('tk'), title:'', project:'', owner:whoami, type:'task', date:'', time:'', due:'', due_time:'', done:false, subtodos:'[]', parent_id:null, sort:0, created_at:Date.now() }, o); }
+    function saveTask(f,id,subs,removed){
+      var rid=id||uid('tk'); var cur=id?((tasks||[]).filter(function(t){return t.id===id;})[0]||{}):{};
+      var parent=baseTask({ id:rid, title:f.title.trim(), project:f.project||'', owner:f.owner, type:f.type, date:f.date||'',
+        time:f.time||'', due:!isEventType(f.type)?(f.due||''):'', due_time:!isEventType(f.type)?(f.due_time||''):'', done:id?!!cur.done:false,
+        parent_id:null, sort:cur.sort||0, created_at:cur.created_at||Date.now() });
+      upsertTask(parent);
+      (subs||[]).forEach(function(s){ if(!(s.title||'').trim())return; upsertTask(baseTask({ id:s.id, title:s.title.trim(), project:f.project||'', owner:s.owner||f.owner, due:s.due||'', due_time:s.due_time||'', done:!!s.done, parent_id:rid, created_at:s.created_at||Date.now() })); });
+      (removed||[]).forEach(function(sid){ deleteTaskRow(sid); });
+      setModal(null);
+    }
+    function addProjectItem(pid,title,due){ upsertTask(baseTask({ title:title.trim(), project:pid, due:due||'' })); }
+    function addSubtask(parentId,pid,title,due){ upsertTask(baseTask({ title:title.trim(), project:pid, parent_id:parentId, due:due||'' })); }
+
+    // project ops
+    function upsertProject(row){ applyLocal(function(n){ var a=(n.projects||[]).slice(); var i=-1; for(var k=0;k<a.length;k++){if(a[k].id===row.id){i=k;break;}} if(i>=0)a[i]=row; else a.push(row); n.projects=a; }); postOp({op:'upsert',table:'projects',row:row}); }
+    function saveProject(f,id){
+      var rid=id||uid('pr'); var cur=id?((projects||[]).filter(function(p){return p.id===id;})[0]||{}):{};
+      var row={ id:rid, name:f.name.trim(), color:f.color, owner:f.owner, kind:f.kind, start_date:f.start_date||'', end_date:f.end_date||'', description:f.description||'', archived:cur.archived?1:0, sort:cur.sort||Date.now(), created_at:cur.created_at||Date.now() };
+      upsertProject(row); setPEdit(null); if(!id) setPanel(rid);
+    }
+    function deleteProject(id){
+      var pt=(tasks||[]).filter(function(t){return t.project===id;});
+      var pm=(materials||[]).filter(function(m){return m.project_id===id;});
+      applyLocal(function(n){ n.projects=(n.projects||[]).filter(function(p){return p.id!==id;}); n.tasks=(n.tasks||[]).filter(function(t){return t.project!==id;}); n.project_materials=(n.project_materials||[]).filter(function(m){return m.project_id!==id;}); });
+      pt.forEach(function(t){ postOp({op:'delete',table:'tasks',row:{id:t.id}}); });
+      pm.forEach(function(m){ postOp({op:'delete',table:'project_materials',row:{id:m.id}}); });
+      postOp({op:'delete',table:'projects',row:{id:id}});
+      setPEdit(null); setPanel(null);
+    }
+    // material ops
+    function addMaterial(pid,title,url){ var u=url.trim(); if(!/^https?:\/\//i.test(u)) u='https://'+u; var row={ id:uid('mat'), project_id:pid, title:(title||'').trim()||u.replace(/^https?:\/\//,''), url:u, sort:Date.now(), created_at:Date.now() }; applyLocal(function(n){ n.project_materials=(n.project_materials||[]).concat([row]); }); postOp({op:'upsert',table:'project_materials',row:row}); }
+    function delMaterial(id){ applyLocal(function(n){ n.project_materials=(n.project_materials||[]).filter(function(m){return m.id!==id;}); }); postOp({op:'delete',table:'project_materials',row:{id:id}}); }
+
+    // habit / journal / settings
+    function setHabit(hid,value){
+      applyLocal(function(n){ var a=(n.habit_logs||[]).slice(); var i=-1; for(var k=0;k<a.length;k++){if(a[k].habit===hid&&a[k].date===TODAY){i=k;break;}} if(i>=0)a[i]=Object.assign({},a[i],{value:value}); else a.push({date:TODAY,habit:hid,value:value}); n.habit_logs=a; });
+      apiPost('/api/habit',{date:TODAY,habit:hid,value:value}).then(scheduleRefresh,scheduleRefresh);
+    }
+    function upsertHabit(row){ applyLocal(function(n){ var a=(n.habits||[]).slice(); var i=-1; for(var k=0;k<a.length;k++){if(a[k].id===row.id){i=k;break;}} if(i>=0)a[i]=row; else a.push(row); n.habits=a; }); postOp({op:'upsert',table:'habits',row:row}); }
+    function saveHabit(f,id){ var rid=id||uid('hb'); var cur=id?((habitDefs||[]).filter(function(h){return h.id===id;})[0]||{}):{}; upsertHabit({id:rid,name:f.name.trim(),kind:f.kind,owner:f.owner,unit:f.unit||'',target:(f.target===''||f.target==null)?null:Number(f.target),caption:f.caption||'',color:f.color||'#1F6FEB',sort:cur.sort||Date.now(),archived:cur.archived?1:0,created_at:cur.created_at||Date.now()}); setHabitEdit(null); }
+    function deleteHabit(id){ applyLocal(function(n){ n.habits=(n.habits||[]).filter(function(h){return h.id!==id;}); }); postOp({op:'delete',table:'habits',row:{id:id}}); setHabitEdit(null); }
+    function upsertTopic(row){ applyLocal(function(n){ var a=(n.topics||[]).slice(); var i=-1; for(var k=0;k<a.length;k++){if(a[k].id===row.id){i=k;break;}} if(i>=0)a[i]=row; else a.unshift(row); n.topics=a; }); postOp({op:'upsert',table:'topics',row:row}); }
+    function setWeekTopic(title){ var wk=ymd(startOfWeek(new Date())); var ex=(topics||[]).filter(function(t){return t.week===wk;})[0]; upsertTopic({id:ex?ex.id:uid('tp'),week:wk,title:(title||'').trim(),owner:whoami,notes:ex?ex.notes:'',sort:ex?ex.sort:Date.now(),created_at:ex?ex.created_at:Date.now()}); }
+    function addTopicLink(topicId,title,url){ var u=(url||'').trim(); if(!/^https?:\/\//i.test(u))u='https://'+u; var row={id:uid('tl'),topic_id:topicId,title:(title||'').trim()||u.replace(/^https?:\/\//,''),url:u,sort:Date.now(),created_at:Date.now()}; applyLocal(function(n){ n.topic_links=(n.topic_links||[]).concat([row]); }); postOp({op:'upsert',table:'topic_links',row:row}); }
+    function delTopicLink(id){ applyLocal(function(n){ n.topic_links=(n.topic_links||[]).filter(function(l){return l.id!==id;}); }); postOp({op:'delete',table:'topic_links',row:{id:id}}); }
+    function saveNote(text){ var key='note_'+whoami; var patch={}; patch[key]=text; applyLocal(function(n){ n.settings=Object.assign({},n.settings||{},patch); }); apiPost('/api/settings',{patch:patch}).then(scheduleRefresh,scheduleRefresh); }
+    function setTheme(kind,value){ var patch={}; patch['theme_'+kind]=value; applyLocal(function(n){ n.settings=Object.assign({},n.settings||{},patch); }); apiPost('/api/settings',{patch:patch}).then(scheduleRefresh,scheduleRefresh); }
+    function addNote(){ var row={id:uid('nt'),text:'',color:'yellow',owner:whoami,date:TODAY,created_at:Date.now()}; applyLocal(function(n){ n.notes=[row].concat(n.notes||[]); }); postOp({op:'upsert',table:'notes',row:row}); }
+    function saveNoteText(note,text){ var row=Object.assign({},note,{text:text}); applyLocal(function(n){ n.notes=(n.notes||[]).map(function(x){return x.id===note.id?row:x;}); }); postOp({op:'upsert',table:'notes',row:row}); }
+    function setNoteColor(note,color){ var row=Object.assign({},note,{color:color}); applyLocal(function(n){ n.notes=(n.notes||[]).map(function(x){return x.id===note.id?row:x;}); }); postOp({op:'upsert',table:'notes',row:row}); }
+    function deleteNote(id){ applyLocal(function(n){ n.notes=(n.notes||[]).filter(function(x){return x.id!==id;}); }); postOp({op:'delete',table:'notes',row:{id:id}}); }
+    // shared focus / pomodoro ops — one row id='shared'
+    var FOCUS_DEF={id:'shared',status:'idle',label:'',minutes:25,ends_at:0,remaining:0,started_by:''};
+    function writeFocus(patch){ var cur=(store&&store.focus)||FOCUS_DEF; var row=Object.assign({},cur,patch,{id:'shared',updated_at:Date.now()}); applyLocal(function(n){ n.focus=row; }); postOp({op:'upsert',table:'focus',row:row}); }
+    function startFocus(mins,label){ var m=mins||25; writeFocus({status:'running',minutes:m,label:(label||'').trim(),ends_at:Date.now()+m*60000,remaining:0,started_by:whoami}); }
+    function pauseFocus(){ var f=store&&store.focus; if(!f||f.status!=='running')return; writeFocus({status:'paused',remaining:Math.max(0,(f.ends_at||0)-Date.now())}); }
+    function resumeFocus(){ var f=store&&store.focus; if(!f||f.status!=='paused')return; writeFocus({status:'running',ends_at:Date.now()+(f.remaining||0)}); }
+    function resetFocus(){ writeFocus({status:'idle',label:'',ends_at:0,remaining:0,started_by:''}); }
+    // wave + notifications
+    var WAVE_EMOJIS=['💛','👋','✨','☕','💪','🫶'];
+    function showToast(o){ clearTimeout(toastTmr.current); setToast(Object.assign({t:Date.now()},o)); toastTmr.current=setTimeout(function(){ setToast(null); }, (o&&o.big)?4500:3400); }
+    function notify(title,body){ try{ if(lsGet('sp_notif','')==='1' && typeof Notification!=='undefined' && Notification.permission==='granted'){ new Notification(title,{body:body||''}); } }catch(e){} }
+    function sendWave(emoji){ var e=emoji||'💛'; var row={id:'latest',emoji:e,sender:whoami,created_at:Date.now()}; lastWaveRef.current=row.created_at; applyLocal(function(n){ n.wave=row; }); postOp({op:'upsert',table:'waves',row:row}); var pn=(settings&&settings.partnerName)||'Partner'; showToast({emoji:e,text:'Sent '+e+' to '+pn}); setWaveOpen(false); }
+    useEffect(function(){
+      if(!store) return;
+      var w=store.wave, f=store.focus;
+      var fkey=(f&&f.status==='running')?('run:'+f.ends_at+':'+f.started_by):'idle';
+      if(!readyRef.current){ lastWaveRef.current=w?w.created_at:0; lastFocusKeyRef.current=fkey; readyRef.current=true; return; }
+      if(w && w.created_at>lastWaveRef.current){ lastWaveRef.current=w.created_at; if(w.sender && w.sender!==whoami){ var nm=w.sender==='me'?((settings&&settings.meName)||'They'):((settings&&settings.partnerName)||'Partner'); showToast({emoji:w.emoji||'💛',text:nm+' sent you '+(w.emoji||'💛'),big:true}); notify(nm+' waved '+(w.emoji||'💛'),'They’re here with you.'); } }
+      if(fkey!==lastFocusKeyRef.current){ var prev=lastFocusKeyRef.current; lastFocusKeyRef.current=fkey; if(f && f.status==='running' && f.started_by && f.started_by!==whoami && prev.indexOf('run:'+f.ends_at)!==0){ var fn=f.started_by==='me'?((settings&&settings.meName)||'They'):((settings&&settings.partnerName)||'Partner'); showToast({emoji:'⏳',text:fn+' started a '+(f.minutes||25)+'-min focus'}); notify(fn+' is focusing',(f.label||'Deep work')+' · '+(f.minutes||25)+' min'); } }
+    },[store&&store.wave&&store.wave.created_at, store&&store.focus&&store.focus.ends_at, store&&store.focus&&store.focus.status]);
+    function saveJournal(text,tag){ var id=TODAY+'_'+whoami; var row={id:id,date:TODAY,owner:whoami,text:text,tag:tag,updated_at:Date.now()}; applyLocal(function(n){ var a=(n.journal||[]).slice(); var i=-1; for(var k=0;k<a.length;k++){if(a[k].id===id){i=k;break;}} if(i>=0)a[i]=row; else a.unshift(row); n.journal=a; }); postOp({op:'upsert',table:'journal',row:row}); }
+    function saveSettings(f){ var patch={ meName:(f.meName||'').trim(), partnerName:(f.partnerName||'').trim() }; applyLocal(function(n){ n.settings=Object.assign({},n.settings||{},patch); }); apiPost('/api/settings',{patch:patch}).then(scheduleRefresh,scheduleRefresh); }
+
+    // memos
+    // habit trends + streaks are computed inside Today / Journal from habitLogs now.
+    var counts=useMemo(function(){ var c={today:0}; (tasks||[]).forEach(function(t){ if(!t.parent_id&&t.date===TODAY&&!t.done)c.today++; }); return c; },[tasks]);
+    var projCounts=useMemo(function(){ var m={}; (tasks||[]).forEach(function(t){ if(t.project&&!t.done)m[t.project]=(m[t.project]||0)+1; }); return m; },[tasks]);
+    var upcoming=useMemo(function(){ return upcomingFrom(projects,tasks); },[projects,tasks]);
+
+    if(auth==='out'){ return html`<${Gate} onIn=${function(){ setAuth('checking'); refresh(); }} />`; }
+    var loading=!store;
+    var openProj=(projects||[]).filter(function(p){return p.id===panel;})[0];
+    var editingTask=modal&&modal.editing;
+    var modalChildren=editingTask?childrenOf(tasks,editingTask.id):[];
+
+    var gsSteps=[
+      {k:'proj',label:'Start a project',desc:'The big things you\'re pouring into — each on its own timeline.',cta:'New project',done:(projects||[]).length>0,action:function(){setPEdit({});}},
+      {k:'task',label:'Add a task or event',desc:'Turn it into little tasks with due dates, or drop a plan on a day.',cta:'Add task',done:(tasks||[]).length>0,action:function(){setModal({defaultDate:TODAY});}},
+      {k:'journal',label:'Write tonight\'s journal',desc:'A few honest words on how the day felt.',cta:'Open',done:(journal||[]).length>0,action:function(){setView2('journal');}}
+    ];
+    var gsDone=gsSteps.filter(function(s){return s.done;}).length;
+    var showGS = !loading && view==='today' && gsDone<gsSteps.length && !gsHide;
+
+    var sidebar = html`<aside class="sidebar">
+      <div class="prof"><span class="pav">${whoami==='partner'?'P':'M'}</span><span class="pname">${whoami==='partner'?((settings&&settings.partnerName)||'Partner'):((settings&&settings.meName)||'Mahesh')}</span></div>
+      <button class="addbtn" onClick=${function(){setModal({defaultDate:TODAY});}}>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#1F6FEB"/><path d="M12 8v8M8 12h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>Add task</button>
+      <button class=${'nav'+(view==='today'?' sel':'')} onClick=${function(){setView2('today');}}><span style=${{display:'flex',color:view==='today'?'#195FD0':'#54606E'}}><${Icon}>${icons.today}<//></span>Today<span class="cnt">${counts.today||''}</span></button>
+      <button class=${'nav'+(view==='tasks'?' sel':'')} onClick=${function(){setView2('tasks');}}><span style=${{display:'flex',color:view==='tasks'?'#195FD0':'#54606E'}}><${Icon}>${icons.tasks}<//></span>Tasks<span class="cnt">${(tasks||[]).filter(function(t){return !t.done;}).length||''}</span></button>
+      <button class=${'nav'+(view==='calendar'?' sel':'')} onClick=${function(){setView2('calendar');}}><span style=${{display:'flex',color:view==='calendar'?'#195FD0':'#54606E'}}><${Icon}>${icons.calendar}<//></span>Calendar</button>
+      <button class=${'nav'+(view==='projects'?' sel':'')} onClick=${function(){setView2('projects');}}><span style=${{display:'flex',color:view==='projects'?'#195FD0':'#54606E'}}><${Icon}>${icons.projects}<//></span>Projects</button>
+      <button class=${'nav'+(view==='journal'?' sel':'')} onClick=${function(){setView2('journal');}}><span style=${{display:'flex',color:view==='journal'?'#195FD0':'#54606E'}}><${Icon}>${icons.journal}<//></span>Journal</button>
+      <div class="sec">Projects</div>
+      ${(projects||[]).filter(function(p){return !p.archived;}).map(function(p){ return html`<button class="nav" key=${p.id} onClick=${function(){setPanel(p.id);}}><span class="dot" style=${{background:p.color}}></span>${p.name}<span class="cnt">${projCounts[p.id]||''}</span></button>`; })}
+      <button class="nav" style=${{color:'#195FD0',fontWeight:600}} onClick=${function(){setPEdit({});}}>+ New project</button>
+      <${FocusWidget} focus=${focus} meName=${(settings&&settings.meName)||'You'} partnerName=${(settings&&settings.partnerName)||'Partner'} whoami=${whoami} onStart=${startFocus} onPause=${pauseFocus} onResume=${resumeFocus} onReset=${resetFocus} />
+      <button class="helpbtn" onClick=${function(){setShowIntro(true);}}><span style=${{display:'flex',color:'#54606E'}}><${Icon}>${icons.help}<//></span>How it works</button>
+      <button class="nav" onClick=${function(){setSettingsOpen(true);}}><span style=${{display:'flex',color:'#54606E'}}><${Icon}>${icons.settings}<//></span>Settings</button>
+      <div class="sfoot"><span class="av avm" style=${{background:OWNER_COLOR.me}}>M</span><span class="av avm" style=${{background:OWNER_COLOR.partner,marginLeft:'-8px',border:'2px solid var(--sidebar)'}}>P</span><span style=${{fontWeight:500,fontSize:'12px',color:'#8A93A0',marginLeft:'4px'}}>Shared planner</span></div>
+    </aside>`;
+
+    var titleTxt = ({today:'Today',tasks:'Tasks',calendar:'Calendar',projects:'Projects',journal:'Journal',settings:'Settings'})[view]||'Today';
+    var content;
+    if(loading){ content=html`<div class="empty" style=${{marginTop:'60px',color:'#3C6FB0'}}><div class="big">Loading your planner…</div><div class="sub">Syncing shared data.</div></div>`; }
+    else if(view==='today'){ content=html`<${Fragment}>${showGS?html`<${GetStarted} steps=${gsSteps} done=${gsDone} onDismiss=${function(){setGsHide(true);lsSet('sp_gs_hide','1');}} />`:null}<div class="mobfocus"><${FocusWidget} focus=${focus} meName=${(settings&&settings.meName)||'You'} partnerName=${(settings&&settings.partnerName)||'Partner'} whoami=${whoami} onStart=${startFocus} onPause=${pauseFocus} onResume=${resumeFocus} onReset=${resetFocus} /></div><${Today} sel=${sel} filter=${filter} projects=${projects} tasks=${tasks} routines=${routines} upcoming=${upcoming} habits=${habitDefs} habitLogs=${habitLogs} topics=${topics} topicLinks=${topicLinks} settings=${settings} whoami=${whoami} onToggle=${toggleTask} onEdit=${function(t){setModal({editing:t});}} onAdd=${function(d){setModal({defaultDate:d});}} onSetHabit=${setHabit} onEditHabit=${function(h){setHabitEdit(h);}} onAddHabit=${function(){setHabitEdit({});}} notes=${notes} onAddNote=${addNote} onSaveNote=${saveNoteText} onSetNoteColor=${setNoteColor} onDeleteNote=${deleteNote} onGoJournal=${function(){setView2('journal');}} onShowAll=${function(){setView2('tasks');}} /><//>`; }
+    else if(view==='tasks'){ content=html`<${TasksTable} tasks=${tasks} projects=${projects} meName=${(settings&&settings.meName)||'Me'} partnerName=${(settings&&settings.partnerName)||'Partner'} onEdit=${function(t){setModal({editing:t});}} onToggle=${toggleTask} />`; }
+    else if(view==='calendar'){ content=html`<${Calendar} tasks=${tasks} projects=${projects} onAddDay=${function(ds){setModal({defaultDate:ds});}} onAddSlot=${function(ds,tm){setModal({defaultDate:ds,defaultTime:tm,defaultType:'event'});}} onEditTask=${function(t){setModal({editing:t});}} onOpenProject=${function(id){setPanel(id);}} onToggle=${toggleTask} onSchedule=${scheduleTask} onNewProject=${function(s,e){setPEdit({start_date:s,end_date:e});}} />`; }
+    else if(view==='projects'){ content=html`<${Projects} projects=${projects} tasks=${tasks} onOpen=${function(id){setPanel(id);}} onNew=${function(){setPEdit({});}} />`; }
+    // settings is a modal now (opened from the sidebar / mobile tab), not a view.
+    else { content=html`<${Journal} entries=${journal} whoami=${whoami} topics=${topics} topicLinks=${topicLinks} onSave=${saveJournal} onSetTopic=${setWeekTopic} onAddTopicLink=${addTopicLink} onDelTopicLink=${delTopicLink} />`; }
+
+    var navBtns=['today','tasks','calendar','projects','journal','settings'];
+    return html`<div class="app">
+      ${sidebar}
+      <main class="main"><div class="wrap">
+        <div class="topbar">
+          <div class="brandrow"><span class="brand">SP</span><div><div class="eyebrow">Shared Planner</div><h1 class="title">${titleTxt}</h1></div></div>
+          <div class="ctrls">
+            <button class="navcirc mobonly" style=${{width:'36px',height:'36px'}} aria-label="How it works" onClick=${function(){setShowIntro(true);}}><${Icon} s=${16}>${icons.help}<//></button>
+            <div class="seg" role="group" aria-label="Viewing as"><button class=${whoami==='me'?'on':''} onClick=${function(){setWho2('me');}}>Me</button><button class=${whoami==='partner'?'on':''} onClick=${function(){setWho2('partner');}}>Partner</button></div>
+            ${view==='today'?html`<div class="seg" role="group" aria-label="Filter"><button class=${filter==='all'?'on':''} onClick=${function(){setFilter('all');}}>All</button><button class=${filter==='me'?'on':''} onClick=${function(){setFilter('me');}}>Mine</button></div>`:null}
+            ${view==='projects'?html`<button class="pillbtn" onClick=${function(){setPEdit({});}}>+ New project</button>`:null}
+            ${view==='tasks'?html`<button class="pillbtn" onClick=${function(){setModal({defaultDate:TODAY});}}>+ New task</button>`:null}
+          </div>
+        </div>
+        ${view==='today'&&!loading?html`<div class="datesel">
+          <button class="navcirc" aria-label="Previous week" onClick=${function(){setSel(ymd(addDays(parseYmd(sel),-7)));}}>${chevL}</button>
+          <div class="days">${(function(){var start=startOfWeek(parseYmd(sel));var out=[];for(var i=0;i<7;i++){(function(){var d=addDays(start,i);var ds=ymd(d);out.push(html`<button class="daycell" key=${ds} onClick=${function(){setSel(ds);}}><div class="dletter">${DOWL[d.getDay()]}</div><div class=${'ddisc'+(ds===TODAY?' today':'')+(ds===sel?' sel':'')}>${d.getDate()}</div></button>`);})();}return out;})()}</div>
+          <button class="navcirc" aria-label="Next week" onClick=${function(){setSel(ymd(addDays(parseYmd(sel),7)));}}>${chevR}</button>
+        </div>`:null}
+        ${content}
+      </div></main>
+
+      <nav class="mobnav">${navBtns.map(function(v){ var lbl=v.charAt(0).toUpperCase()+v.slice(1); return html`<button key=${v} class=${view===v?'on':''} onClick=${function(){ if(v==='settings') setSettingsOpen(true); else setView2(v); }}><${Icon} s=${20}>${icons[v]}<//>${lbl}</button>`; })}</nav>
+
+      ${modal?html`<${TaskModal} editing=${modal.editing} children=${modalChildren} defaultDate=${modal.defaultDate} defaultTime=${modal.defaultTime} defaultType=${modal.defaultType} defaultProject=${modal.defaultProject} whoami=${whoami} projects=${projects} onClose=${function(){setModal(null);}} onSave=${saveTask} onDelete=${deleteTask} />`:null}
+      ${pEdit?html`<${ProjectEditor} editing=${pEdit} whoami=${whoami} onClose=${function(){setPEdit(null);}} onSave=${saveProject} onDelete=${deleteProject} />`:null}
+      ${openProj?html`<${ProjectPanel} project=${openProj} tasks=${tasks} materials=${materials} onClose=${function(){setPanel(null);}} onToggle=${toggleTask} onEdit=${function(p){setPEdit(p);}} onEditTask=${function(t){setModal({editing:t});}} onAddItem=${addProjectItem} onAddSub=${addSubtask} onAddMaterial=${addMaterial} onDelMaterial=${delMaterial} />`:null}
+      ${showIntro?html`<${Intro} onClose=${function(){setShowIntro(false);lsSet('sp_intro_v1','1');}} />`:null}
+      ${settingsOpen?html`<${SettingsModal} settings=${settings} habits=${habitDefs} whoami=${whoami} themeBg=${(settings&&settings.theme_bg)||'sky'} themeFont=${(settings&&settings.theme_font)||'inter'} themeRad=${(settings&&settings.theme_radius)||'default'} onSetTheme=${setTheme} onSaveNames=${saveSettings} onAddHabit=${function(){setHabitEdit({});}} onEditHabit=${function(h){setHabitEdit(h);}} onHowItWorks=${function(){setSettingsOpen(false);setShowIntro(true);}} onClose=${function(){setSettingsOpen(false);}} />`:null}
+      ${habitEdit?html`<${HabitEditor} editing=${habitEdit.id?habitEdit:null} whoami=${whoami} onClose=${function(){setHabitEdit(null);}} onSave=${saveHabit} onDelete=${deleteHabit} />`:null}
+      ${!loading?html`<div class="wavewrap">
+        ${waveOpen?html`<div class="wavepick">${WAVE_EMOJIS.map(function(e){ return html`<button class="waveopt" key=${e} onClick=${function(){sendWave(e);}}>${e}</button>`; })}</div>`:null}
+        <button class="wavefab" aria-label=${'Send a wave to '+((settings&&settings.partnerName)||'your partner')} title=${'Wave to '+((settings&&settings.partnerName)||'your partner')} onClick=${function(){setWaveOpen(!waveOpen);}}>🫶</button>
+      </div>`:null}
+      ${toast?html`<div class=${'toast'+(toast.big?' big':'')} key=${toast.t}>${toast.emoji?html`<span class="toast-emoji">${toast.emoji}</span>`:null}<span>${toast.text}</span></div>`:null}
+      ${toast&&toast.big?html`<div class="wavefx" key=${'fx'+toast.t}>${toast.emoji}</div>`:null}
+    </div>`;
+  }
+
+  render(h(App), document.getElementById('root'));
+})();
+</script>
+</body>
+</html>
