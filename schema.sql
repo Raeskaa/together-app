@@ -1,4 +1,10 @@
--- Shared Planner — D1 schema v2 (Calendar + Projects). Blank slate: settings-only seed.
+-- Shared Planner — D1 schema v3 (spaces). Blank slate: settings, two people, one space, starter habits.
+-- People belong to spaces (members). Every project, task, habit, note, topic and journal entry has a space_id.
+-- Owners are a person id (p_…) or 'everyone'.
+
+CREATE TABLE IF NOT EXISTS people (id TEXT PRIMARY KEY, name TEXT, color TEXT, created_at INTEGER);
+CREATE TABLE IF NOT EXISTS spaces (id TEXT PRIMARY KEY, name TEXT, kind TEXT, created_at INTEGER);  -- kind: partner | friends | team | solo
+CREATE TABLE IF NOT EXISTS members (id TEXT PRIMARY KEY, space_id TEXT, person_id TEXT, role TEXT, joined_at INTEGER);  -- id = <space_id>:<person_id>
 
 CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT);
 
@@ -6,14 +12,15 @@ CREATE TABLE IF NOT EXISTS projects (
   id         TEXT PRIMARY KEY,
   name       TEXT,
   color      TEXT,
-  owner      TEXT,              -- me | partner | shared
+  owner      TEXT,              -- person id | everyone
   kind       TEXT,              -- plain | course | branding
   start_date TEXT,
   end_date   TEXT,
   description TEXT,
   archived   INTEGER DEFAULT 0,
   sort       INTEGER,
-  created_at INTEGER
+  created_at INTEGER,
+  space_id   TEXT
 );
 
 CREATE TABLE IF NOT EXISTS project_materials (
@@ -40,7 +47,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   id         TEXT PRIMARY KEY,
   title      TEXT,
   project    TEXT,              -- project id (optional)
-  owner      TEXT,              -- me | partner | shared
+  owner      TEXT,              -- person id | everyone
   type       TEXT,              -- task | event
   date       TEXT,              -- YYYY-MM-DD (when planned / event day)
   time       TEXT,              -- events
@@ -50,7 +57,8 @@ CREATE TABLE IF NOT EXISTS tasks (
   subtodos   TEXT,              -- legacy JSON (unused in v2; subtasks are child rows)
   parent_id  TEXT,              -- set => this row is a subtask of parent_id
   sort       INTEGER,
-  created_at INTEGER
+  created_at INTEGER,
+  space_id   TEXT
 );
 
 CREATE TABLE IF NOT EXISTS journal (
@@ -59,7 +67,8 @@ CREATE TABLE IF NOT EXISTS journal (
   owner      TEXT,
   text       TEXT,
   tag        TEXT,
-  updated_at INTEGER
+  updated_at INTEGER,
+  space_id   TEXT
 );
 
 CREATE TABLE IF NOT EXISTS habit_logs (
@@ -73,14 +82,15 @@ CREATE TABLE IF NOT EXISTS habits (
   id         TEXT PRIMARY KEY,
   name       TEXT,
   kind       TEXT,              -- check | count
-  owner      TEXT,              -- me | partner | shared
+  owner      TEXT,              -- person id | everyone
   unit       TEXT,              -- count: label e.g. "cigs"
   target     INTEGER,           -- count: daily aim
   caption    TEXT,              -- small subtitle, e.g. "4 -> 1 pack by 30 Nov"
   color      TEXT,
   sort       INTEGER,
   archived   INTEGER DEFAULT 0,
-  created_at INTEGER
+  created_at INTEGER,
+  space_id   TEXT
 );
 
 CREATE TABLE IF NOT EXISTS topics (
@@ -90,7 +100,8 @@ CREATE TABLE IF NOT EXISTS topics (
   owner      TEXT,
   notes      TEXT,
   sort       INTEGER,
-  created_at INTEGER
+  created_at INTEGER,
+  space_id   TEXT
 );
 
 CREATE TABLE IF NOT EXISTS topic_links (
@@ -108,39 +119,43 @@ CREATE TABLE IF NOT EXISTS notes (
   color      TEXT,              -- yellow | pink | blue | green | purple | peach
   owner      TEXT,
   date       TEXT,              -- YYYY-MM-DD the note was jotted
-  created_at INTEGER
+  created_at INTEGER,
+  space_id   TEXT
 );
 
--- one shared focus/pomodoro timer both people see live (single row id='shared')
+-- one shared focus/pomodoro timer per space (row id = the space id)
 CREATE TABLE IF NOT EXISTS focus (
-  id         TEXT PRIMARY KEY,  -- always 'shared'
+  id         TEXT PRIMARY KEY,  -- the space id
   status     TEXT,              -- idle | running | paused
   label      TEXT,              -- what we're working on
   minutes    INTEGER,           -- total length of this session
   ends_at    INTEGER,           -- epoch ms when it finishes (while running)
   remaining  INTEGER,           -- ms left (while paused)
-  started_by TEXT,              -- me | partner
+  started_by TEXT,              -- person id
   updated_at INTEGER
 );
 INSERT OR IGNORE INTO focus (id,status,label,minutes,ends_at,remaining,started_by,updated_at)
-  VALUES ('shared','idle','',25,0,0,'',0);
+  VALUES ('s_hateclub','idle','',25,0,0,'',0);
 
--- one shared "wave" ping (a heart/emoji sent to each other); single row id='latest'
+-- one "wave" ping per space (a heart/emoji sent to each other); row id = the space id
 CREATE TABLE IF NOT EXISTS waves (
-  id         TEXT PRIMARY KEY,  -- always 'latest'
+  id         TEXT PRIMARY KEY,  -- the space id
   emoji      TEXT,
-  sender     TEXT,              -- me | partner
+  sender     TEXT,              -- person id
   created_at INTEGER
 );
 
--- seed: names + the three starter habits (editable/deletable). Everything else blank.
+-- seed: the two people in one space + the three starter habits (editable/deletable). Everything else blank.
+INSERT OR IGNORE INTO people (id,name,color,created_at) VALUES ('p_mahesh','Mahesh','#15171A',1762560000000),('p_partner','Partner','#5B6B86',1762560000001);
+INSERT OR IGNORE INTO spaces (id,name,kind,created_at) VALUES ('s_hateclub','hate club','partner',1762560000000);
+INSERT OR IGNORE INTO members (id,space_id,person_id,role,joined_at) VALUES ('s_hateclub:p_mahesh','s_hateclub','p_mahesh','owner',1762560000000),('s_hateclub:p_partner','s_hateclub','p_partner','member',1762560000001);
 INSERT OR IGNORE INTO settings (key,value) VALUES
   ('meName','Mahesh'),
   ('partnerName','Partner'),
   ('weekTopic',''),
   ('cigAimToday','76');
 
-INSERT OR IGNORE INTO habits (id,name,kind,owner,unit,target,caption,color,sort,created_at) VALUES
-  ('cigs','Cigarettes','count','me','cigs',76,'4 → 1 pack by 30 Nov','#C2704B',1,1762050000000),
-  ('read','Read · 1 hour','check','me','',NULL,'Build the streak','#1F6FEB',2,1762050000001),
-  ('art','Art & posting','check','me','',NULL,'',' #2E9E6B',3,1762050000002);
+INSERT OR IGNORE INTO habits (id,name,kind,owner,unit,target,caption,color,sort,created_at,space_id) VALUES
+  ('cigs','Cigarettes','count','p_mahesh','cigs',76,'4 → 1 pack by 30 Nov','#C2704B',1,1762050000000,'s_hateclub'),
+  ('read','Read · 1 hour','check','p_mahesh','',NULL,'Build the streak','#1F6FEB',2,1762050000001,'s_hateclub'),
+  ('art','Art & posting','check','p_mahesh','',NULL,'','#2E9E6B',3,1762050000002,'s_hateclub');

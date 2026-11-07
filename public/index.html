@@ -675,13 +675,19 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
   function fmtUntil(s){ var n=daysUntil(s); return n<0?(-n+'d ago'):(n===0?'today':n+'d'); }
   function uid(pre){ return pre+'_'+Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36); }
 
-  var OWNER_COLOR={me:'#15171A',partner:'#5B6B86',shared:'#B4792B'};
-  // Owners are stored as me|partner|shared; labels read from the viewer's side. App sets VIEW every render.
-  var VIEW={who:'me',names:{me:'Mahesh',partner:'Partner'}};
-  function otherOf(w){ return w==='partner'?'me':'partner'; }
-  function nameOf(o){ if(o==='shared') return 'Both'; return VIEW.names[o]||(o==='partner'?'Partner':'Mahesh'); }
+  // Owners are a person id (p_…) or 'everyone'. Everything lives in a space; App sets VIEW every render from people + members.
+  var EVERYONE='everyone';
+  var DEFAULT_SPACE='s_hateclub';
+  var LEGACY_WHO={me:'p_mahesh',partner:'p_partner'};   // what this device remembered before spaces
+  var PERSON_COLORS=['#15171A','#5B6B86','#2E9E6B','#B0529E','#C2704B','#7A5BD8'];
+  var VIEW={who:'p_mahesh',space:DEFAULT_SPACE,people:{},members:['p_mahesh','p_partner']};
+  function personOf(id){ return VIEW.people[id]||null; }
+  function otherOf(w){ for(var i=0;i<VIEW.members.length;i++){ if(VIEW.members[i]!==w) return VIEW.members[i]; } return w; }
+  function nameOf(o){ if(o===EVERYONE) return VIEW.members.length>2?'Everyone':'Both'; var p=personOf(o); return (p&&p.name)||'Someone'; }
   function relName(o){ return o===VIEW.who?'You':nameOf(o); }
   function initialOf(o){ return ((nameOf(o)||'?').trim().charAt(0)||'?').toUpperCase(); }
+  function personColor(o){ if(o===EVERYONE) return '#B4792B'; var p=personOf(o); if(p&&p.color) return p.color; var k=VIEW.members.indexOf(o); return PERSON_COLORS[k>=0?k%PERSON_COLORS.length:1]; }
+  function inSpace(r){ return !r.space_id || r.space_id===VIEW.space; }
   var PROJ_COLORS=['#1F6FEB','#5B6B86','#2E9E6B','#B0529E','#C2704B','#B4792B','#4F5B76','#7A5BD8'];
   var TASK_TYPES=[
     {id:'task',label:'Task',color:'#1F6FEB',event:false},
@@ -747,27 +753,30 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
   var chevR=html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M10 6l6 6-6 6" stroke="#3A4350" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   var checkMark=html`<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6.2l2.2 2.2 4.8-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
-  function Avatar(props){ var o=props.owner; if(o==='shared'){ return html`<span style=${{display:'inline-flex'}} title="Both">
-      <span class=${'av '+(props.cls||'avm')} style=${{background:OWNER_COLOR.me,border:'2px solid #fff'}}>${initialOf('me')}</span>
-      <span class=${'av '+(props.cls||'avm')} style=${{background:OWNER_COLOR.partner,marginLeft:'-8px',border:'2px solid #fff'}}>${initialOf('partner')}</span></span>`; }
-    return html`<span class=${'av '+(props.cls||'avm')} title=${OWNER_COLOR[o]?relName(o):''} style=${{background:OWNER_COLOR[o]||'#8A847C'}}>${OWNER_COLOR[o]?initialOf(o):'?'}</span>`; }
+  function Avatar(props){ var o=props.owner, cls='av '+(props.cls||'avm');
+    if(o===EVERYONE){ return html`<span style=${{display:'inline-flex'}} title=${nameOf(EVERYONE)}>${VIEW.members.slice(0,3).map(function(m,k){ return html`<span key=${m} class=${cls} style=${{background:personColor(m),border:'2px solid #fff',marginLeft:k?'-8px':0}}>${initialOf(m)}</span>`; })}</span>`; }
+    var known=!!personOf(o);
+    return html`<span class=${cls} title=${known?relName(o):''} style=${{background:known?personColor(o):'#8A847C'}}>${known?initialOf(o):'?'}</span>`; }
   function Check(props){ return html`<button class=${'check'+(props.sm?' sm':'')+(props.done?' on':'')} aria-pressed=${!!props.done} aria-label=${props.label||'Toggle done'} onClick=${props.onClick}>${props.done?checkMark:null}</button>`; }
 
-  function OwnerSeg(props){ var other=otherOf(VIEW.who); var opts=[[VIEW.who,'You'],[other,nameOf(other)],['shared','Both']];
-    return html`<div class="ownerseg">${opts.map(function(o){ return html`<button key=${o[0]} class=${props.value===o[0]?'on':''} onClick=${function(){props.onChange(o[0]);}}>${o[1]}</button>`; })}</div>`; }
+  // You first, then each other member, then everyone in the space
+  function ownerChoices(){ var out=[[VIEW.who,'You']]; VIEW.members.forEach(function(m){ if(m!==VIEW.who) out.push([m,nameOf(m)]); }); out.push([EVERYONE,nameOf(EVERYONE)]); return out; }
+  function OwnerSeg(props){ var opts=ownerChoices();
+    return html`<div class="ownerseg" style=${{gridTemplateColumns:'repeat('+opts.length+',1fr)'}}>${opts.map(function(o){ return html`<button key=${o[0]} class=${props.value===o[0]?'on':''} onClick=${function(){props.onChange(o[0]);}}>${o[1]}</button>`; })}</div>`; }
   // owner filter <option>s, viewer-relative: Everyone · You · {other} · Both
-  function ownerOptions(){ var other=otherOf(VIEW.who); return [['all','Everyone'],[VIEW.who,'You'],[other,nameOf(other)],['shared','Both']].map(function(o){ return html`<option key=${o[0]} value=${o[0]}>${o[1]}</option>`; }); }
+  function ownerOptions(){ return [['all',VIEW.members.length>2?'Anyone':'Everyone']].concat(ownerChoices()).map(function(o){ return html`<option key=${o[0]} value=${o[0]}>${o[1]}</option>`; }); }
 
   // ---- local copy of a change: the same ops the server applies, replayed over the last server state ----
-  var STORE_KEY={tasks:'tasks',projects:'projects',project_materials:'project_materials',journal:'journal',habits:'habits',topics:'topics',topic_links:'topic_links',notes:'notes'};
+  var STORE_KEY={tasks:'tasks',projects:'projects',project_materials:'project_materials',journal:'journal',habits:'habits',topics:'topics',topic_links:'topic_links',notes:'notes',people:'people',spaces:'spaces',members:'members'};
   function idxOf(a,id){ for(var i=0;i<a.length;i++){ if(a[i].id===id) return i; } return -1; }
   function applyOp(n,op){
     if(op.op==='settings'){ n.settings=Object.assign({},n.settings||{},op.patch); return; }
     if(op.op==='habit'){ var hl=(n.habit_logs||[]).slice(); var hi=-1; for(var k=0;k<hl.length;k++){ if(hl[k].habit===op.habit&&hl[k].date===op.date){hi=k;break;} }
       var cur=hi>=0?(hl[hi].value||0):0; var v=op.delta!=null?Math.max(0,cur+op.delta):Math.max(0,op.value||0);
       if(hi>=0) hl[hi]=Object.assign({},hl[hi],{value:v}); else hl.push({date:op.date,habit:op.habit,value:v}); n.habit_logs=hl; return; }
-    if(op.table==='focus'){ if(op.op==='upsert') n.focus=op.row; else if(op.op==='patch') n.focus=Object.assign({},n.focus||{},op.fields); return; }
-    if(op.table==='waves'){ if(op.op==='upsert') n.wave=op.row; return; }
+    if(op.table==='focus'||op.table==='waves'){ var fk=op.table==='focus'?'focus_all':'wave_all', sk=op.table==='focus'?'focus':'wave';
+      var frow=op.op==='upsert'?op.row:(op.op==='patch'?Object.assign({},(n[fk]||[]).filter(function(r){return r.id===op.id;})[0]||{},op.fields):null);
+      if(frow){ n[fk]=(n[fk]||[]).filter(function(r){return r.id!==frow.id;}).concat([frow]); n[sk]=frow; } return; }
     var key=STORE_KEY[op.table]; if(!key) return;
     var arr=(n[key]||[]).slice(), i;
     if(op.op==='upsert'){ i=idxOf(arr,op.row.id); if(i>=0) arr[i]=op.row; else if(op.prepend) arr.unshift(op.row); else arr.push(op.row); }
@@ -858,7 +867,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
   function Block(props){ var r=props.r; return html`<div class="arow">
       <div class="atime"><div class="t">${to12(r.start).replace(/am|pm/,'')}<span class="ap">${(+r.start.split(':')[0])<12?'am':'pm'}</span></div><div class="d">${props.dur}</div></div>
       <div class="abody"><div class="atitle block">${r.title}</div></div>
-      <div class="aright">${props.now?html`<span class="pill now">Now</span>`:html`<span class="pill">Block</span>`}<${Avatar} owner=${r.owner||'me'} cls="avm" /></div>
+      <div class="aright">${props.now?html`<span class="pill now">Now</span>`:html`<span class="pill">Block</span>`}<${Avatar} owner=${r.owner||VIEW.who} cls="avm" /></div>
     </div>`; }
   function durOf(r){ if(!r.start||!r.end) return ''; var a=r.start.split(':'),b=r.end.split(':'); var m=(+b[0]*60+ +b[1])-(+a[0]*60+ +a[1]); var hh=Math.floor(m/60),mm=m%60; return hh+'h'+(mm?' '+mm+'m':''); }
 
@@ -876,7 +885,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var done = running && remMs<=0;
     var prog = done?1:(total>0?Math.min(1,Math.max(0,1-remMs/total)):0);
     var R=54, C=2*Math.PI*R, off=C*(1-prog);
-    var who = f.started_by==='me'?(props.meName||'You') : f.started_by==='partner'?(props.partnerName||'Partner') : '';
+    var who = f.started_by?relName(f.started_by):'';
     var ring = html`<div class="fcring">
       <svg viewBox="0 0 128 128" width="128" height="128">
         <circle cx="64" cy="64" r="54" fill="none" stroke="#E7EDF5" stroke-width="9" />
@@ -956,7 +965,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var habits=props.habits, habitLogs=props.habitLogs, topics=props.topics, topicLinks=props.topicLinks, settings=props.settings, whoami=props.whoami, notes=props.notes;
     var projMap={}; (projects||[]).forEach(function(p){projMap[p.id]=p;});
     var isToday = sel===TODAY;
-    var fpass=function(t){ return props.filter==='all'||t.owner===whoami||t.owner==='shared'; };
+    var fpass=function(t){ return props.filter==='all'||t.owner===whoami||t.owner===EVERYONE; };
     var onDay=function(t){ return t.date===sel || (t.due===sel && !t.done); };
     var tops=(tasks||[]).filter(function(t){ return !t.parent_id && onDay(t) && fpass(t); });
     var topIds={}; tops.forEach(function(t){ topIds[t.id]=1; });
@@ -972,7 +981,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var upAll=(upcoming||[]).filter(function(d){ return d.date>TODAY; });
     var up=upAll.slice(0,4);
 
-    var myHabits=(habits||[]).filter(function(h){return !h.archived && (h.owner===whoami||h.owner==='shared');});
+    var myHabits=(habits||[]).filter(function(h){return !h.archived && (h.owner===whoami||h.owner===EVERYONE);});
     var countH=myHabits.filter(function(h){return h.kind==='count';});
     var checkH=myHabits.filter(function(h){return h.kind!=='count';});
     function logVal(id,ds){ var a=habitLogs||[]; for(var i=0;i<a.length;i++){if(a[i].habit===id&&a[i].date===ds)return a[i].value;} return undefined; }
@@ -987,7 +996,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       ${up.length?html`<div class="upnext">
         <div class="upeyebrow">Coming up · soonest first</div>
         <div class="chips">
-        ${up.map(function(d){ var c=d.isproj?(d.color||'#1F6FEB'):(OWNER_COLOR[d.owner]||'#5B6B86');
+        ${up.map(function(d){ var c=d.isproj?(d.color||'#1F6FEB'):personColor(d.owner);
           return html`<span class="chip" key=${d.id}><span class="dot" style=${{background:c}}></span>${d.title} <b>${fmtUntil(d.date)}</b> <span class="sub">${shortDate(d.date)}</span></span>`; })}
         <span class="showalllink" onClick=${function(){props.onShowAll&&props.onShowAll();}}>${upAll.length>up.length?('Show all '+upAll.length):'All tasks'} →</span>
         </div>
@@ -1065,9 +1074,9 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var active=(projects||[]).filter(function(p){return !p.archived;});
     var H0=7,H1=22,ROW=48;
 
-    function pass(t){ var o=(fo==='all')||(t.owner===fo)||(fo!=='shared'&&t.owner==='shared'); var p=(fp==='all')||(t.project===fp); return o&&p; }
-    function projPass(p){ var o=(fo==='all')||(p.owner===fo)||(fo!=='shared'&&p.owner==='shared'); return o&&((fp==='all')||(p.id===fp)); }
-    function colorOf(t){ return (t.project&&projMap[t.project])?(projMap[t.project].color||'#1F6FEB'):(OWNER_COLOR[t.owner]||'#5B6B86'); }
+    function pass(t){ var o=(fo==='all')||(t.owner===fo)||(fo!==EVERYONE&&t.owner===EVERYONE); var p=(fp==='all')||(t.project===fp); return o&&p; }
+    function projPass(p){ var o=(fo==='all')||(p.owner===fo)||(fo!==EVERYONE&&p.owner===EVERYONE); return o&&((fp==='all')||(p.id===fp)); }
+    function colorOf(t){ return (t.project&&projMap[t.project])?(projMap[t.project].color||'#1F6FEB'):personColor(t.owner); }
     function dayItems(ds){
       var items=[];
       (tasks||[]).forEach(function(t){ if(!pass(t))return; if(isEventType(t.type)&&t.date===ds) items.push({k:'ev',label:(t.time?to12(t.time)+' ':'')+t.title,t:t}); else if(!isEventType(t.type)&&t.date===ds) items.push({k:'task',label:t.title,done:t.done,t:t}); });
@@ -1461,7 +1470,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
   function ProjectEditor(props){
     var ed=props.editing||{};
     // older projects were saved with kind "plain", which has no option of its own; it means "project"
-    var st=useState({ name:ed.name||'', owner:ed.owner||props.whoami||'me', color:ed.color||PROJ_COLORS[0], kind:(ed.kind&&ed.kind!=='plain')?ed.kind:'project', start_date:ed.start_date||'', end_date:ed.end_date||'', description:ed.description||'' });
+    var st=useState({ name:ed.name||'', owner:ed.owner||props.whoami||VIEW.who, color:ed.color||PROJ_COLORS[0], kind:(ed.kind&&ed.kind!=='plain')?ed.kind:'project', start_date:ed.start_date||'', end_date:ed.end_date||'', description:ed.description||'' });
     var f=st[0], set=st[1];
     function upd(k,v){ var o=Object.assign({},f); o[k]=v; set(o); }
     return html`<div class="pov" style=${{zIndex:62}} onClick=${function(e){if(e.target===e.currentTarget)props.onClose();}}>
@@ -1497,7 +1506,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
   function TaskModal(props){
     var ed=props.editing||{};
     var st=useState({
-      title:ed.title||'', project:ed.project||(props.defaultProject||''), owner:ed.owner||props.whoami||'me',
+      title:ed.title||'', project:ed.project||(props.defaultProject||''), owner:ed.owner||props.whoami||VIEW.who,
       type:ed.type||props.defaultType||'task', date:ed.date||props.defaultDate||'', time:ed.time||props.defaultTime||'', due:ed.due||'', due_time:ed.due_time||''
     });
     var f=st[0], set=st[1];
@@ -1614,15 +1623,14 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
   function SettingsModal(props){
     var tabS=useState('people'); var tab=tabS[0], setTab=tabS[1];
     var s=props.settings||{};
-    var nmS=useState({meName:s.meName||'',partnerName:s.partnerName||''}); var nm=nmS[0], setNm=nmS[1];
+    var mine=props.whoami, theirs=otherOf(mine);
+    var nmS=useState(function(){ var o={}; o[mine]=((personOf(mine)||{}).name)||''; o[theirs]=((personOf(theirs)||{}).name)||''; return o; }); var nm=nmS[0], setNm=nmS[1];
     var savedS=useState(false); var saved=savedS[0], setSaved=savedS[1];
     var notifS=useState((function(){try{return lsGet('sp_notif','')==='1';}catch(e){return false;}})()); var notifOn=notifS[0], setNotifOn=notifS[1];
     function toggleNotif(){ if(notifOn){ setNotifOn(false); lsSet('sp_notif','0'); return; } try{ if(typeof Notification==='undefined'){ setNotifOn(true); lsSet('sp_notif','1'); return; } if(Notification.permission==='granted'){ setNotifOn(true); lsSet('sp_notif','1'); } else { Notification.requestPermission().then(function(p){ var ok=p==='granted'; setNotifOn(ok); lsSet('sp_notif',ok?'1':'0'); }); } }catch(e){} }
     function updNm(k,v){ var o=Object.assign({},nm); o[k]=v; setNm(o); setSaved(false); }
-    // "Your name" is the viewer's own name, whichever of the two is holding this device
-    var mine=props.whoami==='partner'?'partner':'me', theirs=otherOf(mine);
-    var myKey=mine==='me'?'meName':'partnerName', theirKey=theirs==='me'?'meName':'partnerName';
-    var myLabel=(nm[myKey]||'').trim()||nameOf(mine), pLabel=(nm[theirKey]||'').trim()||nameOf(theirs);
+    // "Your name" is the viewer's own name, whoever is holding this device
+    var myLabel=(nm[mine]||'').trim()||nameOf(mine), pLabel=(nm[theirs]||'').trim()||nameOf(theirs);
     var habits=(props.habits||[]).filter(function(h){return !h.archived;});
     return html`<div class="overlay" onClick=${function(e){if(e.target===e.currentTarget)props.onClose();}}>
       <div class="setmodal" role="dialog" aria-modal="true">
@@ -1648,15 +1656,15 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
           ${tab==='people'?html`<${Fragment}>
             <label class="lbl" style=${{marginTop:0}}>This device</label>
             <div class="devrow">
-              <span class="av avm" style=${{background:OWNER_COLOR[mine]}}>${initialOf(mine)}</span>
+              <span class="av avm" style=${{background:personColor(mine)}}>${initialOf(mine)}</span>
               <span class="devt">This device is <b>${nameOf(mine)}</b></span>
               <button class="gbtn" onClick=${function(){props.onSwitchWho(theirs);}}>Switch to ${nameOf(theirs)}</button>
             </div>
             <p style=${{margin:'8px 0 4px',fontWeight:400,fontSize:'12.5px',color:'#8A93A0'}}>Each phone or laptop is set once. Switching changes whose tasks show as “You” here.</p>
             <label class="lbl">Your name</label>
-            <div style=${{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}}><span class="av avm" style=${{background:OWNER_COLOR[mine]}}>${myLabel.charAt(0).toUpperCase()}</span><input class="fld" type="text" value=${nm[myKey]} placeholder=${nameOf(mine)} onInput=${function(e){updNm(myKey,e.target.value);}} /></div>
+            <div style=${{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}}><span class="av avm" style=${{background:personColor(mine)}}>${myLabel.charAt(0).toUpperCase()}</span><input class="fld" type="text" value=${nm[mine]} placeholder=${nameOf(mine)} onInput=${function(e){updNm(mine,e.target.value);}} /></div>
             <label class="lbl">Their name</label>
-            <div style=${{display:'flex',alignItems:'center',gap:'10px'}}><span class="av avm" style=${{background:OWNER_COLOR[theirs]}}>${pLabel.charAt(0).toUpperCase()}</span><input class="fld" type="text" value=${nm[theirKey]} placeholder=${nameOf(theirs)} onInput=${function(e){updNm(theirKey,e.target.value);}} /></div>
+            <div style=${{display:'flex',alignItems:'center',gap:'10px'}}><span class="av avm" style=${{background:personColor(theirs)}}>${pLabel.charAt(0).toUpperCase()}</span><input class="fld" type="text" value=${nm[theirs]} placeholder=${nameOf(theirs)} onInput=${function(e){updNm(theirs,e.target.value);}} /></div>
             <div style=${{display:'flex',alignItems:'center',gap:'14px',marginTop:'18px'}}><button class="btn primary" style=${{flex:'none',padding:'10px 22px'}} onClick=${function(){props.onSaveNames(nm);setSaved(true);}}>Save</button>${saved?html`<span style=${{fontWeight:600,fontSize:'13px',color:'#2E9E6B'}}>Saved ✓</span>`:null}</div>
           <//>`:null}
           ${tab==='habits'?html`<${Fragment}>
@@ -1698,7 +1706,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 
   function HabitEditor(props){
     var ed=props.editing||{};
-    var st=useState({ name:ed.name||'', kind:ed.kind||'check', owner:ed.owner||props.whoami||'me', unit:ed.unit||'', target:(ed.target!=null?ed.target:''), caption:ed.caption||'', color:ed.color||PROJ_COLORS[0] });
+    var st=useState({ name:ed.name||'', kind:ed.kind||'check', owner:ed.owner||props.whoami||VIEW.who, unit:ed.unit||'', target:(ed.target!=null?ed.target:''), caption:ed.caption||'', color:ed.color||PROJ_COLORS[0] });
     var f=st[0], set=st[1];
     function upd(k,v){ var o=Object.assign({},f); o[k]=v; set(o); }
     return html`<div class="overlay" style=${{zIndex:80}} onClick=${function(e){if(e.target===e.currentTarget)props.onClose();}}>
@@ -1794,28 +1802,23 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 
   // ---- first run on a device: who is holding it ----
   function WhoModal(props){
-    var aS=useState(false); var asking=aS[0], setAsking=aS[1];
+    var aS=useState(null); var asking=aS[0], setAsking=aS[1];   // the person whose name we're asking for
     var vS=useState(''); var v=vS[0], setV=vS[1];
-    var me=props.meName||'Mahesh', pn=(props.partnerName||'').trim();
-    var unset=!pn || pn==='Partner';
+    var members=props.members||[];
+    var first=members.length?nameOf(members[0]):'';
+    function unset(id){ var n=(((personOf(id)||{}).name)||'').trim(); return !n || n==='Partner'; }
     return html`<div class="overlay whoov">
       <div class="modal whomodal" role="dialog" aria-modal="true" aria-labelledby="whottl">
         <div class="meyebrow">Welcome</div>
         <h3 id="whottl" class="whottl">Who’s this?</h3>
         <p class="whosub">So the app knows which tasks are yours. Each phone or laptop asks once — you can change it in Settings.</p>
-        ${!asking?html`<div class="whocards">
-          <button class="whocard" onClick=${function(){props.onPick('me');}}>
-            <span class="av whoav" style=${{background:OWNER_COLOR.me}}>${me.charAt(0).toUpperCase()}</span>
-            <span class="whon">${me}</span><span class="whos">That’s me</span>
-          </button>
-          <button class="whocard" onClick=${function(){ if(unset) setAsking(true); else props.onPick('partner'); }}>
-            <span class="av whoav" style=${{background:OWNER_COLOR.partner}}>${unset?'?':pn.charAt(0).toUpperCase()}</span>
-            <span class="whon">${unset?('Not '+me+'?'):pn}</span><span class="whos">${unset?'Tap and add your name':'That’s me'}</span>
-          </button>
-        </div>`:html`<form onSubmit=${function(e){ e.preventDefault(); if(v.trim()) props.onPick('partner',v.trim()); }}>
-          <label class="lbl">Your name</label>
-          <input class="fld" type="text" autofocus value=${v} placeholder="Your first name" onInput=${function(e){setV(e.target.value);}} />
-          <div class="mactions"><button type="button" class="btn ghost" onClick=${function(){setAsking(false);}}>Back</button><button type="submit" class="btn primary" disabled=${!v.trim()}>Continue</button></div>
+        ${!asking?html`<div class="whocards">${members.map(function(id){ var un=unset(id); return html`<button key=${id} class="whocard" onClick=${function(){ if(un) setAsking(id); else props.onPick(id); }}>
+            <span class="av whoav" style=${{background:personColor(id)}}>${un?'?':initialOf(id)}</span>
+            <span class="whon">${un?('Not '+first+'?'):nameOf(id)}</span><span class="whos">${un?'Tap and add your name':'That’s me'}</span>
+          </button>`; })}</div>`:html`<form onSubmit=${function(e){ e.preventDefault(); if(v.trim()) props.onPick(asking,v.trim()); }}>
+          <label class="lbl" for="who-name">Your name</label>
+          <input class="fld" id="who-name" type="text" autofocus value=${v} placeholder="Your first name" onInput=${function(e){setV(e.target.value);}} />
+          <div class="mactions"><button type="button" class="btn ghost" onClick=${function(){setAsking(null);}}>Back</button><button type="submit" class="btn primary" disabled=${!v.trim()}>Continue</button></div>
         </form>`}
       </div>
     </div>`;
@@ -1842,8 +1845,11 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var authRef=useRef(auth); authRef.current=auth;
     var stS=useState(null); var store=stS[0], setStore=stS[1];
     var vS=useState((function(){var v=lsGet('sp_view','today'); return v==='settings'?'today':v;})()); var view=vS[0], setView=vS[1];
-    var wS=useState(lsGet('sp_who','me')); var whoami=wS[0], setWho=wS[1];
-    var nwS=useState(lsGet('sp_who',null)==null); var needWho=nwS[0], setNeedWho=nwS[1];   // this device has never said who it is
+    // who is holding this device (a person id); older devices remembered 'me'/'partner'
+    function readWho(){ var v=lsGet('sp_who',null); if(v&&LEGACY_WHO[v]){ v=LEGACY_WHO[v]; lsSet('sp_who',v); } return v; }
+    var wS=useState(function(){ return readWho()||'p_mahesh'; }); var whoami=wS[0], setWho=wS[1];
+    var nwS=useState(function(){ return lsGet('sp_who',null)==null; }); var needWho=nwS[0], setNeedWho=nwS[1];   // this device has never said who it is
+    var spS=useState(lsGet('sp_space',DEFAULT_SPACE)); var space=spS[0];   // one space for now; a switcher comes with the second
     var fS=useState('all'); var filter=fS[0], setFilter=fS[1];
     var dayS=useState(TODAY); var today=dayS[0], setToday=dayS[1];
     var selS=useState(TODAY); var sel=selS[0], setSel=selS[1];
@@ -1959,21 +1965,27 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     function setView2(v){ setView(v); lsSet('sp_view',v); }
     function setWho2(w){ setWho(w); lsSet('sp_who',w); }
 
-    var projects=store?store.projects:null;
-    var tasks=store?store.tasks:null;
+    // everything below is the current space's
+    VIEW.space=space;
+    function inSp(a){ return a?a.filter(inSpace):a; }
+    var projects=store?inSp(store.projects):null;
+    var tasks=store?inSp(store.tasks):null;
     var materials=store?store.project_materials:null;
     var routines=store?store.routines:null;
-    var journal=store?store.journal:null;
-    var habitDefs=store?store.habits:null;
+    var journal=store?inSp(store.journal):null;
+    var habitDefs=store?inSp(store.habits):null;
     var habitLogs=store?store.habit_logs:null;
-    var topics=store?store.topics:null;
+    var topics=store?inSp(store.topics):null;
     var topicLinks=store?store.topic_links:null;
     var settings=store?store.settings:null;
-    var notes=store?store.notes:null;
-    var focus=store?store.focus:null;
-    var wave=store?store.wave:null;
-    // every label below reads from the viewer's side
-    VIEW.who=whoami; VIEW.names={me:(settings&&settings.meName)||'Mahesh',partner:(settings&&settings.partnerName)||'Partner'};
+    var notes=store?inSp(store.notes):null;
+    var focus=store?(((store.focus_all||[]).filter(function(r){return r.id===space;})[0])||store.focus):null;
+    var wave=store?(((store.wave_all||[]).filter(function(r){return r.id===space;})[0])||store.wave):null;
+    // every label below reads from the viewer's side, from the people in this space
+    var pmap={}; ((store&&store.people)||[]).forEach(function(p){ pmap[p.id]=p; });
+    if(!Object.keys(pmap).length){ pmap={p_mahesh:{id:'p_mahesh',name:(settings&&settings.meName)||'Mahesh'},p_partner:{id:'p_partner',name:(settings&&settings.partnerName)||'Partner'}}; }   // before the spaces migration
+    var mids=((store&&store.members)||[]).filter(function(m){return m.space_id===space;}).map(function(m){return m.person_id;});
+    VIEW.who=whoami; VIEW.people=pmap; VIEW.members=mids.length?mids:['p_mahesh','p_partner'];
     var other=otherOf(whoami);
     useEffect(function(){ try{
       var bg=(settings&&settings.theme_bg)||'sky', ft=(settings&&settings.theme_font)||'inter', rd=(settings&&settings.theme_radius)||'default';
@@ -1984,7 +1996,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       var r=document.getElementById('root'); if(r){ r.setAttribute('data-radius', rd); if(bgp&&bgp.dark) r.setAttribute('data-ground','dark'); else r.removeAttribute('data-ground'); }
     }catch(e){} },[settings]);
     // while a focus session runs, sync faster so both people see start/pause/reset within a few seconds
-    useEffect(function(){ var f=store&&store.focus; if(!f||f.status!=='running') return; var iv=setInterval(function(){ if(document.visibilityState!=='hidden') refresh(); },5000); return function(){ clearInterval(iv); }; },[store&&store.focus&&store.focus.status]);
+    useEffect(function(){ var f=focus; if(!f||f.status!=='running') return; var iv=setInterval(function(){ if(document.visibilityState!=='hidden') refresh(); },5000); return function(){ clearInterval(iv); }; },[focus&&focus.status]);
 
     // task ops — edits send only the fields that changed
     function findTask(id){ return (tasks||[]).filter(function(t){return t.id===id;})[0]; }
@@ -2002,7 +2014,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       var kids=childrenOf(tasks,id).length;
       holdDelete([{op:'delete',table:'tasks',id:id,_label:t.title}],'Deleted “'+t.title+'”'+(kids?(' and its '+kids+' subtask'+(kids>1?'s':'')):''));
     }
-    function baseTask(o){ return Object.assign({ id:uid('tk'), title:'', project:'', owner:whoami, type:'task', date:'', time:'', due:'', due_time:'', done:false, subtodos:'[]', parent_id:null, sort:0, created_at:Date.now() }, o); }
+    function baseTask(o){ return Object.assign({ id:uid('tk'), title:'', project:'', owner:whoami, type:'task', date:'', time:'', due:'', due_time:'', done:false, subtodos:'[]', parent_id:null, sort:0, created_at:Date.now(), space_id:space }, o); }
     var TASK_FIELDS=['title','project','owner','type','date','time','due','due_time'];
     function saveTask(f,id,subs,removed,origSubs){
       var ev=isEventType(f.type);
@@ -2030,7 +2042,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     function saveProject(f,id){
       var vals={ name:f.name.trim(), color:f.color, owner:f.owner, kind:f.kind, start_date:f.start_date||'', end_date:f.end_date||'', description:f.description||'' };
       if(id){ var snap=pEdit||{}, ch={}; PROJ_FIELDS.forEach(function(k){ if((snap[k]||'')!==(vals[k]||'')) ch[k]=vals[k]; }); if(Object.keys(ch).length) commit([{op:'patch',table:'projects',id:id,fields:ch,_label:vals.name}]); setPEdit(null); return; }
-      var rid=uid('pr'); commit([{op:'upsert',table:'projects',row:Object.assign({id:rid,archived:0,sort:Date.now(),created_at:Date.now()},vals),_label:vals.name}]);
+      var rid=uid('pr'); commit([{op:'upsert',table:'projects',row:Object.assign({id:rid,archived:0,sort:Date.now(),created_at:Date.now(),space_id:space},vals),_label:vals.name}]);
       setPEdit(null); setPanel(rid);
     }
     function askDeleteProject(id){
@@ -2056,7 +2068,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     function saveHabit(f,id){
       var vals={ name:f.name.trim(), kind:f.kind, owner:f.owner, unit:f.unit||'', target:(f.target===''||f.target==null)?null:Number(f.target), caption:f.caption||'', color:f.color||'#1F6FEB' };
       if(id){ var snap=habitEdit||{}, ch={}; HABIT_FIELDS.forEach(function(k){ var a=snap[k]==null?'':snap[k], b=vals[k]==null?'':vals[k]; if(a!==b) ch[k]=vals[k]; }); if(Object.keys(ch).length) commit([{op:'patch',table:'habits',id:id,fields:ch,_label:vals.name}]); setHabitEdit(null); return; }
-      commit([{op:'upsert',table:'habits',row:Object.assign({id:uid('hb'),sort:Date.now(),archived:0,created_at:Date.now()},vals),_label:vals.name}]); setHabitEdit(null);
+      commit([{op:'upsert',table:'habits',row:Object.assign({id:uid('hb'),sort:Date.now(),archived:0,created_at:Date.now(),space_id:space},vals),_label:vals.name}]); setHabitEdit(null);
     }
     function deleteHabit(id){
       var hb=(habitDefs||[]).filter(function(x){return x.id===id;})[0]; setHabitEdit(null); if(!hb) return;
@@ -2068,38 +2080,39 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     function setWeekTopic(title){
       var wk=ymd(startOfWeek(parseYmd(TODAY))); var ex=(topics||[]).filter(function(t){return t.week===wk;})[0]; var tt=(title||'').trim();
       if(ex){ if(tt!==(ex.title||'')) commit([{op:'patch',table:'topics',id:ex.id,fields:{title:tt},_label:tt}]); return; }
-      commit([{op:'upsert',table:'topics',row:{id:uid('tp'),week:wk,title:tt,owner:whoami,notes:'',sort:Date.now(),created_at:Date.now()},prepend:true,_label:tt}]);
+      commit([{op:'upsert',table:'topics',row:{id:uid('tp'),week:wk,title:tt,owner:whoami,notes:'',sort:Date.now(),created_at:Date.now(),space_id:space},prepend:true,_label:tt}]);
     }
     function addTopicLink(topicId,title,url){ var u=(url||'').trim(); if(!/^https?:\/\//i.test(u))u='https://'+u; var row={id:uid('tl'),topic_id:topicId,title:(title||'').trim()||u.replace(/^https?:\/\//,''),url:u,sort:Date.now(),created_at:Date.now()}; commit([{op:'upsert',table:'topic_links',row:row,_label:row.title}]); }
     function delTopicLink(l){ holdDelete([{op:'delete',table:'topic_links',id:l.id,_label:l.title}],'Removed “'+(l.title||l.url)+'”'); }
     function setTheme(kind,value){ var patch={}; patch['theme_'+kind]=value; commit([{op:'settings',patch:patch,_label:'the theme'}]); }
-    function addNote(){ var row={id:uid('nt'),text:'',color:'yellow',owner:whoami,date:TODAY,created_at:Date.now()}; commit([{op:'upsert',table:'notes',row:row,prepend:true,_label:'a note'}]); }
+    function addNote(){ var row={id:uid('nt'),text:'',color:'yellow',owner:whoami,date:TODAY,created_at:Date.now(),space_id:space}; commit([{op:'upsert',table:'notes',row:row,prepend:true,_label:'a note'}]); }
     function saveNoteText(note,text){ commit([{op:'patch',table:'notes',id:note.id,fields:{text:text},_label:'a note'}]); }
     function setNoteColor(note,color){ commit([{op:'patch',table:'notes',id:note.id,fields:{color:color},_label:'a note'}]); }
     function deleteNote(n){ holdDelete([{op:'delete',table:'notes',id:n.id,_label:'a note'}],'Deleted a note'); }
-    // shared focus / pomodoro ops — one row id='shared'
-    var FOCUS_DEF={id:'shared',status:'idle',label:'',minutes:25,ends_at:0,remaining:0,started_by:''};
-    function writeFocus(patch){ var cur=(store&&store.focus)||FOCUS_DEF; var row=Object.assign({},cur,patch,{id:'shared',updated_at:Date.now()}); commit([{op:'upsert',table:'focus',row:row,_label:'the focus timer'}]); }
+    // shared focus / pomodoro ops — one row per space (id = the space id)
+    var FOCUS_DEF={id:space,status:'idle',label:'',minutes:25,ends_at:0,remaining:0,started_by:''};
+    function writeFocus(patch){ var cur=focus||FOCUS_DEF; var row=Object.assign({},cur,patch,{id:space,updated_at:Date.now()}); commit([{op:'upsert',table:'focus',row:row,_label:'the focus timer'}]); }
     function startFocus(mins,label){ var m=mins||25; writeFocus({status:'running',minutes:m,label:(label||'').trim(),ends_at:Date.now()+m*60000,remaining:0,started_by:whoami}); }
-    function pauseFocus(){ var f=store&&store.focus; if(!f||f.status!=='running')return; writeFocus({status:'paused',remaining:Math.max(0,(f.ends_at||0)-Date.now())}); }
-    function resumeFocus(){ var f=store&&store.focus; if(!f||f.status!=='paused')return; writeFocus({status:'running',ends_at:Date.now()+(f.remaining||0)}); }
+    function pauseFocus(){ var f=focus; if(!f||f.status!=='running')return; writeFocus({status:'paused',remaining:Math.max(0,(f.ends_at||0)-Date.now())}); }
+    function resumeFocus(){ var f=focus; if(!f||f.status!=='paused')return; writeFocus({status:'running',ends_at:Date.now()+(f.remaining||0)}); }
     function resetFocus(){ writeFocus({status:'idle',label:'',ends_at:0,remaining:0,started_by:''}); }
     // wave + notifications
     var WAVE_EMOJIS=['💛','👋','✨','☕','💪','🫶'];
     function showToast(o){ clearTimeout(toastTmr.current); setToast(Object.assign({t:Date.now()},o)); toastTmr.current=setTimeout(function(){ setToast(null); }, (o&&o.ms)||((o&&o.big)?4500:3400)); }
     function notify(title,body){ try{ if(lsGet('sp_notif','')==='1' && typeof Notification!=='undefined' && Notification.permission==='granted'){ new Notification(title,{body:body||''}); } }catch(e){} }
-    function sendWave(emoji){ var e=emoji||'💛'; var row={id:'latest',emoji:e,sender:whoami,created_at:Date.now()}; lastWaveRef.current=row.created_at; commit([{op:'upsert',table:'waves',row:row,_label:'your wave'}]); showToast({emoji:e,text:'Sent '+e+' to '+nameOf(other)}); setWaveOpen(false); }
+    function sendWave(emoji){ var e=emoji||'💛'; var row={id:space,emoji:e,sender:whoami,created_at:Date.now()}; lastWaveRef.current=row.created_at; commit([{op:'upsert',table:'waves',row:row,_label:'your wave'}]); showToast({emoji:e,text:'Sent '+e+' to '+nameOf(other)}); setWaveOpen(false); }
     useEffect(function(){
       if(!store) return;
-      var w=store.wave, f=store.focus;
+      var w=wave, f=focus;
       var fkey=(f&&f.status==='running')?('run:'+f.ends_at+':'+f.started_by):'idle';
       if(!readyRef.current){ lastWaveRef.current=w?w.created_at:0; lastFocusKeyRef.current=fkey; readyRef.current=true; return; }
       if(w && w.created_at>lastWaveRef.current){ lastWaveRef.current=w.created_at; if(w.sender && w.sender!==whoami){ var nm=nameOf(w.sender); showToast({emoji:w.emoji||'💛',text:nm+' sent you '+(w.emoji||'💛'),big:true}); notify(nm+' waved '+(w.emoji||'💛'),'They’re here with you.'); } }
       if(fkey!==lastFocusKeyRef.current){ var prev=lastFocusKeyRef.current; lastFocusKeyRef.current=fkey; if(f && f.status==='running' && f.started_by && f.started_by!==whoami && prev.indexOf('run:'+f.ends_at)!==0){ var fn=nameOf(f.started_by); showToast({emoji:'⏳',text:fn+' started a '+(f.minutes||25)+'-min focus'}); notify(fn+' is focusing',(f.label||'Deep work')+' · '+(f.minutes||25)+' min'); } }
-    },[store&&store.wave&&store.wave.created_at, store&&store.focus&&store.focus.ends_at, store&&store.focus&&store.focus.status]);
-    function saveJournal(text,tag){ var id=TODAY+'_'+whoami; var row={id:id,date:TODAY,owner:whoami,text:text,tag:tag,updated_at:Date.now()}; commit([{op:'upsert',table:'journal',row:row,prepend:true,_label:'tonight’s journal'}]); }
-    function saveSettings(f){ commit([{op:'settings',patch:{ meName:(f.meName||'').trim(), partnerName:(f.partnerName||'').trim() },_label:'the names'}]); }
-    function pickWho(w,name){ setWho2(w); setNeedWho(false); if(name) commit([{op:'settings',patch:{partnerName:name},_label:'your name'}]); }
+    },[wave&&wave.created_at, focus&&focus.ends_at, focus&&focus.status]);
+    function saveJournal(text,tag){ var id=TODAY+'_'+whoami; var row={id:id,date:TODAY,owner:whoami,text:text,tag:tag,updated_at:Date.now(),space_id:space}; commit([{op:'upsert',table:'journal',row:row,prepend:true,_label:'tonight’s journal'}]); }
+    // names live on people now: save only the ones that changed
+    function saveSettings(nm){ var ops=[]; Object.keys(nm).forEach(function(id){ var n=(nm[id]||'').trim(); var p=personOf(id); if(n && (!p||p.name!==n)) ops.push({op:'patch',table:'people',id:id,fields:{name:n},_label:'the names'}); }); commit(ops); }
+    function pickWho(w,name){ setWho2(w); setNeedWho(false); if(name) commit([{op:'patch',table:'people',id:w,fields:{name:name},_label:'your name'}]); }
     function switchWho(w){ setWho2(w); setFilter('all'); showToast({text:'This device is now '+nameOf(w)}); }
 
     // memos
@@ -2138,16 +2151,16 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       <div class="sec">Projects</div>
       ${(projects||[]).filter(function(p){return !p.archived;}).map(function(p){ return html`<button class="nav" key=${p.id} onClick=${function(){setPanel(p.id);}}><span class="dot" style=${{background:p.color}}></span>${p.name}<span class="cnt">${projCounts[p.id]||''}</span></button>`; })}
       <button class="nav" style=${{color:'#195FD0',fontWeight:600}} onClick=${function(){setPEdit({});}}>+ New project</button>
-      <${FocusWidget} focus=${focus} meName=${(settings&&settings.meName)||'You'} partnerName=${(settings&&settings.partnerName)||'Partner'} whoami=${whoami} onStart=${startFocus} onPause=${pauseFocus} onResume=${resumeFocus} onReset=${resetFocus} />
+      <${FocusWidget} focus=${focus} whoami=${whoami} onStart=${startFocus} onPause=${pauseFocus} onResume=${resumeFocus} onReset=${resetFocus} />
       <button class="helpbtn" onClick=${function(){setShowIntro(true);}}><span style=${{display:'flex',color:'#54606E'}}><${Icon}>${icons.help}<//></span>How it works</button>
       <button class="nav" onClick=${function(){setSettingsOpen(true);}}><span style=${{display:'flex',color:'#54606E'}}><${Icon}>${icons.settings}<//></span>Settings</button>
-      <div class="sfoot"><span class="av avm" style=${{background:OWNER_COLOR.me}}>${initialOf('me')}</span><span class="av avm" style=${{background:OWNER_COLOR.partner,marginLeft:'-8px',border:'2px solid var(--sidebar)'}}>${initialOf('partner')}</span>${syncTxt?html`<span class=${'syncln '+sync.st} role="status"><i class="syncdot"></i>${syncTxt}${sync.st==='error'?html` · <button class="linkbtn" onClick=${retryNow}>Retry</button>`:null}</span>`:html`<span style=${{fontWeight:500,fontSize:'12px',color:'#8A93A0',marginLeft:'4px'}}>Shared planner</span>`}</div>
+      <div class="sfoot">${VIEW.members.slice(0,3).map(function(m,k){ return html`<span key=${m} class="av avm" style=${{background:personColor(m),marginLeft:k?'-8px':0,border:k?'2px solid var(--sidebar)':'0'}}>${initialOf(m)}</span>`; })}${syncTxt?html`<span class=${'syncln '+sync.st} role="status"><i class="syncdot"></i>${syncTxt}${sync.st==='error'?html` · <button class="linkbtn" onClick=${retryNow}>Retry</button>`:null}</span>`:html`<span style=${{fontWeight:500,fontSize:'12px',color:'#8A93A0',marginLeft:'4px'}}>Shared planner</span>`}</div>
     </aside>`;
 
     var titleTxt = ({today:'Today',tasks:'Tasks',calendar:'Calendar',projects:'Projects',journal:'Journal',settings:'Settings'})[view]||'Today';
     var content;
     if(loading){ content=html`<div class="empty" style=${{marginTop:'60px',color:'#3C6FB0'}}><div class="big">Loading your planner…</div><div class="sub">Syncing shared data.</div></div>`; }
-    else if(view==='today'){ content=html`<${Fragment}>${showGS?html`<${GetStarted} steps=${gsSteps} done=${gsDone} onDismiss=${function(){setGsHide(true);lsSet('sp_gs_hide','1');}} />`:null}<div class="mobfocus"><${FocusWidget} focus=${focus} meName=${(settings&&settings.meName)||'You'} partnerName=${(settings&&settings.partnerName)||'Partner'} whoami=${whoami} onStart=${startFocus} onPause=${pauseFocus} onResume=${resumeFocus} onReset=${resetFocus} /></div><${Today} sel=${sel} filter=${filter} projects=${projects} tasks=${tasks} routines=${routines} upcoming=${upcoming} habits=${habitDefs} habitLogs=${habitLogs} topics=${topics} topicLinks=${topicLinks} settings=${settings} whoami=${whoami} onToggle=${toggleTask} onEdit=${function(t){setModal({editing:t});}} onAdd=${function(d){setModal({defaultDate:d});}} carry=${carry} onMoveAllToday=${moveAllToday} onSetHabit=${checkHabit} onStepHabit=${stepHabit} onEditHabit=${function(h){setHabitEdit(h);}} onAddHabit=${function(){setHabitEdit({});}} notes=${notes} onAddNote=${addNote} onSaveNote=${saveNoteText} onSetNoteColor=${setNoteColor} onDeleteNote=${deleteNote} onGoJournal=${function(){setView2('journal');}} onShowAll=${function(){setView2('tasks');}} /><//>`; }
+    else if(view==='today'){ content=html`<${Fragment}>${showGS?html`<${GetStarted} steps=${gsSteps} done=${gsDone} onDismiss=${function(){setGsHide(true);lsSet('sp_gs_hide','1');}} />`:null}<div class="mobfocus"><${FocusWidget} focus=${focus} whoami=${whoami} onStart=${startFocus} onPause=${pauseFocus} onResume=${resumeFocus} onReset=${resetFocus} /></div><${Today} sel=${sel} filter=${filter} projects=${projects} tasks=${tasks} routines=${routines} upcoming=${upcoming} habits=${habitDefs} habitLogs=${habitLogs} topics=${topics} topicLinks=${topicLinks} settings=${settings} whoami=${whoami} onToggle=${toggleTask} onEdit=${function(t){setModal({editing:t});}} onAdd=${function(d){setModal({defaultDate:d});}} carry=${carry} onMoveAllToday=${moveAllToday} onSetHabit=${checkHabit} onStepHabit=${stepHabit} onEditHabit=${function(h){setHabitEdit(h);}} onAddHabit=${function(){setHabitEdit({});}} notes=${notes} onAddNote=${addNote} onSaveNote=${saveNoteText} onSetNoteColor=${setNoteColor} onDeleteNote=${deleteNote} onGoJournal=${function(){setView2('journal');}} onShowAll=${function(){setView2('tasks');}} /><//>`; }
     else if(view==='tasks'){ content=html`<${TasksTable} tasks=${tasks} projects=${projects} onEdit=${function(t){setModal({editing:t});}} onToggle=${toggleTask} />`; }
     else if(view==='calendar'){ content=html`<${Calendar} tasks=${tasks} projects=${projects} onAddDay=${function(ds){setModal({defaultDate:ds});}} onAddSlot=${function(ds,tm){setModal({defaultDate:ds,defaultTime:tm,defaultType:'event'});}} onEditTask=${function(t){setModal({editing:t});}} onOpenProject=${function(id){setPanel(id);}} onToggle=${toggleTask} onSchedule=${scheduleTask} onNewProject=${function(s,e){setPEdit({start_date:s,end_date:e});}} />`; }
     else if(view==='projects'){ content=html`<${Projects} projects=${projects} tasks=${tasks} onOpen=${function(id){setPanel(id);}} onNew=${function(){setPEdit({});}} />`; }
@@ -2181,7 +2194,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       ${modal?html`<${TaskModal} key=${editingTask?editingTask.id:'new'} parent=${editingParent} onOpenParent=${function(p){setModal({editing:p});}} editing=${modal.editing} children=${modalChildren} defaultDate=${modal.defaultDate} defaultTime=${modal.defaultTime} defaultType=${modal.defaultType} defaultProject=${modal.defaultProject} whoami=${whoami} projects=${projects} onClose=${function(){setModal(null);}} onSave=${saveTask} onDelete=${deleteTask} />`:null}
       ${pEdit?html`<${ProjectEditor} editing=${pEdit} whoami=${whoami} onClose=${function(){setPEdit(null);}} onSave=${saveProject} onDelete=${askDeleteProject} />`:null}
       ${openProj?html`<${ProjectPanel} project=${openProj} tasks=${tasks} materials=${materials} onClose=${function(){setPanel(null);}} onToggle=${toggleTask} onEdit=${function(p){setPEdit(p);}} onEditTask=${function(t){setModal({editing:t});}} onAddItem=${addProjectItem} onAddSub=${addSubtask} onAddMaterial=${addMaterial} onDelMaterial=${delMaterial} onReopen=${reopenProject} />`:null}
-      ${needWho&&!loading?html`<${WhoModal} meName=${nameOf('me')} partnerName=${(settings&&settings.partnerName)||''} onPick=${pickWho} />`:null}
+      ${needWho&&!loading?html`<${WhoModal} members=${VIEW.members} onPick=${pickWho} />`:null}
       ${showIntro&&!needWho?html`<${Intro} onClose=${function(){setShowIntro(false);lsSet('sp_intro_v1','1');}} />`:null}
       ${settingsOpen?html`<${SettingsModal} settings=${settings} habits=${habitDefs} whoami=${whoami} themeBg=${(settings&&settings.theme_bg)||'sky'} themeFont=${(settings&&settings.theme_font)||'inter'} themeRad=${(settings&&settings.theme_radius)||'default'} onSetTheme=${setTheme} onSaveNames=${saveSettings} onSwitchWho=${switchWho} onAddHabit=${function(){setHabitEdit({});}} onEditHabit=${function(h){setHabitEdit(h);}} onHowItWorks=${function(){setSettingsOpen(false);setShowIntro(true);}} onClose=${function(){setSettingsOpen(false);}} />`:null}
       ${habitEdit?html`<${HabitEditor} editing=${habitEdit.id?habitEdit:null} whoami=${whoami} onClose=${function(){setHabitEdit(null);}} onSave=${saveHabit} onDelete=${deleteHabit} />`:null}

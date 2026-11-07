@@ -4,6 +4,55 @@
 
 ---
 
+## 2026-11-08: Spaces structure (data only, screens unchanged)
+
+**Request:** "Yes, build it now" (`BRIEF-people-spaces.md` decision 1): build for partner / friends / teams now, keep the two-person screens.
+
+**Shipped (local-verified, not deployed)**
+- New tables `people`, `spaces`, `members`. Every project, task, habit, note, topic and journal entry has `space_id`. Owners are a person id or `everyone`. The focus timer and the wave are one row per space.
+- `migrate3.sql` + `migrate3.sh` move today's data into one space, "hate club" (kind partner; Mahesh + partner, names taken from the old settings). It's additive and safe to re-run; checked by running it twice locally.
+- App:
+  - names and colours come from people; "Both" becomes "Everyone" once a space has 3+ members
+  - the owner picker and filters list every member
+  - Who's this? shows one card per member and saves a new name to the person
+  - new rows carry the space
+  - a device that remembered `me` / `partner` is mapped once
+- Worker: translates what a tab on the old build writes (`me` / `partner` / `shared`, focus `shared`, wave `latest`, journal `<date>_me`, the `meName` / `partnerName` settings).
+- Caught and fixed in testing: the journal-id rule turned `<date>_p_partner` into `<date>_p_p_partner`; it now matches only exact old ids.
+
+**Not done:** the space switcher (it appears with the second space), invites, real accounts (the sign-in redesign waits for Mahesh's Mobbin refs), and brief decisions 2–4 (they only matter once a second space exists; the journal stays visible inside the space, as before).
+
+## 2026-11-05: Variants canvas: Projects redesign, This week scoreboard, sign-in (design only, nothing built)
+
+**Surface:** both (desktop frames + one phone frame)
+**Request:** "I hate the projects board · make 4–5 variants before anything · gamify, who's winning, who needs help · empty states · table/list · ID + password each". Brief `BRIEF-projects-scoreboard.md`, approved with the recommended answers.
+
+**Shipped (canvas)**
+- Canvas: https://claude.ai/artifact/25zw9iYyovGXj73Yxah5di (Design type, 16 artboards; source in session scratchpad only)
+- Projects: A Table · B Deadline lanes · C Timeline (12 weeks, runway to each deadline) · D Next-step list · E Dense cards
+- Projects states: no projects yet · filter matches nothing · all finished · phone list (chips All/Mine/Theirs/Both/Finished)
+- Inside a project: List · Table · Timeline switch, shown as a table with subtasks
+- This week: S1 head-to-head · S2 race to 100 with a pace line · S3 dashboard widgets · Today score strip with the "+15" moment · Monday-morning empty week
+- Sign in: who → password → wrong password (4 tries left, then a 1-minute wait)
+
+**Design system**
+- used: the app's own look (sky ground, white canvas, `#1F6FEB`, ink, Inter, pills)
+- small-text greys were darkened to `#4B5866` to pass 4.5:1
+- added: nothing to the system
+
+**Assumptions to confirm**
+- owners are shown as a mix (live data has all 6 as Partner's)
+- task names "Home page copy", "Case study images", "Brand moodboard" are samples
+- every score is a sample week
+- phone tabs proposed as Today · Calendar · Week · Projects · More
+
+**Picked (Mahesh, 8 Nov)**
+- Projects: **A Table, B Lanes, C Timeline and E Cards all ship, as views of one page** (a view switch). D is dropped.
+- Empty states: approved. Inside a project (List · Table · Timeline): approved.
+- This week: **S3 dashboard is the base.** Keep its points so far, habits kept, needs a hand, leaderboard and open tasks. Add **S1's points-by-day chart and its "could use a hand" card**, and **S2's "race to 100 by Sunday" track**.
+- Sign-in: **rejected ("shitty")**. Mahesh is sending Mobbin references; redesign after those arrive.
+- New requirement: **more than one partner**. A has one romantic partner, several friends, and teams with B and C, so a shared task lives in a shared project inside a team. It's two people for now, but the structure must allow this later (`BRIEF-people-spaces.md`).
+
 ## 2026-11-05: Trust pass (GAPS.md tier 1)
 
 **Surface:** both (one responsive file, `public/index.html`), plus the worker (`src/worker.js`)
