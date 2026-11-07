@@ -4,6 +4,77 @@
 
 ---
 
+## 2026-11-08: Everything picked: own sign-ins, points + This week, Projects views, project page (built, local-verified, not deployed)
+
+**Request:** "complete all, dont wait for mobbin things". Built from the approved briefs and canvas picks. Sign-in is my own design, since the Mobbin refs never came.
+
+**Shipped**
+- **Sign-in:** one calm card at normal sizes.
+  - username + password with a show/hide eye; the last username is remembered
+  - errors spelled out: "4 tries left before a 1-minute wait", a lock countdown, and an offline message
+  - **first-time setup**: the shared passcode once → "Which one is you?" (only people without a sign-in) → name if unset → username + password ("username taken" handled)
+  - Settings › Account: your name, @username, change password, people in the space ("Has a sign-in / Not set up yet"), Sign out
+  - the "Who's this?" picker and the device switch are gone
+- **Server:**
+  - PBKDF2-SHA256 at 50k rounds (~4 ms) with a salt per person
+  - v2 cookies carry the person; the old passcode cookie only opens setup
+  - 5 wrong tries → 1-minute lock, per username, and per IP for the passcode
+  - `done_by` / `done_at` set **by the server** when a task is ticked
+  - you can only rename yourself
+  - state is scoped to your spaces; private journal entries are only sent to their owner, with `journal_days` (dates only) so they still score
+  - password fields never leave the server
+- **Points** (per space, Mon–Sun, the day turning at 4am):
+  - task +10, subtask +3, on time +5, helping +5
+  - habit kept +2 (count habits: ≤ aim), journal +2, finished focus +3
+  - teams have scores off unless turned on
+  - "needs a hand" = 3+ overdue, or under half of the week's tasks by Thursday
+- **This week** = S3 base + S1 + S2:
+  - race to 100 with a dashed pace line
+  - needs-a-hand card: Take one (moves it to Both, with Undo) · Send a cheer
+  - fresh-week card with last week's result
+  - points so far (lines plus pace; labels kept apart)
+  - leaderboard with weeks won
+  - points by day, habits kept (per-day dots), tasks this week (donut), still open (table)
+  - a This week / Last week switch
+- **Today:** score strip ("You're ahead by N", tap for the week), and a "+N · done on time · you helped" toast on every tick. Sidebar: "This week 5 · 22".
+- **Projects:**
+  - one page with a **Table · Lanes · Timeline · Cards** switch (remembered)
+  - Filter by Active / Finished / All, Owned by, Sort by Deadline / Progress / Name / Newest; summary line
+  - empty states: none · filter matches nothing · all finished
+  - table: grouped by deadline, next task tickable, the row opens the project, the ⋯ menu edits
+  - timeline: 12 weeks from Monday, runway bars, deadline diamonds, task dots, today line
+  - phone: the table becomes a list and lanes scroll sideways
+  - progress counts tasks only (gap #22)
+- **Inside a project:** a full page instead of the side panel: breadcrumb, Edit / Finish project / Reopen, facts row, **List · Table · Timeline**, materials. The table has expandable subtasks and Done / on time / Overdue status.
+- **Calendar:** a week with nothing timed folds the hour grid ("Show the hours"); otherwise it scrolls to the first timed item or to now; it opens on the 4am day.
+- **Journal:** private by default; "Share tonight's entry with {name}"; your private entries are marked "Only you".
+- **Focus:** a finished session is logged once (by whoever started it) and the timer resets. The 5-second polling stops when time is up (gap #20).
+- **Phone:** tabs are Today · Week · Calendar · Projects · More (Tasks, Journal, Settings, How it works).
+- **Name:** "hate club" everywhere (title, top bar, footer, intro).
+
+**Verified (local, desktop 1280 + phone 375, as both people)**
+- setup with a v1 cookie, and with no cookie (wrong passcode, name required, username taken)
+- sign out → wrong password → sign in
+- ticks score correctly (+3 subtask; +20 = task + on time + help), with `done_by` from the server
+- a private journal entry stays private but counts (+2)
+- a focus session logged after its end time passed
+- all four Projects views, the project page Table view, the calendar fold, the More sheet
+- no script errors (only the 401/409 responses the tests triggered on purpose)
+
+**Fixed in testing:**
+- the server was putting private journal entries into the space
+- the points-chart labels overlapped
+- the open-tasks table clipped its Status column
+- the timeline Today pill covered the first week label
+- the phone chart text was unreadable
+- "No tasks yet" showed on projects whose tasks were all done
+- the calendar opened on the next week after midnight
+
+**Not done:**
+- invites and new spaces (the switcher appears with the second space)
+- password reset by email (for now Mahesh resets one by clearing that person's sign-in)
+- Calendar and the Today date strip still start weeks on Sunday, while points use Mon–Sun (weekly topics are keyed by Sunday)
+
 ## 2026-11-08: Spaces structure (data only, screens unchanged)
 
 **Request:** "Yes, build it now" (`BRIEF-people-spaces.md` decision 1): build for partner / friends / teams now, keep the two-person screens.

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#DCEBFF">
-<title>Shared Planner</title>
+<title>hate club</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
 <style>
 /* Calm sky system: soft blue->white gradient pane + ink/blue accents, Todoist-style shell. Single light theme by choice. */
@@ -621,6 +621,260 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
   .modal.whomodal{max-width:none;width:100%;height:100%;max-height:none;border-radius:0;display:flex;flex-direction:column;justify-content:center}
 }
 
+/* ---- shared bits ---- */
+.muted{color:#5E6875}
+.small{font-size:12.5px}
+.tnum{font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.linkbtn.inl{padding:0;font-size:inherit}
+.pill.okp{color:#1D6842;background:#E3F4EA;font-weight:600}
+.segc{display:inline-flex;background:#F1F4F8;border-radius:9px;padding:3px;gap:2px}
+.segc button{border:0;background:none;border-radius:7px;padding:6px 12px;font-size:13px;font-weight:500;color:#3F4B59;cursor:pointer;font-family:inherit}
+.segc button.on{background:#fff;color:#15171A;font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.kebab{border:0;background:none;color:#4B5866;padding:6px;border-radius:6px;display:inline-flex;cursor:pointer}
+.kebab:hover{background:#EEF2F7}
+.avl{width:30px;height:30px;font-size:12px}
+
+/* ---- sign in + setup ---- */
+.authpage{min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:12vh 16px 40px;box-sizing:border-box;background:var(--grad)}
+.authcard{width:100%;max-width:380px;box-sizing:border-box;background:#fff;border:1px solid #E5EAF1;border-radius:16px;box-shadow:0 18px 50px rgba(20,60,130,.16);padding:26px 26px 22px;display:flex;flex-direction:column}
+.authbrand{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.authbrand .brand{width:30px;height:30px;font-size:11.5px;border-radius:8px}
+.authname{font-weight:700;font-size:14.5px;letter-spacing:-.01em}
+.authh{margin:0;font-size:20px;font-weight:700;letter-spacing:-.015em;color:#15171A}
+.authsub{margin:5px 0 4px;font-size:13.5px;color:#5E6875;line-height:1.5}
+.authcard .lbl{margin-top:16px}
+.pwf{display:flex;align-items:center;border:1px solid var(--field);border-radius:10px;background:#FBFDFF;transition:border-color .12s,box-shadow .12s}
+.pwf:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash);background:#fff}
+.pwf.bad{border-color:#C64A3B;box-shadow:0 0 0 3px #FCEAE7}
+.pwf input{flex:1;min-width:0;border:0;background:transparent;padding:10px 12px;font-family:inherit;font-size:14px;color:#15171A;outline:none}
+.pweye{border:0;background:none;color:#5E6875;padding:8px 10px;display:flex;cursor:pointer;border-radius:8px}
+.pweye:hover{color:#15171A}
+.autherr{display:flex;gap:8px;align-items:flex-start;margin-top:10px;font-size:13px;color:#A3392C;font-weight:500;line-height:1.45}
+.authhint{font-size:12px;color:#5E6875;margin-top:6px}
+.authgo{margin-top:18px;width:100%;flex:none}
+.authnote{margin:10px 0 0;font-size:12px;color:#5E6875;text-align:center}
+.authfoot{margin-top:16px;padding-top:14px;border-top:1px solid #EEF2F7;font-size:13px;color:#3F4B59;text-align:center}
+.authfoot .linkbtn{padding:0;font-size:13px}
+.whopick{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.whorow{display:flex;align-items:center;gap:11px;width:100%;border:1px solid var(--field);background:#fff;border-radius:10px;padding:9px 12px;font-family:inherit;font-size:14px;font-weight:600;color:#15171A;cursor:pointer;text-align:left;min-height:44px;transition:border-color .12s,box-shadow .12s}
+.whorow:hover{border-color:#BFD5F7}
+.whorow.on{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+.whorn{flex:1;min-width:0}
+.whoradio{width:16px;height:16px;border-radius:99px;border:1.6px solid #AEB8C5;box-sizing:border-box;flex:none}
+.whoradio.on{border:5px solid var(--accent)}
+
+/* ---- phone: More sheet ---- */
+.moreov{align-items:flex-end;padding:0}
+.moresheet{max-width:none;width:100%;border-radius:18px 18px 0 0;padding:10px 10px calc(14px + env(safe-area-inset-bottom,0px))}
+.morerow{display:flex;align-items:center;gap:12px;width:100%;border:0;background:none;padding:13px 12px;font-family:inherit;font-size:15px;font-weight:500;color:#2F343B;border-radius:10px;cursor:pointer;min-height:48px}
+.morerow:hover{background:#F1F5FA}
+
+/* ---- Today: score strip ---- */
+.scorestrip{display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%;box-sizing:border-box;margin:0 0 16px;border:1px solid #E5EAF1;background:#F7F9FC;border-radius:12px;padding:10px 14px;font-family:inherit;color:#15171A;cursor:pointer;text-align:left}
+.scorestrip:hover{border-color:#BFD5F7}
+.crownp{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#85560F;background:#FBF1E6;border-radius:99px;padding:3px 10px;white-space:nowrap}
+.crownp.calm{color:#46505D;background:#EEF2F7}
+.sstxt{font-size:13.5px;font-weight:600;font-variant-numeric:tabular-nums}
+.ssbars{flex:1;min-width:120px;display:flex;flex-direction:column;gap:4px}
+.ssr{height:5px;border-radius:99px;background:#E3E9F1;position:relative;overflow:hidden}
+.ssr i{position:absolute;left:0;top:0;bottom:0;border-radius:99px}
+.sshelp{font-size:12.5px;color:#5E6875}
+.ssgo{font-size:13px;font-weight:600;color:var(--accent-deep);display:inline-flex;align-items:center;gap:3px}
+
+/* ---- This week ---- */
+.wkhd{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;font-size:13px}
+.wbox{border:1px solid #E5EAF1;border-radius:14px;background:#fff;padding:16px 20px}
+.wboxh{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.wboxh h2{margin:0;font-size:16px;font-weight:700}
+.wboxh p{margin:3px 0 0;font-size:13px}
+.track{position:relative;margin:30px 10px 4px 116px}
+.ln{position:relative;height:46px;display:flex;align-items:center}
+.lnlab{position:absolute;left:-116px;width:106px;display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden}
+.rail{position:absolute;left:0;right:0;height:8px;border-radius:99px;background:#EEF2F7}
+.fill{position:absolute;left:0;height:8px;border-radius:99px;transition:width .5s cubic-bezier(.16,1,.3,1)}
+.runner{position:absolute;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center}
+.runner .av{box-shadow:0 0 0 3px #fff,0 2px 6px rgba(0,0,0,.15)}
+.rv{position:absolute;top:-19px;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.goal{position:absolute;right:-6px;top:-28px;display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700}
+.pace{position:absolute;top:-10px;bottom:-10px;width:0;border-left:2px dashed #3C6FB0;z-index:1}
+.pacel{position:absolute;bottom:-22px;left:0;transform:translateX(-50%);font-size:11px;font-weight:700;color:#3C6FB0;white-space:nowrap;background:#fff;padding:0 4px}
+.ticks{position:relative;height:18px;margin:26px 10px 0 116px}
+.ticks span{position:absolute;transform:translateX(-50%);font-size:11px;font-weight:600;color:#4B5866;font-variant-numeric:tabular-nums}
+.helpcard,.freshcard{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px;border:1px solid #E5EAF1;background:#F7F9FC;border-radius:14px;padding:13px 16px}
+.freshcard{border-style:dashed;justify-content:space-between}
+.freshcard p{margin:3px 0 0;font-size:13px}
+.hg{width:34px;height:34px;border-radius:99px;background:#fff;border:1px solid #E5EAF1;display:flex;align-items:center;justify-content:center;color:#B4792B;flex:none}
+.ht{flex:1;min-width:240px}
+.ht b{font-size:14px}
+.ht p{margin:2px 0 0;font-size:13px;color:#5E6875}
+.btn.hbtn{flex:none;padding:8px 14px;font-size:13px}
+.dash{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:14px}
+.w{border:1px solid #E5EAF1;border-radius:14px;background:#fff;padding:14px 18px 16px;min-width:0}
+.span2{grid-column:span 2}
+.wt{font-size:12.5px;font-weight:600;color:#3C6FB0}
+.lboard{list-style:none;margin:10px 0 0;padding:0}
+.lboard li{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid #EEF2F7;font-size:14px}
+.lboard li:first-child{border-top:0}
+.rank{width:16px;font-weight:700;color:#4B5866;font-variant-numeric:tabular-nums}
+.lbn{flex:1;font-weight:600}
+.lbp{font-weight:700;font-variant-numeric:tabular-nums}
+.bchart{display:flex;align-items:flex-end;height:140px;margin-top:16px;border-bottom:1px solid #DCE3EC}
+.bday{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:4px;height:100%}
+.bbar{width:16px;min-height:2px;border-radius:4px 4px 1px 1px;position:relative}
+.bv{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:10.5px;font-weight:600;color:#2F343B;font-variant-numeric:tabular-nums}
+.bfut{width:36px;height:100%;border:1px dashed #DCE3EC;border-bottom:0;border-radius:6px 6px 0 0;box-sizing:border-box}
+.bdays{display:flex;margin-top:6px}
+.bdays span{flex:1;text-align:center;font-size:11.5px;font-weight:600;color:#4B5866}
+.bdays span.t{color:var(--accent-deep)}
+.bkey{display:flex;gap:14px;margin-top:8px;font-size:12px;color:#3F4B59}
+.bkey i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.habk{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+.hkrow{display:flex;align-items:center;gap:9px;font-size:13px}
+.hkn{width:58px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hkd{display:flex;gap:4px}
+.hk{width:13px;height:13px;border-radius:4px;background:#E3E9F1}
+.hk.k{background:#1F6FEB}
+.hk.s{background:#A9C8F7}
+.hk.f{background:transparent;border:1px dashed #DCE3EC;box-sizing:border-box}
+.donutrow{display:flex;align-items:center;gap:18px;margin-top:12px;flex-wrap:wrap}
+.donut{width:112px;height:112px;border-radius:99px;display:flex;align-items:center;justify-content:center;flex:none}
+.donut>span{width:78px;height:78px;border-radius:99px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut b{font-size:24px;font-variant-numeric:tabular-nums;line-height:1}
+.donut small{font-size:11.5px;color:#5E6875}
+.dleg{display:flex;flex-direction:column;gap:8px;font-size:13px}
+.dleg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:7px;vertical-align:-1px}
+.otbl{margin-top:8px;overflow-x:auto}
+.orow{display:grid;grid-template-columns:minmax(150px,2fr) 96px minmax(96px,1.2fr) 78px 84px;column-gap:12px;align-items:center;min-height:44px;border-top:1px solid #EEF2F7;font-size:13.5px;min-width:540px}
+.orow .oc.small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.orow:first-child{border-top:0}
+.oc{display:flex;align-items:center;gap:8px;min-width:0}
+.ot{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ---- Projects ---- */
+.ptool{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:18px}
+.plab{font-size:12.5px;color:#4B5866;font-weight:500}
+.pviews{display:inline-flex;margin-left:auto;background:#F1F4F8;border-radius:9px;padding:3px;gap:2px}
+.pviews button{display:inline-flex;align-items:center;gap:6px;border:0;background:none;border-radius:7px;padding:6px 10px;font-family:inherit;font-size:12.5px;font-weight:500;color:#3F4B59;cursor:pointer}
+.pviews button.on{background:#fff;color:#15171A;font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.psum{margin:10px 2px 0;font-size:13px;color:#5E6875}
+.pempty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:56px 20px 40px;max-width:440px;margin:0 auto}
+.pempty h2{margin:6px 0 0;font-size:18px;font-weight:700;text-wrap:balance}
+.pempty p{margin:0;font-size:13.5px;line-height:1.55;color:#5E6875}
+.pei{width:60px;height:60px;border-radius:16px;background:var(--accent-wash);color:var(--accent-deep);display:flex;align-items:center;justify-content:center}
+.pei.ok{background:#E3F4EA;color:#1D6842}
+.pea{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+.pea .btn{flex:none;padding:10px 16px}
+.ptbl{margin-top:12px;border:1px solid #E5EAF1;border-radius:12px;overflow-x:auto}
+.ptr{display:grid;grid-template-columns:minmax(180px,1.3fr) minmax(220px,1.7fr) 140px 100px 92px 120px 36px;align-items:center;column-gap:14px;padding:0 14px;min-height:58px;border-top:1px solid #EEF2F7;min-width:960px;cursor:pointer}
+.ptr:hover{background:#F6F9FE}
+.ptr.pth{min-height:38px;background:#F8FAFD;border-top:0;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#4B5866;cursor:default}
+.ptr.pth:hover{background:#F8FAFD}
+.ptgrp{padding:8px 14px;background:#FBFCFE;border-top:1px solid #EEF2F7;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3C6FB0;min-width:960px}
+.ptn{display:flex;align-items:center;gap:10px;min-width:0}
+.ptn>span:last-child{min-width:0;display:flex;flex-direction:column}
+.pname2{border:0;background:none;padding:0;font-family:inherit;font-weight:600;font-size:14.5px;color:#15171A;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pkind{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#5E6875;margin-top:2px}
+.ptc{display:flex;align-items:center;min-width:0;font-size:13.5px}
+.nextc{display:flex;align-items:center;gap:8px;min-width:0}
+.nt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.progc{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#3F4B59}
+.pbar2{display:inline-block;width:70px;height:6px;border-radius:99px;background:#E8EDF4;overflow:hidden;flex:none}
+.pbar2 i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.ownc{display:flex;align-items:center;gap:8px;font-size:13px;min-width:0}
+.lanes2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px;align-items:start}
+.lane2{background:#F5F8FC;border:1px solid #EAEFF5;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:9px;min-height:200px}
+.lane2h{display:flex;align-items:center;justify-content:space-between;padding:3px 5px 0;font-size:13.5px;font-weight:700}
+.lanec2{font-size:12px;font-weight:600;color:#3F4B59;background:#fff;border:1px solid #E5EAF1;border-radius:99px;padding:1px 8px}
+.lane2s{font-size:11.5px;color:#4B5866;font-weight:500;padding:0 5px 2px}
+.lane2e{margin:6px 5px;font-size:12.5px;color:#5E6875}
+.lc2,.pc2{background:#fff;border:1px solid #E5EAF1;border-radius:12px;padding:11px 12px 10px;display:flex;flex-direction:column;gap:8px;cursor:pointer;box-shadow:0 1px 2px rgba(20,40,80,.04)}
+.lc2:hover,.pc2:hover{border-color:#BFD5F7}
+.lc2h{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.lc2n{display:flex;align-items:center;gap:8px;border:0;background:none;padding:0;font-family:inherit;font-weight:600;font-size:15px;color:#15171A;text-align:left;cursor:pointer}
+.lc2p{display:flex;align-items:center;gap:8px;font-size:12px;color:#4B5866}
+.lc2p .pbar2{flex:1;width:auto}
+.lc2x{font-size:13px;min-height:22px;display:flex;align-items:center}
+.lc2f{display:flex;align-items:center;gap:8px;border-top:1px solid #EEF2F7;padding-top:8px;font-size:12.5px;color:#3F4B59}
+.pcr{margin-left:auto;font-weight:600;color:#2F343B}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:14px}
+.pc2{min-height:176px}
+.pc2 .lc2f{margin-top:auto}
+.pnew{border:1.5px dashed #C9D3DF;border-radius:12px;background:#FBFCFE;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:var(--accent-deep);font-family:inherit;font-weight:600;font-size:14px;min-height:176px;cursor:pointer}
+.pnew span{font-weight:500;font-size:12.5px;color:#5E6875}
+.ptl{margin-top:14px;border:1px solid #E5EAF1;border-radius:12px;overflow-x:auto}
+.ptlin{min-width:900px}
+.ptlrow{display:grid;grid-template-columns:260px minmax(620px,1fr);min-height:60px;border-top:1px solid #EEF2F7}
+.ptlrow.ptlhd{min-height:50px;border-top:0;background:#F8FAFD}
+.ptll{display:flex;align-items:center;gap:10px;padding:0 12px;border-right:1px solid #EEF2F7;min-width:0}
+.ptlname{flex:1;min-width:0;border:0;background:none;padding:0;font-family:inherit;text-align:left;cursor:pointer;display:flex;flex-direction:column}
+.lname2{font-weight:600;font-size:14px;color:#15171A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ptlt{position:relative;background-image:linear-gradient(to right,#EEF2F7 1px,transparent 1px);background-size:calc(100% / 12) 100%}
+.ptlwk{position:absolute;top:0;bottom:0;display:flex;align-items:flex-start;padding-top:7px;font-size:11.5px;font-weight:600;color:#4B5866;padding-left:6px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ptlnow{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:#E5484D}
+.ptlnowl{position:absolute;bottom:5px;transform:translateX(-50%);background:#E5484D;color:#fff;font-size:10.5px;font-weight:700;border-radius:99px;padding:2px 7px;z-index:2}
+.ptlrun{position:absolute;top:50%;height:10px;margin-top:-5px;border-radius:99px}
+.ptldia{position:absolute;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;transform:rotate(45deg);border-radius:2px;box-shadow:0 0 0 2px #fff;z-index:1}
+.ptllab{position:absolute;top:50%;transform:translateY(-50%);font-size:12px;font-weight:600;white-space:nowrap;color:#2F343B}
+.ptlnone{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:12px;color:#5E6875}
+.ptltd{position:absolute;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:99px;background:#fff;border:2px solid #B4792B;box-sizing:border-box;z-index:1}
+.ptlkey{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:#3F4B59}
+.ptlkey span{display:inline-flex;align-items:center;gap:7px}
+.ptlkey .k1{display:inline-block;width:22px;height:8px;border-radius:99px;background:rgba(31,111,235,.2)}
+.ptlkey .k2{display:inline-block;width:10px;height:10px;transform:rotate(45deg);border-radius:2px;background:var(--accent)}
+.ptlkey .k3{display:inline-block;width:10px;height:10px;border-radius:99px;border:2px solid #B4792B;box-sizing:border-box}
+
+/* ---- inside a project ---- */
+.ppage{margin-top:12px}
+.pcrumb{display:flex;gap:6px;align-items:center;font-size:13px;color:#4B5866}
+.pghd{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:8px}
+.pgt1{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+.pgname{margin:0;font-size:24px;font-weight:700;letter-spacing:-.02em}
+.pgact{display:flex;gap:8px}
+.btn.pgb{flex:none;padding:8px 13px;font-size:13px}
+.facts2{display:flex;flex-wrap:wrap;margin-top:16px;border:1px solid #E5EAF1;border-radius:12px}
+.fact2{flex:1 1 160px;padding:11px 15px;border-left:1px solid #EEF2F7;display:flex;flex-direction:column;gap:4px}
+.fact2:first-child{border-left:0}
+.fk2{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#4B5866}
+.fv2{font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:8px}
+.pgtabs{margin:18px 0 6px}
+.pgt{margin-top:8px;border:1px solid #E5EAF1;border-radius:12px;overflow-x:auto}
+.pgr{display:grid;grid-template-columns:minmax(240px,2fr) 140px 170px 120px 100px 36px;align-items:center;column-gap:14px;padding:0 14px;min-height:50px;border-top:1px solid #EEF2F7;font-size:14px;min-width:860px}
+.pgr.pgh{min-height:38px;background:#F8FAFD;border-top:0;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#4B5866}
+.pgr.pge{grid-template-columns:1fr;font-size:13px}
+.pgr.sub{min-height:44px;background:#FCFDFF;font-size:13.5px}
+.pgc{display:flex;align-items:center;gap:8px;min-width:0}
+.pgc.ind{padding-left:28px}
+.pgtt{border:0;background:none;padding:0;font-family:inherit;font-size:14px;font-weight:600;color:#15171A;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pgtt.done,.pgc .done{color:#6B7480;text-decoration:line-through}
+.pgt .pgadd{margin:0;padding:10px 14px;border-top:1px solid #EEF2F7;min-width:860px;box-sizing:border-box}
+
+/* ---- calendar: no timed items ---- */
+.nohours{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding:18px 16px;font-size:13px;color:#5E6875;border-top:1px solid var(--line-soft)}
+.allday.tall .adc{min-height:200px}
+
+/* ---- journal: share or keep private ---- */
+.jshare{display:flex;align-items:center;gap:9px;margin-top:12px;font-size:13px;color:#2F343B}
+.jshare input{width:17px;height:17px;margin:0;accent-color:var(--accent)}
+.jpriv{font-size:11px;font-weight:600;color:#5E6875;margin-left:8px}
+
+@media(max-width:1100px){ .dash{grid-template-columns:repeat(2,minmax(0,1fr))} .dash .span2{grid-column:span 2} }
+@media(max-width:820px){
+  .dash{grid-template-columns:minmax(0,1fr)} .dash .span2{grid-column:auto}
+  .track,.ticks{margin-left:86px} .lnlab{left:-86px;width:80px}
+  .pviews{margin-left:0;width:100%;justify-content:space-between} .pviews button{flex:1;justify-content:center}
+  .ptbl{border:0;overflow:visible}
+  .ptr.pth,.ptgrp{min-width:0}
+  .ptr.pth{display:none}
+  .ptr{min-width:0;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"name left" "next next" "prog own";row-gap:8px;padding:12px 4px;min-height:0}
+  .ptr .ptn{grid-area:name} .ptr .ptleft{grid-area:left;justify-content:flex-end} .ptr .ptnext{grid-area:next;padding-left:18px} .ptr .ptprog{grid-area:prog;padding-left:18px} .ptr .ptown{grid-area:own;justify-content:flex-end}
+  .ptr .ptdead,.ptr .ptmore{display:none}
+  .lanes2{grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:minmax(250px,82%);overflow-x:auto;padding-bottom:6px}
+  .pgrid{grid-template-columns:minmax(0,1fr)}
+  .facts2 .fact2{flex-basis:45%}
+  .pgname{font-size:21px}
+}
+
 /* mobile */
 .mobnav{display:none}
 @media(max-width:820px){
@@ -747,6 +1001,8 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     projects:html`<path d="M4 7.5A1.5 1.5 0 015.5 6h3.2a1.5 1.5 0 011.2.6l.9 1.2a1.5 1.5 0 001.2.6H18.5A1.5 1.5 0 0120 9.9V18a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 014 18V7.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`,
     journal:html`<path d="M5 4.5h10a2 2 0 012 2V20l-6-2.5V4.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M5 4.5a2 2 0 00-2 2V18l2-.8" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>`,
     settings:html`<circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>`,
+    week:html`<path d="M8 4h8v5a4 4 0 01-8 0V4zM8 6H5a3 3 0 003 4M16 6h3a3 3 0 01-3 4M12 13v4M8.5 20h7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>`,
+    more:html`<circle cx="5" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="19" cy="12" r="1.7" fill="currentColor"/>`,
     help:html`<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M9.3 9.2a2.8 2.8 0 015.3 1c0 1.9-2.6 2-2.6 3.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="17.2" r="1" fill="currentColor"/>`
   };
   var chevL=html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M14 6l-6 6 6 6" stroke="#3A4350" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
@@ -767,7 +1023,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
   function ownerOptions(){ return [['all',VIEW.members.length>2?'Anyone':'Everyone']].concat(ownerChoices()).map(function(o){ return html`<option key=${o[0]} value=${o[0]}>${o[1]}</option>`; }); }
 
   // ---- local copy of a change: the same ops the server applies, replayed over the last server state ----
-  var STORE_KEY={tasks:'tasks',projects:'projects',project_materials:'project_materials',journal:'journal',habits:'habits',topics:'topics',topic_links:'topic_links',notes:'notes',people:'people',spaces:'spaces',members:'members'};
+  var STORE_KEY={tasks:'tasks',projects:'projects',project_materials:'project_materials',journal:'journal',habits:'habits',topics:'topics',topic_links:'topic_links',notes:'notes',people:'people',spaces:'spaces',members:'members',focus_log:'focus_log'};
   function idxOf(a,id){ for(var i=0;i<a.length;i++){ if(a[i].id===id) return i; } return -1; }
   function applyOp(n,op){
     if(op.op==='settings'){ n.settings=Object.assign({},n.settings||{},op.patch); return; }
@@ -813,7 +1069,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     return out;
   }
   function projStats(projId,tasks){
-    var all=(tasks||[]).filter(function(t){return t.project===projId;});
+    var all=(tasks||[]).filter(function(t){return t.project===projId && !t.parent_id;});
     var done=all.filter(function(t){return t.done;}).length;
     return {total:all.length,done:done,pct:all.length?Math.round(done/all.length*100):0};
   }
@@ -993,6 +1249,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var myNotes=(notes||[]).filter(function(n){return n.owner===whoami;});
 
     return html`<${Fragment}>
+      ${props.score?html`<${ScoreStrip} score=${props.score} help=${props.help} onOpen=${props.onOpenWeek} />`:null}
       ${up.length?html`<div class="upnext">
         <div class="upeyebrow">Coming up · soonest first</div>
         <div class="chips">
@@ -1065,11 +1322,17 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
   function Calendar(props){
     var tasks=props.tasks, projects=props.projects;
     var modeS=useState('week'); var mode=modeS[0], setMode=modeS[1];
-    var curS=useState(new Date()); var cur=curS[0], setCur=curS[1];
+    var curS=useState(function(){ return parseYmd(TODAY); }); var cur=curS[0], setCur=curS[1];
     var foS=useState('all'); var fo=foS[0], setFo=foS[1];
     var fpS=useState('all'); var fp=fpS[0], setFp=fpS[1];
     var selS=useState(null); var selId=selS[0], setSel=selS[1];
     var rgS=useState(null); var rg=rgS[0], setRg=rgS[1];
+    var shS=useState(false); var showHours=shS[0], setShowHours=shS[1];
+    var hwRef=useRef(null);
+    // open the hour grid at the first timed item this week, or at the current hour
+    useEffect(function(){ var el=hwRef.current; if(!el) return; var first=null, w0=startOfWeek(cur);
+      for(var k=0;k<7;k++){ timed(ymd(addDays(w0,k))).forEach(function(t){ var hh=+t.time.split(':')[0]; if(first==null||hh<first) first=hh; }); }
+      el.scrollTop=Math.max(0,((first!=null?first:new Date().getHours())-H0)*ROW-24); },[mode, ymd(cur), showHours]);
     var projMap={}; (projects||[]).forEach(function(p){projMap[p.id]=p;});
     var active=(projects||[]).filter(function(p){return !p.archived;});
     var H0=7,H1=22,ROW=48;
@@ -1170,18 +1433,19 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       </div></div>`;
     } else {
       var wsd=startOfWeek(cur); var days=[]; for(var k=0;k<7;k++){ days.push(addDays(wsd,k)); }
+      var anyTimed=days.some(function(dd){ return timed(ymd(dd)).length>0; }), fold=!anyTimed&&!showHours;
       var hours=[]; for(var hh=H0;hh<=H1;hh++){ hours.push(hh); }
       var now=new Date(); var nowFrac=now.getHours()+now.getMinutes()/60;
       var showNow = (ymd(wsd)<=TODAY && TODAY<=ymd(addDays(wsd,6)) && nowFrac>=H0 && nowFrac<=H1);
       main = html`<div class="wkcal"><div class="wkinner">
         <div class="wkcalhd"><div class="wd corner"></div>${days.map(function(dd){ var isT=ymd(dd)===TODAY; return html`<div class=${'wd'+(isT?' today':'')} key=${ymd(dd)}>${DOW[dd.getDay()]}<span class="num">${dd.getDate()}</span></div>`; })}</div>
-        <div class="allday"><div class="lab">all-day</div>${days.map(function(dd){ var ds=ymd(dd);
+        <div class=${'allday'+(fold?' tall':'')}><div class="lab">all-day</div>${days.map(function(dd){ var ds=ymd(dd);
           return html`<div class="adc" key=${ds} onClick=${function(){dayAreaClick(ds);}}>
             ${allday(ds).map(function(t){ var c=colorOf(t); return html`<button class=${'adi'+(t.done?' done':'')} key=${t.id} style=${{borderLeft:'3px solid '+c,background:hexA(c,.1)}} onClick=${function(e){e.stopPropagation();props.onEditTask(t);}}><span class=${'evchk'+(t.done?' on':'')} onClick=${function(e){e.stopPropagation();props.onToggle(t);}}>${t.done?checkMark:''}</span><span class="evtt">${t.title}</span></button>`; })}
             ${dues(ds).map(function(t){ return html`<button class="adi due" key=${'d'+t.id} onClick=${function(e){e.stopPropagation();props.onEditTask(t);}}>⚑ ${t.title}</button>`; })}
           </div>`;
         })}</div>
-        <div class="hwrap"><div class="hgrid">
+        ${fold?html`<div class="nohours">Nothing has a time this week. Give a task a time to see it on the grid. <button class="linkbtn inl" onClick=${function(){setShowHours(true);}}>Show the hours</button></div>`:html`<div class="hwrap" ref=${hwRef}><div class="hgrid">
           <div class="htcol">${hours.map(function(x){return html`<div class="htime" key=${x} style=${{height:ROW+'px'}}>${to12(pad2(x)+':00')}</div>`;})}</div>
           ${days.map(function(dd){ var ds=ymd(dd);
             return html`<div class="hcol" key=${ds}>
@@ -1190,7 +1454,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
             </div>`;
           })}
           ${showNow?html`<div class="nowline" style=${{top:((nowFrac-H0)*ROW)+'px'}}></div>`:null}
-        </div></div>
+        </div></div>`}
       </div></div>`;
     }
 
@@ -1205,51 +1469,6 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       </div>`:null}
       <div class="calsplit">${rail}<div class="calmain">${main}</div></div>
       <p style=${{fontWeight:400,fontSize:'12px',color:'#3C6FB0',margin:'12px 2px 0'}}>${selTask?'Now pick a day or time for it.':'Pick a task on the left to give it a day, or tap any day to add something. Select two days to start a project across them.'}</p>
-    <//>`;
-  }
-
-  // ---- Projects ----
-  function Projects(props){
-    var projects=props.projects, tasks=props.tasks;
-    var active=(projects||[]).filter(function(p){return !p.archived;});
-    var finished=(projects||[]).filter(function(p){return !!p.archived;});
-    var fS=useState(false); var showFin=fS[0], setShowFin=fS[1];
-    function card(p){ var st=projStats(p.id,tasks);
-        var open=Math.max(0,(st.total||0)-(st.done||0));
-        var hasTl=!!(p.start_date&&p.end_date);
-        var tpct=0; if(hasTl){ var a=parseYmd(p.start_date),b=parseYmd(p.end_date),x=parseYmd(TODAY); tpct=Math.max(0,Math.min(1,(x-a)/((b-a)||1)))*100; }
-        var dleft = p.end_date?daysUntil(p.end_date):null;
-        var R=18,C=2*Math.PI*R,off=C*(1-(st.pct||0)/100);
-        var initial=(((p.name||'').trim().charAt(0))||'·').toUpperCase();
-        return html`<button class="projcard" key=${p.id} onClick=${function(){props.onOpen(p.id);}}>
-          <div class="pc-band">
-            <span class="pc-glyph">${initial}</span>
-            <div class="pc-ring">
-              <svg viewBox="0 0 44 44" width="44" height="44"><circle cx="22" cy="22" r=${R} fill="none" stroke="#E2E8F1" stroke-width="4"/><circle class="arc" cx="22" cy="22" r=${R} fill="none" stroke-width="4" stroke-linecap="round" stroke-dasharray=${C} stroke-dashoffset=${off} transform="rotate(-90 22 22)"/></svg>
-              <span class="pct">${st.pct||0}%</span>
-            </div>
-          </div>
-          <div class="pc-body">
-            <div class="pc-name">${p.name||'Untitled project'}</div>
-            <div class="pc-kind">${(p.kind&&p.kind!=='plain')?p.kind:'Project'}</div>
-            ${hasTl?html`<div class="pc-tl">
-              <div class="pc-tlbar"><i style=${{width:tpct+'%'}}></i></div>
-              <div class="pc-tldates"><span>${shortDate(p.start_date)}</span><span>${shortDate(p.end_date)}</span></div>
-            </div>`:html`<div class="pc-tl pc-notl">No timeline yet</div>`}
-            <div class="pc-foot">
-              ${p.archived?html`<span class="pc-due none">Finished</span>`:p.end_date?html`<span class=${'pc-due'+(dleft!=null&&dleft<=14?' soon':'')}>${dleft<0?(-dleft+'d over'):(dleft===0?'Due today':dleft+'d left')}</span>`:html`<span class="pc-due none">No due date</span>`}
-              <span class="pc-open"><${Avatar} owner=${p.owner} cls="avm" /><span class="pc-count">${open?(open+' open'):(st.total?'All done':'No tasks')}</span></span>
-            </div>
-          </div>
-        </button>`;
-    }
-    return html`<${Fragment}>
-      <div class="projgrid">
-        ${active.map(card)}
-        <button class="newproj" onClick=${function(){props.onNew();}}><span style=${{fontSize:'24px',lineHeight:1}}>+</span>New project</button>
-      </div>
-      ${finished.length?html`<div class="finhd"><button class="view" onClick=${function(){setShowFin(!showFin);}}>${showFin?'Hide finished':('Finished · '+finished.length)} ${showFin?'▴':'▾'}</button></div>`:null}
-      ${showFin&&finished.length?html`<div class="projgrid fingrid">${finished.map(card)}</div>`:null}
     <//>`;
   }
 
@@ -1347,101 +1566,6 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
           </div>
         </div>`;
       })}
-    </div>`;
-  }
-
-  // ---- Project side panel ----
-  function ProjectPanel(props){
-    var p=props.project; var tasks=props.tasks, materials=props.materials;
-    var itemS=useState({title:'',due:''}); var ni=itemS[0], setNi=itemS[1];
-    var matS=useState({title:'',url:''}); var nm=matS[0], setNm=matS[1];
-    var subForS=useState(null); var subFor=subForS[0], setSubFor=subForS[1]; // item id to add subtask to
-    var subS=useState({title:'',due:''}); var ns=subS[0], setNs=subS[1];
-    var viewS=useState('list'); var pview=viewS[0], setPview=viewS[1];
-    if(!p) return null;
-    var items=(tasks||[]).filter(function(t){return t.project===p.id && !t.parent_id;});
-    var mats=(materials||[]).filter(function(m){return m.project_id===p.id;});
-    var st=projStats(p.id,tasks);
-    var hasTl=p.start_date&&p.end_date;
-    function sPos(ds){ if(!hasTl) return 0; var a=parseYmd(p.start_date),b=parseYmd(p.end_date),x=parseYmd(ds); var f=(x-a)/((b-a)||1); return Math.max(0,Math.min(1,f))*100; }
-    return html`<div class="pov" onClick=${function(e){if(e.target===e.currentTarget)props.onClose();}}>
-      <div class="ppanel" role="dialog" aria-modal="true">
-        <div class="phd">
-          <div class="phtop">
-            <span class="dot" style=${{background:p.color,width:'12px',height:'12px',marginTop:'7px'}}></span>
-            <h2 class="ptitle">${p.name}</h2>
-            <button class="x" aria-label="Close" onClick=${props.onClose}>×</button>
-          </div>
-          <div class="pmeta">
-            <${Avatar} owner=${p.owner} cls="avm" />
-            <span class="pmeta-t">${relName(p.owner)} · ${p.kind&&p.kind!=='plain'?p.kind:'project'}</span>
-            ${p.archived?html`<span class="pill">Finished</span><button class="view" onClick=${function(){props.onReopen(p.id);}}>Reopen</button>`:null}
-            <button class="view" style=${{marginLeft:'auto'}} onClick=${function(){props.onEdit(p);}}>Edit</button>
-          </div>
-          <div class="pbar" style=${{marginTop:'14px'}}><i style=${{width:st.pct+'%'}}></i></div>
-          <div class="pprog">${st.done} of ${st.total} done · ${st.pct}%</div>
-          <div class="prail">
-            <div class="prow"><span class="k">Deadline</span><span class="v">${p.end_date?shortDate(p.end_date):'—'}</span></div>
-            <div class="prow"><span class="k">Days left</span><span class="v">${p.end_date?(daysUntil(p.end_date)>=0?(daysUntil(p.end_date)+'d'):(-daysUntil(p.end_date)+'d over')):'—'}</span></div>
-            <div class="prow"><span class="k">Started</span><span class="v">${p.start_date?shortDate(p.start_date):'—'}</span></div>
-            <div class="prow"><span class="k">Owner</span><span class="v"><${Avatar} owner=${p.owner} cls="avm" />${relName(p.owner)}</span></div>
-          </div>
-        </div>
-        <div class="pbody">
-          <div class="pvtoggle">
-            <button class=${pview==='list'?'on':''} onClick=${function(){setPview('list');}}>List</button>
-            <button class=${pview==='timeline'?'on':''} onClick=${function(){setPview('timeline');}}>Timeline</button>
-          </div>
-          ${pview==='timeline'?html`<${ProjectTimeline} project=${p} tasks=${tasks} />`:html`<${Fragment}>
-          <div class="psec">
-            <h4>Tasks${items.length?html` · ${items.length}`:''}</h4>
-            ${items.length===0?html`<p style=${{color:'#8A93A0',fontSize:'13px',margin:'2px 0'}}>No tasks yet. Add the pieces of this project below.</p>`:null}
-            ${items.map(function(it){ var subs=childrenOf(tasks,it.id); var sdone=subs.filter(function(s){return s.done;}).length;
-              return html`<div class="irow" key=${it.id}>
-                <${Check} done=${it.done} label=${it.title} onClick=${function(){props.onToggle(it);}} />
-                <div class="ibody">
-                  <div class=${'ititle'+(it.done?' done':'')}>${it.title}</div>
-                  <div class="ameta">
-                    ${it.due?html`<span class="pill due">Due ${shortDate(it.due)}</span>`:null}
-                    <button class="view" onClick=${function(){ setSubFor(subFor===it.id?null:it.id); setNs({title:'',due:''}); }}>${subs.length?(sdone+'/'+subs.length+' subtasks'):'+ subtask'}</button>
-                    <button class="view" onClick=${function(){props.onEditTask(it);}}>Edit</button>
-                  </div>
-                  ${subs.length?html`<div class="subs">${subs.map(function(s){return html`<div class=${'subrow'+(s.done?' done':'')} key=${s.id}><${Check} sm=${true} done=${s.done} onClick=${function(){props.onToggle(s);}} /><span class="slabel">${s.title}</span>${s.due?html`<span class="pill due">${shortDate(s.due)}</span>`:null}</div>`;})}</div>`:null}
-                  ${subFor===it.id?html`<div class="addrow">
-                    <input class="grow" type="text" placeholder="Subtask" value=${ns.title} onInput=${function(e){setNs(Object.assign({},ns,{title:e.target.value}));}} />
-                    <input type="date" value=${ns.due} onInput=${function(e){setNs(Object.assign({},ns,{due:e.target.value}));}} />
-                    <button class="mini" onClick=${function(){ if(ns.title.trim()){ props.onAddSub(it.id,p.id,ns.title,ns.due); setNs({title:'',due:''}); } }}>Add</button>
-                  </div>`:null}
-                </div>
-                <${Avatar} owner=${it.owner} cls="avm" />
-              </div>`;
-            })}
-            <div class="addrow">
-              <input class="grow" type="text" placeholder="New task (e.g. Case study 1)" value=${ni.title} onInput=${function(e){setNi(Object.assign({},ni,{title:e.target.value}));}} />
-              <input type="date" value=${ni.due} onInput=${function(e){setNi(Object.assign({},ni,{due:e.target.value}));}} />
-              <button class="mini" onClick=${function(){ if(ni.title.trim()){ props.onAddItem(p.id,ni.title,ni.due); setNi({title:'',due:''}); } }}>Add</button>
-            </div>
-          </div>
-
-          <div class="psec">
-            <h4>Materials${mats.length?html` · ${mats.length}`:''}</h4>
-            ${mats.length===0?html`<p style=${{color:'#8A93A0',fontSize:'13px',margin:'2px 0'}}>No links yet.</p>`:null}
-            ${mats.map(function(m){ return html`<div class="matrow" key=${m.id}>
-              <span style=${{color:'#AEB6C1'}}>🔗</span>
-              <a href=${m.url} target="_blank" rel="noreferrer noopener">${m.title||m.url}</a>
-              <button class="x" aria-label="Remove" onClick=${function(){props.onDelMaterial(m);}}>×</button>
-            </div>`; })}
-            <div class="addrow">
-              <input type="text" placeholder="Label" style=${{width:'110px'}} value=${nm.title} onInput=${function(e){setNm(Object.assign({},nm,{title:e.target.value}));}} />
-              <input class="grow" type="url" placeholder="https://…" value=${nm.url} onInput=${function(e){setNm(Object.assign({},nm,{url:e.target.value}));}} />
-              <button class="mini" onClick=${function(){ if((nm.url||'').trim()){ props.onAddMaterial(p.id,nm.title,nm.url); setNm({title:'',url:''}); } }}>Add</button>
-            </div>
-          </div>
-
-          ${p.description?html`<div class="psec"><h4>Description</h4><p style=${{fontSize:'14px',lineHeight:1.55,color:'#39414C',margin:0,whiteSpace:'pre-wrap'}}>${p.description}</p></div>`:null}
-          <//>`}
-        </div>
-      </div>
     </div>`;
   }
 
@@ -1570,9 +1694,12 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     // an unsaved draft is kept on this device, so switching tabs (or the app closing) doesn't lose it
     var draftKey='sp_jdraft_'+TODAY+'_'+whoami;
     useEffect(function(){ var local=lsGet(draftKey,null); setDraft(local!=null?local:(todayEntry?(todayEntry.text||''):'')); setTag(todayEntry?(todayEntry.tag||''):''); },[todayEntry&&todayEntry.id, draftKey]);
+    var shS=useState(false); var share=shS[0], setShare=shS[1];
+    useEffect(function(){ setShare(todayEntry?!!todayEntry.space_id:false); },[todayEntry&&todayEntry.id]);
+    var shareChanged=!!todayEntry&&(!!todayEntry.space_id)!==share;
     var savedText=todayEntry?(todayEntry.text||''):'';
     var jstatus = props.pending?(props.offline?'Not sent yet · it saves when you’re back online':'Saving…')
-      : (draft!==savedText?(draft.trim()?'Not saved yet':'') : (todayEntry&&todayEntry.updated_at?('Saved · '+timeOf(todayEntry.updated_at)):''));
+      : ((draft!==savedText||shareChanged)?((draft.trim()||shareChanged)?'Not saved yet':'') : (todayEntry&&todayEntry.updated_at?('Saved · '+timeOf(todayEntry.updated_at)):''));
     var TAGS=[['good','Good day'],['hard','Hard day'],['shipped','Shipped something'],['rest','Rest']];
     var earlier=(entries||[]).slice().sort(function(a,b){return a.date<b.date?1:-1;}).filter(function(e){return !(e.date===TODAY&&e.owner===whoami);});
     var curWeek=ymd(startOfWeek(parseYmd(TODAY)));
@@ -1590,13 +1717,15 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
           <textarea class="ta" placeholder="Start writing…" value=${draft} onInput=${function(e){setDraft(e.target.value); lsSet(draftKey,e.target.value);}}></textarea>
           <div class="tags">
             ${TAGS.map(function(tg){ return html`<button key=${tg[0]} class=${'tagchip'+(tag===tg[0]?' on':'')} onClick=${function(){setTag(tag===tg[0]?'':tg[0]);}}>${tg[1]}</button>`; })}
-            <button class="savebtn" onClick=${function(){props.onSave(draft,tag); lsDel(draftKey);}}>Save entry</button>
+            <button class="savebtn" onClick=${function(){props.onSave(draft,tag,share); lsDel(draftKey);}}>Save entry</button>
           </div>
+          <label class="jshare" for="j-share"><input id="j-share" type="checkbox" checked=${share} onChange=${function(e){setShare(e.target.checked);}} />Share tonight's entry with ${nameOf(otherOf(whoami))}</label>
+          ${!share?html`<div class="jstatus" style=${{marginTop:'4px'}}>Only you can see it. Writing it still earns +${PTS.journal} on the board.</div>`:null}
           ${jstatus?html`<div class="jstatus" aria-live="polite">${jstatus}</div>`:null}
         </section>
         <h3 style=${{fontWeight:600,fontSize:'11px',letterSpacing:'.07em',textTransform:'uppercase',color:'#3C6FB0',margin:'24px 2px 10px'}}>Earlier</h3>
         ${earlier.map(function(e){ var tl=({good:'Good day',hard:'Hard day',shipped:'Shipped something',rest:'Rest'})[e.tag]||''; var tc=e.tag==='hard'?'#C64A3B':(e.tag==='shipped'?'#2E9E6B':'#8A93A0');
-          return html`<section class="card jentry" key=${e.id}><div class="jh"><span style=${{fontWeight:600,fontSize:'13px'}}>${shortDate(e.date)}${e.owner!==whoami?(' · '+nameOf(e.owner)):''}</span>${tl?html`<span style=${{fontWeight:500,fontSize:'11px',color:tc}}>${tl}</span>`:null}</div><p>${e.text}</p></section>`;
+          return html`<section class="card jentry" key=${e.id}><div class="jh"><span style=${{fontWeight:600,fontSize:'13px'}}>${shortDate(e.date)}${e.owner!==whoami?(' · '+nameOf(e.owner)):''}${e.owner===whoami&&!e.space_id?html`<span class="jpriv">Only you</span>`:null}</span>${tl?html`<span style=${{fontWeight:500,fontSize:'11px',color:tc}}>${tl}</span>`:null}</div><p>${e.text}</p></section>`;
         })}
         ${earlier.length===0?html`<p style=${{color:'#8A93A0',fontSize:'13px',padding:'0 2px'}}>Nothing here yet — your first entry is waiting.</p>`:null}
       </div>
@@ -1626,6 +1755,8 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var mine=props.whoami, theirs=otherOf(mine);
     var nmS=useState(function(){ var o={}; o[mine]=((personOf(mine)||{}).name)||''; o[theirs]=((personOf(theirs)||{}).name)||''; return o; }); var nm=nmS[0], setNm=nmS[1];
     var savedS=useState(false); var saved=savedS[0], setSaved=savedS[1];
+    var pwS=useState({cur:'',next:''}); var pw=pwS[0], setPw=pwS[1];
+    var pmS=useState(''); var pwMsg=pmS[0], setPwMsg=pmS[1];
     var notifS=useState((function(){try{return lsGet('sp_notif','')==='1';}catch(e){return false;}})()); var notifOn=notifS[0], setNotifOn=notifS[1];
     function toggleNotif(){ if(notifOn){ setNotifOn(false); lsSet('sp_notif','0'); return; } try{ if(typeof Notification==='undefined'){ setNotifOn(true); lsSet('sp_notif','1'); return; } if(Notification.permission==='granted'){ setNotifOn(true); lsSet('sp_notif','1'); } else { Notification.requestPermission().then(function(p){ var ok=p==='granted'; setNotifOn(ok); lsSet('sp_notif',ok?'1':'0'); }); } }catch(e){} }
     function updNm(k,v){ var o=Object.assign({},nm); o[k]=v; setNm(o); setSaved(false); }
@@ -1638,7 +1769,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
           <div class="meyebrow" style=${{padding:'2px 11px 2px'}}>Settings</div>
           <div class="setgrp">General</div>
           <div class="setnav">
-            <button class=${tab==='people'?'on':''} onClick=${function(){setTab('people');}}>People</button>
+            <button class=${tab==='people'?'on':''} onClick=${function(){setTab('people');}}>Account</button>
             <button class=${tab==='habits'?'on':''} onClick=${function(){setTab('habits');}}>Habits</button>
             <button class=${tab==='notifs'?'on':''} onClick=${function(){setTab('notifs');}}>Notifications</button>
           </div>
@@ -1652,20 +1783,23 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
           </div>
         </div>
         <div class="setbody">
-          <div class="mhd"><h3>${({people:'People',habits:'Habits',notifs:'Notifications',appearance:'Appearance',about:'About & sharing'})[tab]||'Settings'}</h3><button class="x" aria-label="Close" onClick=${props.onClose}>×</button></div>
+          <div class="mhd"><h3>${({people:'Account',habits:'Habits',notifs:'Notifications',appearance:'Appearance',about:'About & sharing'})[tab]||'Settings'}</h3><button class="x" aria-label="Close" onClick=${props.onClose}>×</button></div>
           ${tab==='people'?html`<${Fragment}>
-            <label class="lbl" style=${{marginTop:0}}>This device</label>
-            <div class="devrow">
-              <span class="av avm" style=${{background:personColor(mine)}}>${initialOf(mine)}</span>
-              <span class="devt">This device is <b>${nameOf(mine)}</b></span>
-              <button class="gbtn" onClick=${function(){props.onSwitchWho(theirs);}}>Switch to ${nameOf(theirs)}</button>
+            <label class="lbl" style=${{marginTop:0}} for="acct-name">Your name</label>
+            <div style=${{display:'flex',alignItems:'center',gap:'10px'}}><span class="av avm" style=${{background:personColor(mine)}}>${myLabel.charAt(0).toUpperCase()}</span><input class="fld" id="acct-name" type="text" value=${nm[mine]} onInput=${function(e){updNm(mine,e.target.value);}} /><button class="btn ghost" style=${{flex:'none',padding:'9px 14px'}} disabled=${!(nm[mine]||'').trim()} onClick=${function(){props.onSaveName((nm[mine]||'').trim());setSaved(true);}}>Save</button></div>
+            ${saved?html`<div class="jstatus" style=${{color:'#1D6842'}}>Saved ✓</div>`:null}
+            <div class="lbl">Username</div>
+            <div style=${{fontSize:'14px',fontWeight:600}}>${props.me&&props.me.username?('@'+props.me.username):'—'}</div>
+            <div class="lbl">Change password</div>
+            <div style=${{display:'flex',flexDirection:'column',gap:'8px',maxWidth:'360px'}}>
+              <label class="sr" for="acct-cur">Current password</label><${PasswordField} id="acct-cur" value=${pw.cur} placeholder="Current password" onInput=${function(v){setPw(Object.assign({},pw,{cur:v}));setPwMsg('');}} />
+              <label class="sr" for="acct-new">New password</label><${PasswordField} id="acct-new" value=${pw.next} placeholder="New password, at least 8 characters" autocomplete="new-password" onInput=${function(v){setPw(Object.assign({},pw,{next:v}));setPwMsg('');}} />
+              <button class="btn ghost" style=${{flex:'none',alignSelf:'flex-start',padding:'9px 14px'}} disabled=${!pw.cur||pw.next.length<8} onClick=${function(){ props.onChangePassword(pw.cur,pw.next).then(function(res){ if(res.ok){ setPw({cur:'',next:''}); setPwMsg('ok'); } else setPwMsg(res.j.error==='locked'?'locked':(res.j.error==='short_password'?'short':'wrong')); },function(){ setPwMsg('net'); }); }}>Change password</button>
+              ${pwMsg?html`<div class=${pwMsg==='ok'?'jstatus':'autherr'} style=${pwMsg==='ok'?{color:'#1D6842'}:null}>${({ok:'Password changed.',wrong:'Your current password doesn’t match.',short:'Use at least 8 characters.',locked:'Too many wrong tries. Wait a minute, then try again.',net:'Can’t reach the server. Try again.'})[pwMsg]}</div>`:null}
             </div>
-            <p style=${{margin:'8px 0 4px',fontWeight:400,fontSize:'12.5px',color:'#8A93A0'}}>Each phone or laptop is set once. Switching changes whose tasks show as “You” here.</p>
-            <label class="lbl">Your name</label>
-            <div style=${{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}}><span class="av avm" style=${{background:personColor(mine)}}>${myLabel.charAt(0).toUpperCase()}</span><input class="fld" type="text" value=${nm[mine]} placeholder=${nameOf(mine)} onInput=${function(e){updNm(mine,e.target.value);}} /></div>
-            <label class="lbl">Their name</label>
-            <div style=${{display:'flex',alignItems:'center',gap:'10px'}}><span class="av avm" style=${{background:personColor(theirs)}}>${pLabel.charAt(0).toUpperCase()}</span><input class="fld" type="text" value=${nm[theirs]} placeholder=${nameOf(theirs)} onInput=${function(e){updNm(theirs,e.target.value);}} /></div>
-            <div style=${{display:'flex',alignItems:'center',gap:'14px',marginTop:'18px'}}><button class="btn primary" style=${{flex:'none',padding:'10px 22px'}} onClick=${function(){props.onSaveNames(nm);setSaved(true);}}>Save</button>${saved?html`<span style=${{fontWeight:600,fontSize:'13px',color:'#2E9E6B'}}>Saved ✓</span>`:null}</div>
+            <div class="lbl">People in this space</div>
+            ${(props.members||[]).map(function(m){ var pp=personOf(m)||{}; return html`<div class="devrow" key=${m} style=${{padding:'5px 0'}}><${Avatar} owner=${m} cls="avm" /><span class="devt">${m===mine?(nameOf(m)+' (you)'):nameOf(m)}</span><span class=${'pill'+(pp.claimed?' okp':'')}>${pp.claimed?'Has a sign-in':'Not set up yet'}</span></div>`; })}
+            <div style=${{marginTop:'18px',paddingTop:'14px',borderTop:'1px solid #EEF2F7'}}><button class="btn ghost" style=${{flex:'none',padding:'9px 16px'}} onClick=${props.onSignOut}>Sign out</button></div>
           <//>`:null}
           ${tab==='habits'?html`<${Fragment}>
             <p style=${{margin:'0 0 10px',fontWeight:400,fontSize:'13px',color:'#8A93A0'}}>Daily habits — a checkbox, or a counter with a goal. They show on Today.</p>
@@ -1728,24 +1862,6 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     </div>`;
   }
 
-  // ---- Gate ----
-  function Gate(props){
-    var pS=useState(''); var pass=pS[0], setPass=pS[1];
-    var eS=useState(''); var err=eS[0], setErr=eS[1];
-    var bS=useState(false); var busy=bS[0], setBusy=bS[1];
-    function submit(e){ if(e)e.preventDefault(); if(!pass.trim())return; setBusy(true); setErr('');
-      apiPost('/api/login',{passcode:pass}).then(function(r){ return r.json().then(function(j){return {ok:r.ok,j:j};}); })
-      .then(function(res){ setBusy(false); if(res.ok&&res.j&&res.j.ok){ props.onIn(); } else { setErr((res.j&&res.j.error)||'Wrong passcode.'); setPass(''); } })
-      .catch(function(){ setBusy(false); setErr('Network error — try again.'); });
-    }
-    return html`<div class="gate"><form class="gatecard" onSubmit=${submit}>
-      <span class="brand">SP</span><h1>Shared Planner</h1><p class="lead">Pop in the passcode you two share.</p>
-      <input type="password" autofocus value=${pass} onInput=${function(e){setPass(e.target.value);}} placeholder="Passcode" />
-      <div class="err">${err}</div>
-      <button class="btn primary" style=${{width:'100%'}} disabled=${busy} type="submit">${busy?'Checking…':'Enter'}</button>
-    </form></div>`;
-  }
-
   // ---- onboarding bits ----
   function hexA(h,a){ h=(h||'#1F6FEB').replace('#',''); if(h.length===3)h=h.split('').map(function(x){return x+x;}).join(''); var n=parseInt(h,16); return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')'; }
   var svgCheck2=html`<path d="M4 12.5l5 5 11-11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
@@ -1759,12 +1875,13 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     {c:'#2E9E6B',g:icons.calendar,t:'Calendar',d:'See your days at a glance. Tap any day to drop in a task or a plan.'},
     {c:'#C2704B',g:svgFlame,t:'Habits',d:'Keep the small daily promises — reading, cutting back — and watch the streak grow.'},
     {c:'#7A5BD8',g:icons.journal,t:'Journal & notes',d:'End the day with a few honest words, and keep little notes as they come.'},
+    {c:'#B4792B',g:icons.week,t:'This week',d:'Finishing things earns points. See who\'s ahead, and who could use a hand.'},
     {c:'#5B6B86',g:svgPeople,t:'Yours · theirs · both',d:'Mark anything as yours, theirs, or for both of you — you\'ll both see it, live.'}
   ];
   function Intro(props){
     return html`<div class="overlay" onClick=${function(e){if(e.target===e.currentTarget)props.onClose();}}>
       <div class="modal" role="dialog" aria-modal="true" style=${{maxWidth:'460px'}}>
-        <div class="mhd"><div><div class="meyebrow">Welcome</div><h3>How Shared Planner works</h3></div><button class="x" aria-label="Close" onClick=${props.onClose}>×</button></div>
+        <div class="mhd"><div><div class="meyebrow">Welcome</div><h3>How hate club works</h3></div><button class="x" aria-label="Close" onClick=${props.onClose}>×</button></div>
         <p style=${{margin:'2px 0 8px',fontWeight:400,fontSize:'13px',color:'#5A616B'}}>Your little shared corner, just the two of you. Here's the gist:</p>
         ${INTRO.map(function(r){ return html`<div class="introrow" key=${r.t}><${IconBadge} color=${r.c}>${r.g}<//><div><div class="it">${r.t}</div><div class="id">${r.d}</div></div></div>`; })}
         <div class="mactions" style=${{marginTop:'16px'}}><button class="btn primary" onClick=${props.onClose}>Got it</button></div>
@@ -1800,30 +1917,6 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     </div>`;
   }
 
-  // ---- first run on a device: who is holding it ----
-  function WhoModal(props){
-    var aS=useState(null); var asking=aS[0], setAsking=aS[1];   // the person whose name we're asking for
-    var vS=useState(''); var v=vS[0], setV=vS[1];
-    var members=props.members||[];
-    var first=members.length?nameOf(members[0]):'';
-    function unset(id){ var n=(((personOf(id)||{}).name)||'').trim(); return !n || n==='Partner'; }
-    return html`<div class="overlay whoov">
-      <div class="modal whomodal" role="dialog" aria-modal="true" aria-labelledby="whottl">
-        <div class="meyebrow">Welcome</div>
-        <h3 id="whottl" class="whottl">Who’s this?</h3>
-        <p class="whosub">So the app knows which tasks are yours. Each phone or laptop asks once — you can change it in Settings.</p>
-        ${!asking?html`<div class="whocards">${members.map(function(id){ var un=unset(id); return html`<button key=${id} class="whocard" onClick=${function(){ if(un) setAsking(id); else props.onPick(id); }}>
-            <span class="av whoav" style=${{background:personColor(id)}}>${un?'?':initialOf(id)}</span>
-            <span class="whon">${un?('Not '+first+'?'):nameOf(id)}</span><span class="whos">${un?'Tap and add your name':'That’s me'}</span>
-          </button>`; })}</div>`:html`<form onSubmit=${function(e){ e.preventDefault(); if(v.trim()) props.onPick(asking,v.trim()); }}>
-          <label class="lbl" for="who-name">Your name</label>
-          <input class="fld" id="who-name" type="text" autofocus value=${v} placeholder="Your first name" onInput=${function(e){setV(e.target.value);}} />
-          <div class="mactions"><button type="button" class="btn ghost" onClick=${function(){setAsking(null);}}>Back</button><button type="submit" class="btn primary" disabled=${!v.trim()}>Continue</button></div>
-        </form>`}
-      </div>
-    </div>`;
-  }
-
   // ---- confirm before a delete that takes a lot with it ----
   function ConfirmModal(props){
     return html`<div class="overlay confirmov" onClick=${function(e){if(e.target===e.currentTarget)props.onClose();}}>
@@ -1839,16 +1932,532 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     </div>`;
   }
 
+  // ---- points: who's ahead this week (Mon–Sun; a day turns at 4am) ----
+  var PTS={task:10,sub:3,ontime:5,help:5,habit:2,journal:2,focus:3};
+  var WEEK_GOAL=100;
+  var crownGlyph=html`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 18l-1-10 5 4 4-7 4 7 5-4-1 10z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>`;
+  var flagGlyph=html`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 21V4M6 4h10l-2 3.5L16 11H6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  function mondayOf(ds){ var d=parseYmd(ds); return ymd(addDays(d,-((d.getDay()+6)%7))); }
+  function weekDates(ws){ var out=[]; for(var i=0;i<7;i++) out.push(ymd(addDays(parseYmd(ws),i))); return out; }
+  function dayOfMs(ms){ return ymd(new Date(ms-DAY_START_HOUR*3600000)); }
+  function weekRange(ws){ var a=parseYmd(ws), b=addDays(a,6); return 'Mon '+a.getDate()+(a.getMonth()!==b.getMonth()?(' '+MON[a.getMonth()].slice(0,3)):'')+' – Sun '+b.getDate()+' '+MON[b.getMonth()].slice(0,3); }
+  function taskPoints(t,doneDay,by){ var onTime=!!t.due&&doneDay<=t.due, helped=t.owner!==by; return {n:(t.parent_id?PTS.sub:PTS.task)+(onTime?PTS.ontime:0)+(helped?PTS.help:0),onTime:onTime,helped:helped}; }
+  // everything a person earned in one week, from what's in the space
+  function scoreWeek(d,ws){
+    var days=weekDates(ws), at={}; days.forEach(function(x,i){ at[x]=i; });
+    var P={}; d.members.forEach(function(m){ P[m]={id:m,points:0,byDay:[0,0,0,0,0,0,0],done:0,subs:0,onTime:0,help:0,habit:0,journal:0,focus:0,events:[],habitDay:[0,0,0,0,0,0,0],habitTotal:0}; });
+    function add(pid,i,n,ev){ var p=P[pid]; if(!p||i==null) return; p.points+=n; p.byDay[i]+=n; p.events.push(Object.assign({day:days[i],pts:n},ev)); }
+    (d.tasks||[]).forEach(function(t){ if(!t.done||!t.done_at||!t.done_by||isEventType(t.type)) return; var day=dayOfMs(t.done_at), i=at[day]; if(i==null) return;
+      var r=taskPoints(t,day,t.done_by), p=P[t.done_by]; if(p){ if(t.parent_id)p.subs++; else p.done++; if(r.onTime)p.onTime++; if(r.helped)p.help++; }
+      add(t.done_by,i,r.n,{kind:'task',title:t.title,onTime:r.onTime,helped:r.helped}); });
+    var hb={}; (d.habits||[]).forEach(function(h){ if(!h.archived&&P[h.owner]){ hb[h.id]=h; P[h.owner].habitTotal++; } });
+    (d.habitLogs||[]).forEach(function(l){ var h=hb[l.habit], i=at[l.date]; if(!h||i==null||l.date>TODAY) return;
+      var kept=h.kind==='count'?(h.target==null?l.value>0:l.value<=h.target):l.value>0; if(!kept) return;
+      P[h.owner].habit++; P[h.owner].habitDay[i]++; add(h.owner,i,PTS.habit,{kind:'habit',title:h.name}); });
+    (d.journal||[]).forEach(function(j){ var i=at[j.date]; if(i==null||!P[j.owner]) return; P[j.owner].journal++; add(j.owner,i,PTS.journal,{kind:'journal',title:'Wrote the journal'}); });
+    (d.focusLog||[]).forEach(function(f){ var i=at[dayOfMs(f.ended_at)]; if(i==null||!P[f.person_id]) return; P[f.person_id].focus++; add(f.person_id,i,PTS.focus,{kind:'focus',title:'Finished a '+(f.minutes||25)+'-min focus'}); });
+    var ranked=d.members.map(function(m){ return P[m]; }).sort(function(a,b){ return b.points-a.points; });
+    return {ws:ws,days:days,people:P,ranked:ranked,leader:(ranked.length>1&&ranked[0].points>ranked[1].points)?ranked[0].id:null};
+  }
+  // planned for this week (a day or a deadline in it), owned by one person
+  function weekWork(tasks,ws,pid){ var we=ymd(addDays(parseYmd(ws),6)); return (tasks||[]).filter(function(t){ if(isEventType(t.type)||(pid&&t.owner!==pid)) return false; var dd=t.date||t.due; return !!dd&&dd>=ws&&dd<=we; }); }
+  function overdueOf(tasks,pid){ return (tasks||[]).filter(function(t){ return !t.done&&!isEventType(t.type)&&t.owner===pid&&((t.date&&t.date<TODAY)||(t.due&&t.due<TODAY)); }); }
+  // 3+ overdue, or under half of the week's tasks by Thursday
+  function needsHand(tasks,ws,pid,dayIdx){ var od=overdueOf(tasks,pid); if(od.length>=3) return {why:'overdue',list:od};
+    var w=weekWork(tasks,ws,pid), done=w.filter(function(t){return t.done;}).length;
+    if(dayIdx>=3&&w.length>=2&&done<w.length/2) return {why:'behind',list:w.filter(function(t){return !t.done;})}; return null; }
+  function weeksWon(d){ var first=null; (d.tasks||[]).forEach(function(t){ if(t.done_at&&(first==null||t.done_at<first)) first=t.done_at; });
+    var won={}; d.members.forEach(function(m){ won[m]=0; }); if(first==null) return won;
+    var ws=mondayOf(dayOfMs(first)), cur=mondayOf(TODAY), guard=0;
+    while(ws<cur&&guard++<104){ var r=scoreWeek(d,ws); if(r.leader) won[r.leader]++; ws=ymd(addDays(parseYmd(ws),7)); }
+    return won; }
+  // teams keep scores off unless they turn them on
+  function scoresOn(space){ return !space||space.kind!=='team'||!!space.scores; }
+
+  // the slim line on Today: who's ahead, tap for the week
+  function ScoreStrip(props){ var sc=props.score, me=sc.people[VIEW.who], ot=sc.people[otherOf(VIEW.who)]; if(!me||!ot) return null;
+    var lead=sc.leader, gap=Math.abs(me.points-ot.points);
+    var pill=lead===VIEW.who?('You’re ahead by '+gap):(lead?(nameOf(lead)+' is ahead by '+gap):(me.points?'Level':'A fresh week'));
+    return html`<button type="button" class="scorestrip" onClick=${props.onOpen}>
+      <span class=${'crownp'+(lead?'':' calm')}>${lead?crownGlyph:null}${pill}</span>
+      <span class="sstxt">You ${me.points} · ${nameOf(ot.id)} ${ot.points}</span>
+      <span class="ssbars" aria-hidden="true"><span class="ssr"><i style=${{width:Math.min(100,me.points/WEEK_GOAL*100)+'%',background:personColor(me.id)}}></i></span><span class="ssr"><i style=${{width:Math.min(100,ot.points/WEEK_GOAL*100)+'%',background:personColor(ot.id)}}></i></span></span>
+      ${props.help?html`<span class="sshelp">${nameOf(props.help)} could use a hand</span>`:null}
+      <span class="ssgo">See the week <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </button>`; }
+
+  // ---- This week ----
+  function WeekPage(props){
+    var d=props.data, tasks=d.tasks, projects=props.projects||[];
+    var wS=useState('this'); var which=wS[0], setWhich=wS[1];
+    var ws=which==='this'?mondayOf(TODAY):ymd(addDays(parseYmd(mondayOf(TODAY)),-7));
+    var sc=scoreWeek(d,ws), days=sc.days, P=sc.people, members=d.members;
+    var dayIdx=which==='this'?Math.max(0,days.indexOf(TODAY)):6;
+    var pace=Math.round((dayIdx+1)/7*WEEK_GOAL);
+    var won=weeksWon(d);
+    var projMap={}; projects.forEach(function(p){ projMap[p.id]=p; });
+    var anything=sc.ranked.some(function(p){ return p.points>0; });
+    var helps=which==='this'?members.filter(function(m){ return m!==VIEW.who; }).map(function(m){ var h=needsHand(tasks,ws,m,dayIdx); return h?{id:m,h:h}:null; }).filter(Boolean):[];
+    var last=which==='this'?scoreWeek(d,ymd(addDays(parseYmd(ws),-7))):null;
+    // points so far: one line per person, plus the pace to 100 by Sunday
+    var narrow=typeof window!=='undefined'&&window.innerWidth<640;
+    var W=narrow?340:600,H=narrow?190:210,L=30,R=narrow?54:20,T=18,B=28, x=function(i){ return L+i*(W-L-R)/6; };
+    var cum={}; members.forEach(function(m){ var c=0; cum[m]=P[m].byDay.map(function(v){ c+=v; return c; }); });
+    var top=Math.max(WEEK_GOAL,Math.max.apply(null,members.map(function(m){ return cum[m][6]; }).concat([0])));
+    var y=function(v){ return T+(H-T-B)*(1-v/top); };
+    var lines=members.map(function(m){ return {id:m,pts:cum[m].slice(0,dayIdx+1).map(function(v,i){ return x(i)+','+y(v).toFixed(1); }).join(' '),end:cum[m][dayIdx],ly:y(cum[m][dayIdx])}; });
+    // end labels: keep at least 15px apart when the scores are close
+    lines.slice().sort(function(a,b){ return a.ly-b.ly; }).forEach(function(l,i,arr){ if(i&&l.ly-arr[i-1].ly<15) l.ly=arr[i-1].ly+15; });
+    // points by day: bars per person
+    var dmax=Math.max(10,Math.max.apply(null,members.map(function(m){ return Math.max.apply(null,P[m].byDay); })));
+    // tasks planned this week, and what's still open
+    var planned=weekWork(tasks,ws,null), doneN=planned.filter(function(t){return t.done;}).length;
+    var open=(tasks||[]).filter(function(t){ if(t.done||isEventType(t.type)) return false; var dd=t.date||t.due; var overdue=(t.date&&t.date<TODAY)||(t.due&&t.due<TODAY); return overdue||(dd&&dd>=ws&&dd<=days[6]); });
+    open.sort(function(a,b){ var ao=((a.date&&a.date<TODAY)||(a.due&&a.due<TODAY))?0:1, bo=((b.date&&b.date<TODAY)||(b.due&&b.due<TODAY))?0:1; if(ao!==bo) return ao-bo; var ak=a.due||a.date||'', bk=b.due||b.date||''; return ak<bk?-1:ak>bk?1:0; });
+    var overdueOpen=open.filter(function(t){ return (t.date&&t.date<TODAY)||(t.due&&t.due<TODAY); }).length;
+    var pct=planned.length?Math.round(doneN/planned.length*100):0;
+    var dayNames=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    return html`<div class="week">
+      <div class="wkhd"><span class="muted">${weekRange(ws)} · ${which==='this'?('day '+(dayIdx+1)+' of 7'):'last week'}</span>
+        <div class="segc" role="group" aria-label="Week"><button type="button" class=${which==='this'?'on':''} onClick=${function(){setWhich('this');}}>This week</button><button type="button" class=${which==='last'?'on':''} onClick=${function(){setWhich('last');}}>Last week</button></div></div>
+
+      <section class="wbox race" aria-label="Race to 100 by Sunday">
+        <div class="wboxh"><div><h2>Race to ${WEEK_GOAL} by Sunday</h2><p class="muted">${which==='this'?('Today is day '+(dayIdx+1)+' of 7, so '+pace+' points is on pace (the dashed line).'):'How last week ended.'}</p></div>
+          ${sc.leader?html`<span class="crownp">${crownGlyph}${sc.leader===VIEW.who?'You lead':(nameOf(sc.leader)+' leads')} by ${sc.ranked[0].points-sc.ranked[1].points}</span>`:html`<span class="crownp calm">${anything?'Level':'Nobody has scored yet'}</span>`}</div>
+        <div class="track">
+          <span class="goal">${flagGlyph}${WEEK_GOAL}</span>
+          ${which==='this'?html`<span class="pace" style=${{left:Math.min(100,pace)+'%'}} title=${'On pace · '+pace}></span>`:null}
+          ${members.map(function(m){ var v=P[m].points, at=Math.min(100,v/WEEK_GOAL*100); return html`<div class="ln" key=${m}><span class="lnlab"><${Avatar} owner=${m} cls="avm" />${relName(m)}</span><span class="rail"></span><span class="fill" style=${{width:at+'%',background:personColor(m)}}></span><span class="runner" style=${{left:at+'%'}}><span class="rv">${v}</span><${Avatar} owner=${m} cls="avl" /></span></div>`; })}
+        </div>
+        <div class="ticks"><span style=${{left:'0%'}}>0</span><span style=${{left:'25%'}}>25</span><span style=${{left:'50%'}}>50</span><span style=${{left:'75%'}}>75</span><span style=${{left:'100%'}}>100</span></div>
+      </section>
+
+      ${helps.map(function(x){ return html`<div class="helpcard" key=${x.id}>
+        <span class="hg" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 21a7 7 0 100-14 7 7 0 000 14zM12 10v4l2.5 1.5M12 3v2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+        <div class="ht"><b>${nameOf(x.id)} could use a hand</b><p>${x.h.why==='overdue'?(x.h.list.length+' overdue: '):'Behind on this week: '}${x.h.list.slice(0,3).map(function(t){return t.title;}).join(' · ')}${x.h.list.length>3?(' and '+(x.h.list.length-3)+' more'):''}</p></div>
+        <button type="button" class="btn primary hbtn" onClick=${function(){props.onTakeOne(x.h.list[0]);}}>Take one</button>
+        <button type="button" class="btn ghost hbtn" onClick=${function(){props.onCheer(x.id);}}>Send a cheer</button>
+      </div>`; })}
+      ${which==='this'&&!anything?html`<div class="freshcard"><div><b>A fresh week. The first tick takes the lead.</b><p class="muted">Finish a task for +${PTS.task}, on time for +${PTS.ontime} more, and help with one of theirs for +${PTS.help}.</p></div>${last&&last.leader?html`<span class="crownp">${crownGlyph}Last week: ${last.leader===VIEW.who?'you':nameOf(last.leader)} won ${last.ranked[0].points}–${last.ranked[1].points}</span>`:null}</div>`:null}
+
+      <div class="dash">
+        <section class="w span2" aria-label="Points so far">
+          <div class="wboxh"><span class="wt">Points so far</span><span class="muted small">${members.map(function(m){ return relName(m)+' '+P[m].points; }).join(' · ')}</span></div>
+          <svg viewBox=${'0 0 '+W+' '+H} width="100%" style=${{height:'auto',display:'block'}} role="img" aria-label=${'Points so far: '+members.map(function(m){return relName(m)+' '+P[m].points;}).join(', ')}>
+            ${[0,top/2,top].map(function(v){ return html`<g key=${v}><line x1=${L} x2=${W-R} y1=${y(v)} y2=${y(v)} stroke="#E5EAF1" stroke-dasharray="3 4"></line><text x=${L-8} y=${y(v)+4} text-anchor="end" font-size="10.5" fill="#4B5866">${Math.round(v)}</text></g>`; })}
+            ${which==='this'?html`<line x1=${x(0)} y1=${y(WEEK_GOAL/7)} x2=${x(6)} y2=${y(WEEK_GOAL)} stroke="#3C6FB0" stroke-width="1.5" stroke-dasharray="5 5"></line>`:null}
+            ${lines.map(function(l){ return html`<g key=${l.id}><polyline points=${l.pts} fill="none" stroke=${personColor(l.id)} stroke-width="3" stroke-linejoin="round" stroke-linecap="round"></polyline><circle cx=${x(dayIdx)} cy=${y(l.end)} r="5" fill=${personColor(l.id)} stroke="#fff" stroke-width="2"></circle><text x=${x(dayIdx)+((dayIdx<5||narrow)?10:-10)} y=${l.ly+4} text-anchor=${(dayIdx<5||narrow)?'start':'end'} font-size="12" font-weight="700" fill="#15171A">${relName(l.id)} ${l.end}</text></g>`; })}
+            ${dayNames.map(function(n,i){ return html`<text key=${n} x=${x(i)} y=${H-6} text-anchor="middle" font-size="11" font-weight="600" fill=${i===dayIdx&&which==='this'?'#195FD0':'#4B5866'}>${n}</text>`; })}
+          </svg>
+        </section>
+        <section class="w" aria-label="Leaderboard">
+          <span class="wt">This week</span>
+          <ol class="lboard">${sc.ranked.map(function(p,i){ return html`<li key=${p.id}><span class="rank">${i+1}</span><${Avatar} owner=${p.id} cls="avm" /><span class="lbn">${relName(p.id)}</span>${sc.leader===p.id?html`<span class="crownp">${crownGlyph}${p.points}</span>`:html`<span class="lbp">${p.points}</span>`}</li>`; })}</ol>
+          <p class="muted small" style=${{margin:'10px 0 0'}}>Weeks won · ${members.map(function(m){ return relName(m)+' '+won[m]; }).join(' – ')}</p>
+          <p class="muted small" style=${{margin:'6px 0 0'}}>${members.map(function(m){ var p=P[m]; return relName(m)+': '+p.done+' done'+(p.onTime?(', '+p.onTime+' on time'):''); }).join(' · ')}</p>
+        </section>
+        <section class="w span2" aria-label="Points by day">
+          <span class="wt">Points by day</span>
+          <div class="bchart">${days.map(function(ds,i){ var future=which==='this'&&i>dayIdx; return html`<div class="bday" key=${ds}>
+            ${future?html`<span class="bfut"></span>`:members.map(function(m){ var v=P[m].byDay[i]; return html`<span key=${m} class="bbar" style=${{height:(v/dmax*120)+'px',background:personColor(m)}}>${v?html`<span class="bv">${v}</span>`:null}</span>`; })}
+          </div>`; })}</div>
+          <div class="bdays">${dayNames.map(function(n,i){ return html`<span key=${n} class=${i===dayIdx&&which==='this'?'t':''}>${n}</span>`; })}</div>
+          <div class="bkey">${members.map(function(m){ return html`<span key=${m}><i style=${{background:personColor(m)}}></i>${relName(m)}</span>`; })}</div>
+        </section>
+        <section class="w" aria-label="Habits kept">
+          <span class="wt">Habits kept</span>
+          <div class="habk">${members.map(function(m){ var p=P[m]; return html`<div class="hkrow" key=${m}><${Avatar} owner=${m} cls="avm" /><span class="hkn">${relName(m)}</span>
+            <span class="hkd">${days.map(function(ds,i){ var fut=which==='this'&&i>dayIdx; var k=p.habitTotal?p.habitDay[i]/p.habitTotal:0; return html`<span key=${ds} title=${dayNames[i]+(fut?'':(': '+p.habitDay[i]+' of '+p.habitTotal))} class=${'hk'+(fut?' f':(k>=1?' k':(k>0?' s':'')))}></span>`; })}</span></div>`; })}</div>
+          <p class="muted small" style=${{margin:'10px 0 0'}}>Filled: every habit kept that day · light: some.</p>
+        </section>
+        <section class="w" aria-label="Tasks this week">
+          <span class="wt">Tasks this week</span>
+          <div class="donutrow"><div class="donut" style=${{background:'conic-gradient(#1F6FEB 0 '+pct+'%,#E3E9F1 '+pct+'% 100%)'}} role="img" aria-label=${doneN+' of '+planned.length+' done'}><span><b>${planned.length}</b><small>tasks</small></span></div>
+            <div class="dleg"><span><i style=${{background:'#1F6FEB'}}></i>Done <b>${doneN}</b></span><span><i style=${{background:'#E3E9F1'}}></i>Not done <b>${planned.length-doneN}</b></span>${overdueOpen?html`<span class="muted small">${overdueOpen} overdue</span>`:null}</div></div>
+        </section>
+        <section class="w span2" aria-label="Still open">
+          <div class="wboxh"><span class="wt">Still open · ${open.length}</span></div>
+          ${open.length?html`<div class="otbl">${open.slice(0,12).map(function(t){ var p=projMap[t.project]; var od=(t.date&&t.date<TODAY)||(t.due&&t.due<TODAY); return html`<div class="orow" key=${t.id}>
+            <span class="oc"><${Check} done=${t.done} label=${t.title} onClick=${function(){props.onToggle(t);}} /><span class="ot">${t.title}</span></span>
+            <span class="oc"><${Avatar} owner=${t.owner} cls="avm" /><span class="small">${relName(t.owner)}</span></span>
+            <span class="oc small">${p?html`<span class="dot" style=${{background:p.color}}></span>${p.name}`:html`<span class="muted">—</span>`}</span>
+            <span class="oc small tnum">${shortDate(t.due||t.date)}</span>
+            <span class="oc">${od?html`<span class="pill due over">Overdue</span>`:html`<span class="pill">To do</span>`}</span>
+          </div>`; })}</div>`:html`<p class="muted small" style=${{margin:'10px 0 0'}}>Nothing open this week.</p>`}
+        </section>
+      </div>
+    </div>`;
+  }
+
+  // ---- Projects: one page, four views (Table · Lanes · Timeline · Cards) ----
+  var PVIEWS=[
+    ['table','Table',html`<path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`],
+    ['lanes','Lanes',html`<rect x="3.5" y="4" width="5" height="16" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="9.5" y="4" width="5" height="11" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="15.5" y="4" width="5" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7"/>`],
+    ['timeline','Timeline',html`<path d="M4 7h9M8 12h11M6 17h7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>`],
+    ['cards','Cards',html`<rect x="4" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="13" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="4" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="13" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7"/>`]
+  ];
+  var kebabGlyph=html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/></svg>`;
+  function nextUp(pid,tasks){ var open=(tasks||[]).filter(function(t){ return t.project===pid&&!t.parent_id&&!t.done&&!isEventType(t.type); });
+    open.sort(function(a,b){ var ak=a.due||a.date||'9999', bk=b.due||b.date||'9999'; return ak<bk?-1:ak>bk?1:0; }); return open[0]||null; }
+  // "7 days" amber within 2 weeks, "3d over" red, grey further out
+  function leftChip(ds){ if(!ds) return null; var n=daysUntil(ds); return {cls:n<0?'due over':(n<=14?'due':''),txt:n<0?((-n)+'d over'):(n===0?'Due today':(n===1?'1 day':n+' days'))}; }
+  function soonChip(ds){ if(!ds) return null; var n=daysUntil(ds); return {cls:n<0?'due over':(n<=2?'due':''),txt:n<0?'overdue':(n===0?'today':(n===1?'tomorrow':shortDate(ds)))}; }
+  function kindLabel(p){ return (p.kind&&p.kind!=='plain'&&p.kind!=='project')?(p.kind==='branding'?'Branding':(p.kind==='course'?'Course':p.kind)):'Project'; }
+
+  function Projects(props){
+    var projects=props.projects||[], tasks=props.tasks;
+    var vS=useState(lsGet('sp_pview','table')); var pv=vS[0], setPv=vS[1];
+    var fS=useState('active'); var fstat=fS[0], setFstat=fS[1];
+    var oS=useState('all'); var fown=oS[0], setFown=oS[1];
+    var sS=useState('deadline'); var sort=sS[0], setSort=sS[1];
+    function setView(v){ setPv(v); lsSet('sp_pview',v); }
+    var list=projects.filter(function(p){ if(fstat==='active'&&p.archived) return false; if(fstat==='finished'&&!p.archived) return false;
+      if(fown!=='all'&&p.owner!==fown&&!(fown!==EVERYONE&&p.owner===EVERYONE)) return false; return true; });
+    var stats={}; list.forEach(function(p){ stats[p.id]=projStats(p.id,tasks); });
+    var byDeadline=function(a,b){ var ak=a.end_date||'9999', bk=b.end_date||'9999'; return ak<bk?-1:ak>bk?1:((a.name||'')<(b.name||'')?-1:1); };
+    list.sort(sort==='progress'?function(a,b){ return stats[b.id].pct-stats[a.id].pct||byDeadline(a,b); }:sort==='name'?function(a,b){ return (a.name||'').toLowerCase()<(b.name||'').toLowerCase()?-1:1; }:sort==='newest'?function(a,b){ return (b.created_at||0)-(a.created_at||0); }:byDeadline);
+    var active=projects.filter(function(p){return !p.archived;});
+    var soon=active.filter(function(p){ return p.end_date&&daysUntil(p.end_date)<=14; }).length;
+    var empty=active.filter(function(p){ return !(tasks||[]).some(function(t){ return t.project===p.id&&!t.parent_id; }); }).length;
+    var CH=html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    var toolbar=html`<div class="ptool">
+      <label class="plab" for="pf-stat">Filter by</label>
+      <select class="tsel" id="pf-stat" value=${fstat} onChange=${function(e){setFstat(e.target.value);}}><option value="active">Active</option><option value="finished">Finished</option><option value="all">All projects</option></select>
+      <select class="tsel" aria-label="Owned by" value=${fown} onChange=${function(e){setFown(e.target.value);}}>${ownerOptions()}</select>
+      ${pv==='table'||pv==='cards'?html`<${Fragment}><label class="plab" for="pf-sort" style=${{marginLeft:'6px'}}>Sort by</label>
+      <select class="tsel" id="pf-sort" value=${sort} onChange=${function(e){setSort(e.target.value);}}><option value="deadline">Deadline</option><option value="progress">Progress</option><option value="name">Name</option><option value="newest">Newest</option></select><//>`:null}
+      <div class="pviews" role="group" aria-label="View">${PVIEWS.map(function(v){ return html`<button type="button" key=${v[0]} class=${pv===v[0]?'on':''} aria-pressed=${pv===v[0]} onClick=${function(){setView(v[0]);}}><${Icon} s=${15}>${v[2]}<//><span>${v[1]}</span></button>`; })}</div>
+    </div>`;
+    var summary=active.length?html`<p class="psum">${active.length} active · ${soon} due in the next 2 weeks${empty?(' · '+empty+' '+(empty===1?'has':'have')+' no tasks yet'):''}</p>`:null;
+
+    // empty states: none yet · filter matches nothing · everything finished
+    var es=null;
+    if(!projects.length) es=html`<div class="pempty"><span class="pei">${html`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7.5A1.5 1.5 0 015.5 6h3.2a1.5 1.5 0 011.2.6l.9 1.2a1.5 1.5 0 001.2.6H18.5A1.5 1.5 0 0120 9.9V18a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 014 18V7.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 11.5v5M9.5 14h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`}</span><h2>No projects yet</h2><p>A project holds one big thing, like a portfolio or an application. Give it a deadline, then break it into tasks you can tick off.</p><div class="pea"><button type="button" class="btn primary" onClick=${props.onNew}>New project</button><button type="button" class="btn ghost" onClick=${props.onPickDates}>Pick dates on the calendar</button></div></div>`;
+    else if(fstat==='active'&&!active.length) es=html`<div class="pempty"><span class="pei ok">${flagGlyph}</span><h2>Every project is finished</h2><p>All ${projects.length} are done. They stay under Finished, with their tasks and links, whenever you want to look back.</p><div class="pea"><button type="button" class="btn primary" onClick=${props.onNew}>New project</button><button type="button" class="btn ghost" onClick=${function(){setFstat('finished');}}>See finished · ${projects.length}</button></div></div>`;
+    else if(!list.length) es=html`<div class="pempty"><span class="pei"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.7"/><path d="M16 16l4 4M8.5 11h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span><h2>No projects match</h2><p>Nothing is ${fstat==='finished'?'finished':(fstat==='active'?'active':'here')}${fown!=='all'?(' and owned by '+(fown===VIEW.who?'you':nameOf(fown))):''} yet. Clear a filter to see the rest.</p><div class="pea"><button type="button" class="btn ghost" onClick=${function(){ setFstat('active'); setFown('all'); }}>Clear filters</button></div></div>`;
+
+    function nextCell(p){ var t=nextUp(p.id,tasks); if(!t){ var any=(stats[p.id]||projStats(p.id,tasks)).total; return html`<span class="muted">${any?'All done':'No tasks yet'} · <button type="button" class="linkbtn inl" onClick=${function(e){e.stopPropagation();props.onOpen(p.id);}}>${any?'+ Add a task':'+ Add the first task'}</button></span>`; }
+      var c=soonChip(t.due||t.date); return html`<span class="nextc"><${Check} sm=${true} done=${false} label=${'Mark '+t.title+' done'} onClick=${function(e){ if(e) e.stopPropagation(); props.onToggle(t);}} /><span class="nt">${t.title}</span>${c?html`<span class=${'pill '+c.cls}>${c.txt}</span>`:null}</span>`; }
+    function progCell(p){ var st=stats[p.id]||projStats(p.id,tasks); return st.total?html`<span class="progc"><span class="pbar2"><i style=${{width:st.pct+'%'}}></i></span><span class="tnum">${st.done} of ${st.total}</span></span>`:html`<span class="muted">—</span>`; }
+    function ownerCell(p){ return html`<span class="ownc"><${Avatar} owner=${p.owner} cls="avm" /><span>${relName(p.owner)}</span></span>`; }
+
+    var body=null;
+    if(!es && pv==='table'){
+      var groups=sort==='deadline'?[['Due in the next 2 weeks',function(p){ return p.end_date&&daysUntil(p.end_date)<=14; }],['Later',function(p){ return p.end_date&&daysUntil(p.end_date)>14; }],['No deadline',function(p){ return !p.end_date; }]]:[['',function(){return true;}]];
+      body=html`<div class="ptbl">
+        <div class="ptr pth"><span>Project</span><span>Next up</span><span>Progress</span><span>Deadline</span><span>Left</span><span>Owner</span><span></span></div>
+        ${groups.map(function(g){ var rows=list.filter(g[1]); if(!rows.length) return null; return html`<${Fragment} key=${g[0]||'all'}>
+          ${g[0]?html`<div class="ptgrp">${g[0]} · ${rows.length}</div>`:null}
+          ${rows.map(function(p){ var lc=leftChip(p.end_date); return html`<div class="ptr" key=${p.id} onClick=${function(){props.onOpen(p.id);}}>
+            <span class="ptn"><span class="dot" style=${{background:p.color}}></span><span><button type="button" class="pname2" onClick=${function(e){e.stopPropagation();props.onOpen(p.id);}}>${p.name||'Untitled project'}</button><span class="pkind">${kindLabel(p)}${p.archived?' · Finished':''}</span></span></span>
+            <span class="ptc ptnext">${nextCell(p)}</span>
+            <span class="ptc ptprog">${progCell(p)}</span>
+            <span class="ptc ptdead tnum">${p.end_date?shortDate(p.end_date):html`<span class="muted">—</span>`}</span>
+            <span class="ptc ptleft">${lc?html`<span class=${'pill '+lc.cls}>${lc.txt}</span>`:null}</span>
+            <span class="ptc ptown">${ownerCell(p)}</span>
+            <span class="ptc ptmore"><button type="button" class="kebab" aria-label=${'Edit '+p.name} onClick=${function(e){e.stopPropagation();props.onEdit(p);}}>${kebabGlyph}</button></span>
+          </div>`; })}
+        <//>`; })}
+      </div>`;
+    } else if(!es && pv==='lanes'){
+      var lanes=[['Next 7 days',0,7],['Next 2 weeks',8,14],['Next 30 days',15,30],['Later',31,1e9],['No deadline',null,null]];
+      body=html`<div class="lanes2">${lanes.map(function(L){ var rows=list.filter(function(p){ if(L[1]==null) return !p.end_date; if(!p.end_date) return false; var n=daysUntil(p.end_date); return L[1]===0?n<=7:(n>=L[1]&&n<=L[2]); }); if(L[1]==null&&!rows.length) return null;
+        var sub=L[1]==null?'':(L[2]<1e9?('by '+shortDate(ymd(addDays(parseYmd(TODAY),L[2])))):('after '+shortDate(ymd(addDays(parseYmd(TODAY),30)))));
+        return html`<section class="lane2" key=${L[0]} aria-label=${L[0]}><div class="lane2h"><span>${L[0]}</span><span class="lanec2">${rows.length}</span></div>${sub?html`<div class="lane2s">${sub}</div>`:null}
+          ${rows.map(function(p){ var lc=leftChip(p.end_date), st=stats[p.id]; return html`<article class="lc2" key=${p.id} onClick=${function(){props.onOpen(p.id);}}>
+            <div class="lc2h">${lc?html`<span class=${'pill '+lc.cls}>${shortDate(p.end_date)} · ${lc.txt}</span>`:html`<span class="pill">No deadline</span>`}<button type="button" class="kebab" aria-label=${'Edit '+p.name} onClick=${function(e){e.stopPropagation();props.onEdit(p);}}>${kebabGlyph}</button></div>
+            <button type="button" class="lc2n" onClick=${function(e){e.stopPropagation();props.onOpen(p.id);}}><span class="dot" style=${{background:p.color}}></span>${p.name||'Untitled project'}</button>
+            ${st.total?html`<div class="lc2p"><span class="pbar2"><i style=${{width:st.pct+'%'}}></i></span><span class="tnum">${st.done} of ${st.total}</span></div>`:null}
+            <div class="lc2x">${nextCell(p)}</div>
+            <div class="lc2f">${ownerCell(p)}</div>
+          </article>`; })}
+          ${rows.length?null:html`<p class="lane2e">Nothing due here.</p>`}
+        </section>`; })}</div>`;
+    } else if(!es && pv==='timeline'){
+      var start=mondayOf(TODAY), N=84, s0=parseYmd(start);
+      var pos=function(ds){ return ((parseYmd(ds)-s0)/86400000+0.5)/N*100; };
+      var nowP=pos(TODAY), endDs=ymd(addDays(s0,N-1));
+      var weeks=[]; for(var w=0;w<12;w++){ var wd=addDays(s0,w*7); weeks.push({l:(w===0||wd.getDate()<=7)?(MON[wd.getMonth()].slice(0,3)+' '+wd.getDate()):String(wd.getDate()),p:w/12*100}); }
+      body=html`<div class="ptl"><div class="ptlin">
+        <div class="ptlrow ptlhd"><div class="ptll"><span class="plab">${list.length} project${list.length===1?'':'s'} · by deadline</span></div><div class="ptlt">${weeks.map(function(wk){ return html`<span class="ptlwk" key=${wk.p} style=${{left:wk.p+'%'}}>${wk.l}</span>`; })}<span class="ptlnowl" style=${{left:nowP+'%'}}>Today</span></div></div>
+        ${list.map(function(p){ var st=stats[p.id], ca=hexA(p.color||'#1F6FEB',.22); var lc=leftChip(p.end_date);
+          var due=(tasks||[]).filter(function(t){ return t.project===p.id&&t.due&&!t.done&&t.due>=start&&t.due<=endDs; });
+          var track;
+          if(!p.end_date) track=html`<span class="ptlnone">No deadline</span>`;
+          else if(p.end_date>endDs) track=html`<${Fragment}><span class="ptlrun" style=${{left:nowP+'%',right:0,background:'linear-gradient(90deg,'+ca+' 70%,rgba(255,255,255,0))'}}></span><span class="ptllab" style=${{right:'10px'}}>${shortDate(p.end_date)} · ${lc.txt} →</span><//>`;
+          else if(p.end_date<start) track=html`<span class="ptllab" style=${{left:'8px'}}><span class="pill due over">${shortDate(p.end_date)} · ${lc.txt}</span></span>`;
+          else { var e=pos(p.end_date), from=p.end_date<TODAY?e:nowP; track=html`<${Fragment}>${p.end_date>=TODAY?html`<span class="ptlrun" style=${{left:from+'%',width:Math.max(0,e-from)+'%',background:ca}}></span>`:null}<span class="ptldia" style=${{left:e+'%',background:p.end_date<TODAY?'#C64A3B':(p.color||'#1F6FEB')}}></span><span class=${'ptllab'+(e>78?' end':'')} style=${e>78?{right:(100-e+2)+'%'}:{left:'calc('+e+'% + 14px)'}}>${shortDate(p.end_date)} · ${lc.txt}</span><//>`; }
+          return html`<div class="ptlrow" key=${p.id}>
+            <div class="ptll"><span class="dot" style=${{background:p.color}}></span><button type="button" class="ptlname" onClick=${function(){props.onOpen(p.id);}}><span class="lname2">${p.name||'Untitled project'}</span><span class="pkind">${kindLabel(p)} · ${st.total?(st.done+' of '+st.total+' done'):'no tasks yet'}</span></button><${Avatar} owner=${p.owner} cls="avm" /></div>
+            <div class="ptlt"><span class="ptlnow" style=${{left:nowP+'%'}}></span>${due.map(function(t){ return html`<span class="ptltd" key=${t.id} title=${t.title+' · due '+shortDate(t.due)} style=${{left:pos(t.due)+'%'}}></span>`; })}${track}</div>
+          </div>`; })}
+      </div></div>
+      <div class="ptlkey"><span><i class="k1"></i>Time left, from today to the deadline</span><span><i class="k2"></i>Deadline</span><span><i class="k3"></i>A task due inside the project</span></div>`;
+    } else if(!es){
+      body=html`<div class="pgrid">${list.map(function(p){ var st=stats[p.id], lc=leftChip(p.end_date); return html`<article class="pc2" key=${p.id} onClick=${function(){props.onOpen(p.id);}}>
+          <div class="lc2h">${lc?html`<span class=${'pill '+lc.cls}>${shortDate(p.end_date)} · ${lc.txt}</span>`:html`<span class="pill">No deadline</span>`}<button type="button" class="kebab" aria-label=${'Edit '+p.name} onClick=${function(e){e.stopPropagation();props.onEdit(p);}}>${kebabGlyph}</button></div>
+          <div><button type="button" class="lc2n" onClick=${function(e){e.stopPropagation();props.onOpen(p.id);}}><span class="dot" style=${{background:p.color}}></span>${p.name||'Untitled project'}</button><div class="pkind">${kindLabel(p)}${p.archived?' · Finished':''}</div></div>
+          ${st.total?html`<div class="lc2p"><span class="pbar2"><i style=${{width:st.pct+'%'}}></i></span><span class="tnum">${st.done} of ${st.total}</span></div>`:html`<div class="lc2p muted">No tasks yet</div>`}
+          <div class="lc2x">${nextCell(p)}</div>
+          <div class="lc2f">${ownerCell(p)}<span class="pcr">${st.total?((st.total-st.done)?((st.total-st.done)+' open'):'All done'):'—'}</span></div>
+        </article>`; })}
+        ${fstat!=='finished'?html`<button type="button" class="pnew" onClick=${props.onNew}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>New project<span>Give it a deadline, then tasks</span></button>`:null}
+      </div>`;
+    }
+    return html`<${Fragment}>${toolbar}${summary}${es||body}<//>`;
+  }
+
+  // ---- inside a project: List · Table · Timeline ----
+  function ProjectPage(props){
+    var p=props.project, tasks=props.tasks, materials=props.materials;
+    var tS=useState(lsGet('sp_ptab','list')); var tab=tS[0], setTabRaw=tS[1];
+    function setTab(v){ setTabRaw(v); lsSet('sp_ptab',v); }
+    var itemS=useState({title:'',due:''}); var ni=itemS[0], setNi=itemS[1];
+    var matS=useState({title:'',url:''}); var nm=matS[0], setNm=matS[1];
+    var subForS=useState(null); var subFor=subForS[0], setSubFor=subForS[1];
+    var subS=useState({title:'',due:''}); var ns=subS[0], setNs=subS[1];
+    var openS=useState({}); var openRows=openS[0], setOpenRows=openS[1];
+    if(!p) return null;
+    var items=(tasks||[]).filter(function(t){return t.project===p.id && !t.parent_id;});
+    items.sort(function(a,b){ if(!!a.done!==!!b.done) return a.done?1:-1; var ak=a.due||a.date||'9999', bk=b.due||b.date||'9999'; return ak<bk?-1:ak>bk?1:0; });
+    var mats=(materials||[]).filter(function(m){return m.project_id===p.id;});
+    var st=projStats(p.id,tasks), lc=leftChip(p.end_date);
+    function addTask(){ if(ni.title.trim()){ props.onAddItem(p.id,ni.title,ni.due); setNi({title:'',due:''}); } }
+    var adder=html`<div class="addrow pgadd">
+      <label class="sr" for="pg-add">Add a task to ${p.name}</label><input id="pg-add" class="grow" type="text" placeholder=${'Add a task to '+(p.name||'this project')} value=${ni.title} onInput=${function(e){setNi(Object.assign({},ni,{title:e.target.value}));}} onKeyDown=${function(e){ if(e.key==='Enter') addTask(); }} />
+      <label class="sr" for="pg-add-due">Deadline</label><input id="pg-add-due" type="date" value=${ni.due} onInput=${function(e){setNi(Object.assign({},ni,{due:e.target.value}));}} />
+      <button type="button" class="mini" onClick=${addTask}>Add</button>
+    </div>`;
+    var listView=html`<${Fragment}>
+      <div class="psec">
+        ${items.length===0?html`<p class="muted" style=${{fontSize:'13px',margin:'2px 0 8px'}}>No tasks yet. What's the first step?</p>`:null}
+        ${items.map(function(it){ var subs=childrenOf(tasks,it.id); var sdone=subs.filter(function(s){return s.done;}).length; var c=soonChip(it.due);
+          return html`<div class="irow" key=${it.id}>
+            <${Check} done=${it.done} label=${it.title} onClick=${function(){props.onToggle(it);}} />
+            <div class="ibody">
+              <div class=${'ititle'+(it.done?' done':'')}>${it.title}</div>
+              <div class="ameta">
+                ${it.due?html`<span class=${'pill due'+(dueOver(it)?' over':'')}>Due ${shortDate(it.due)}${it.due_time?(' · '+to12(it.due_time)):''}</span>`:null}
+                <button class="view" onClick=${function(){ setSubFor(subFor===it.id?null:it.id); setNs({title:'',due:''}); }}>${subs.length?(sdone+'/'+subs.length+' subtasks'):'+ subtask'}</button>
+                <button class="view" onClick=${function(){props.onEditTask(it);}}>Edit</button>
+              </div>
+              ${subs.length?html`<div class="subs">${subs.map(function(s){return html`<div class=${'subrow'+(s.done?' done':'')} key=${s.id}><${Check} sm=${true} done=${s.done} label=${s.title} onClick=${function(){props.onToggle(s);}} /><span class="slabel">${s.title}</span>${s.due?html`<span class=${'pill due'+(dueOver(s)?' over':'')}>${shortDate(s.due)}</span>`:null}</div>`;})}</div>`:null}
+              ${subFor===it.id?html`<div class="addrow">
+                <input class="grow" type="text" aria-label=${'Subtask of '+it.title} placeholder="Subtask" value=${ns.title} onInput=${function(e){setNs(Object.assign({},ns,{title:e.target.value}));}} />
+                <input type="date" aria-label="Subtask deadline" value=${ns.due} onInput=${function(e){setNs(Object.assign({},ns,{due:e.target.value}));}} />
+                <button class="mini" onClick=${function(){ if(ns.title.trim()){ props.onAddSub(it.id,p.id,ns.title,ns.due); setNs({title:'',due:''}); } }}>Add</button>
+              </div>`:null}
+            </div>
+            <${Avatar} owner=${it.owner} cls="avm" />
+          </div>`;
+        })}
+        ${adder}
+      </div>
+    <//>`;
+    var tableView=html`<div class="pgt">
+      <div class="pgr pgh"><span>Task</span><span>Owner</span><span>Due</span><span>Status</span><span>Subtasks</span><span></span></div>
+      ${items.length===0?html`<div class="pgr pge"><span class="muted">No tasks yet. Add the first one below.</span></div>`:null}
+      ${items.map(function(it){ var subs=childrenOf(tasks,it.id), sdone=subs.filter(function(s){return s.done;}).length, open=!!openRows[it.id]; var c=soonChip(it.due||it.date);
+        var status=it.done?html`<span class="pill okp">Done${it.due&&it.done_at&&dayOfMs(it.done_at)<=it.due?' · on time':''}</span>`:(dueOver(it)||(it.date&&it.date<TODAY)?html`<span class="pill due over">Overdue</span>`:html`<span class="pill">To do</span>`);
+        return html`<${Fragment} key=${it.id}>
+          <div class="pgr">
+            <span class="pgc"><${Check} done=${it.done} label=${it.title} onClick=${function(){props.onToggle(it);}} /><button type="button" class=${'pgtt'+(it.done?' done':'')} onClick=${function(){props.onEditTask(it);}}>${it.title}</button></span>
+            <span class="pgc"><${Avatar} owner=${it.owner} cls="avm" /><span class="small">${relName(it.owner)}</span></span>
+            <span class="pgc small tnum">${(it.due||it.date)?shortDate(it.due||it.date):html`<span class="muted">no date</span>`}${!it.done&&c?html`<span class=${'pill '+c.cls}>${c.txt}</span>`:null}</span>
+            <span class="pgc">${status}</span>
+            <span class="pgc">${subs.length?html`<button type="button" class="linkbtn inl" aria-expanded=${open} onClick=${function(){ var o=Object.assign({},openRows); o[it.id]=!open; setOpenRows(o); }}>${sdone} of ${subs.length} ${open?'▴':'▾'}</button>`:html`<span class="muted">—</span>`}</span>
+            <span class="pgc"><button type="button" class="kebab" aria-label=${'Edit '+it.title} onClick=${function(){props.onEditTask(it);}}>${kebabGlyph}</button></span>
+          </div>
+          ${open?subs.map(function(s){ return html`<div class="pgr sub" key=${s.id}>
+            <span class="pgc ind"><${Check} sm=${true} done=${s.done} label=${s.title} onClick=${function(){props.onToggle(s);}} /><span class=${s.done?'done':''}>${s.title}</span></span>
+            <span class="pgc"><${Avatar} owner=${s.owner} cls="avm" /><span class="small">${relName(s.owner)}</span></span>
+            <span class="pgc small tnum">${s.due?shortDate(s.due):html`<span class="muted">no date</span>`}</span>
+            <span class="pgc">${s.done?html`<span class="pill okp">Done</span>`:(dueOver(s)?html`<span class="pill due over">Overdue</span>`:html`<span class="pill">To do</span>`)}</span>
+            <span class="pgc muted">—</span><span class="pgc"></span>
+          </div>`; }):null}
+        <//>`; })}
+      ${adder}
+    </div>`;
+    return html`<div class="ppage">
+      <div class="pcrumb"><button type="button" class="linkbtn inl" onClick=${props.onBack}>Projects</button><span aria-hidden="true">/</span><span>${p.name}</span></div>
+      <div class="pghd">
+        <div class="pgt1"><span class="dot" style=${{background:p.color,width:'12px',height:'12px'}}></span><h2 class="pgname">${p.name}</h2><span class="pill">${kindLabel(p)}</span>${p.archived?html`<span class="pill okp">Finished</span>`:null}</div>
+        <div class="pgact"><button type="button" class="btn ghost pgb" onClick=${function(){props.onEdit(p);}}>Edit</button>${p.archived?html`<button type="button" class="btn ghost pgb" onClick=${function(){props.onReopen(p.id);}}>Reopen</button>`:html`<button type="button" class="btn ghost pgb" onClick=${function(){props.onFinish(p);}}>Finish project</button>`}</div>
+      </div>
+      <div class="facts2">
+        <div class="fact2"><span class="fk2">Deadline</span><span class="fv2 tnum">${p.end_date?shortDate(p.end_date):'—'}</span></div>
+        <div class="fact2"><span class="fk2">Left</span><span class="fv2">${lc?html`<span class=${'pill '+lc.cls}>${lc.txt}</span>`:'—'}</span></div>
+        <div class="fact2"><span class="fk2">Done</span><span class="fv2 tnum">${st.total?html`<span class="pbar2" style=${{width:'96px'}}><i style=${{width:st.pct+'%'}}></i></span>`:null}${st.total?(st.done+' of '+st.total):'No tasks yet'}</span></div>
+        <div class="fact2"><span class="fk2">Owner</span><span class="fv2"><${Avatar} owner=${p.owner} cls="avm" />${relName(p.owner)}</span></div>
+      </div>
+      <div class="pgtabs"><div class="segc" role="group" aria-label="View">${[['list','List'],['table','Table'],['timeline','Timeline']].map(function(x){ return html`<button type="button" key=${x[0]} class=${tab===x[0]?'on':''} aria-pressed=${tab===x[0]} onClick=${function(){setTab(x[0]);}}>${x[1]}</button>`; })}</div></div>
+      ${tab==='timeline'?html`<${ProjectTimeline} project=${p} tasks=${tasks} />`:(tab==='table'?tableView:listView)}
+      <div class="psec">
+        <h4>Materials${mats.length?html` · ${mats.length}`:''}</h4>
+        ${mats.length===0?html`<p class="muted" style=${{fontSize:'13px',margin:'2px 0'}}>No links yet.</p>`:null}
+        ${mats.map(function(m){ return html`<div class="matrow" key=${m.id}>
+          <span style=${{color:'#AEB6C1'}}>🔗</span>
+          <a href=${m.url} target="_blank" rel="noreferrer noopener">${m.title||m.url}</a>
+          <button class="x" aria-label=${'Remove '+(m.title||m.url)} onClick=${function(){props.onDelMaterial(m);}}>×</button>
+        </div>`; })}
+        <div class="addrow">
+          <input type="text" aria-label="Link label" placeholder="Label" style=${{width:'130px'}} value=${nm.title} onInput=${function(e){setNm(Object.assign({},nm,{title:e.target.value}));}} />
+          <input class="grow" type="url" aria-label="Link" placeholder="https://…" value=${nm.url} onInput=${function(e){setNm(Object.assign({},nm,{url:e.target.value}));}} />
+          <button class="mini" onClick=${function(){ if((nm.url||'').trim()){ props.onAddMaterial(p.id,nm.title,nm.url); setNm({title:'',url:''}); } }}>Add</button>
+        </div>
+      </div>
+      ${p.description?html`<div class="psec"><h4>Description</h4><p style=${{fontSize:'14px',lineHeight:1.55,color:'#39414C',margin:0,whiteSpace:'pre-wrap'}}>${p.description}</p></div>`:null}
+    </div>`;
+  }
+
+  // ---- sign in: your own username + password ----
+  var BRANDMARK=html`<div class="authbrand"><span class="brand">hc</span><span class="authname">hate club</span></div>`;
+  var eyeOn=html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.8" stroke="currentColor" stroke-width="1.7"/></svg>`;
+  var eyeOff=html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 3l18 18M10.6 6.1A9.6 9.6 0 0112 6c6 0 9.5 6 9.5 6a16 16 0 01-3.1 3.8M6.2 7.6C3.9 9.3 2.5 12 2.5 12s3.5 6.5 9.5 6.5c1.6 0 3-.4 4.2-1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  var alertGlyph=html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" style=${{flex:'none',marginTop:'1px'}}><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5v5.5M12 16.5h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
+  function PasswordField(props){
+    var sS=useState(false); var show=sS[0], setShow=sS[1];
+    return html`<div class=${'pwf'+(props.bad?' bad':'')}>
+      <input id=${props.id} type=${show?'text':'password'} value=${props.value} autocomplete=${props.autocomplete||'current-password'} aria-invalid=${props.bad?'true':'false'} aria-describedby=${props.describedby||null} placeholder=${props.placeholder||''} onInput=${function(e){props.onInput(e.target.value);}} />
+      <button type="button" class="pweye" aria-label=${show?'Hide password':'Show password'} onClick=${function(){setShow(!show);}}>${show?eyeOff:eyeOn}</button>
+    </div>`;
+  }
+  function AuthError(props){ return props.text?html`<div class="autherr" id=${props.id||null} role="alert">${alertGlyph}<span>${props.text}</span></div>`:null; }
+  // counts down a lock from the server ("Try again in 42s")
+  function useCountdown(){ var s=useState(0); var left=s[0], setLeft=s[1];
+    useEffect(function(){ if(left<=0) return; var t=setTimeout(function(){ setLeft(left-1); },1000); return function(){ clearTimeout(t); }; },[left]);
+    return [left,setLeft]; }
+
+  function SignIn(props){
+    var uS=useState(lsGet('sp_last_user','')); var user=uS[0], setUser=uS[1];
+    var pS=useState(''); var pass=pS[0], setPass=pS[1];
+    var eS=useState(''); var err=eS[0], setErr=eS[1];
+    var bS=useState(false); var busy=bS[0], setBusy=bS[1];
+    var cd=useCountdown(); var wait=cd[0], setWait=cd[1];
+    function submit(e){ e.preventDefault(); if(busy||wait) return;
+      if(!user.trim()||!pass){ setErr(!user.trim()?'Enter your username.':'Enter your password.'); return; }
+      setBusy(true); setErr('');
+      apiPost('/api/login',{username:user.trim(),password:pass}).then(function(r){ return r.json().catch(function(){return {};}).then(function(j){ return {ok:r.ok,j:j}; }); }).then(function(res){
+        setBusy(false);
+        if(res.ok){ lsSet('sp_last_user',user.trim().toLowerCase()); props.onIn(); return; }
+        setPass('');
+        if(res.j.error==='locked'){ setWait(res.j.wait||60); setErr('Too many wrong tries. Wait a minute, then try again.'); }
+        else setErr('That username and password don’t match.'+(res.j.left?(' '+res.j.left+' '+(res.j.left===1?'try':'tries')+' left before a 1-minute wait.'):''));
+      }).catch(function(){ setBusy(false); setErr('Can’t reach the server. Check your connection and try again.'); });
+    }
+    return html`<div class="authpage"><form class="authcard" onSubmit=${submit} noValidate>
+      ${BRANDMARK}
+      <h1 class="authh">Sign in</h1>
+      <p class="authsub">Your tasks, your score, your week.</p>
+      <label class="lbl" for="si-user">Username</label>
+      <input class="fld" id="si-user" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" value=${user} onInput=${function(e){setUser(e.target.value);}} />
+      <label class="lbl" for="si-pass">Password</label>
+      <${PasswordField} id="si-pass" value=${pass} bad=${!!err&&!busy} describedby="si-err" onInput=${setPass} />
+      <${AuthError} id="si-err" text=${err} />
+      <button class="btn primary authgo" type="submit" disabled=${busy||!!wait}>${busy?'Signing in…':(wait?('Try again in '+wait+'s'):'Sign in')}</button>
+      <p class="authnote">You stay signed in on this device for 6 months.</p>
+      <div class="authfoot">First time here? <button type="button" class="linkbtn" onClick=${props.onSetup}>Set up your sign-in</button></div>
+    </form></div>`;
+  }
+
+  // First time: the shared passcode once, then pick yourself and choose a username + password.
+  function Setup(props){
+    var stepS=useState(props.claimable?'pick':'code'); var step=stepS[0], setStep=stepS[1];
+    var listS=useState(props.claimable||[]); var list=listS[0], setList=listS[1];
+    var cS=useState(''); var code=cS[0], setCode=cS[1];
+    var pidS=useState(null); var pid=pidS[0], setPid=pidS[1];
+    var nS=useState(''); var name=nS[0], setName=nS[1];
+    var uS=useState(''); var user=uS[0], setUser=uS[1];
+    var pS=useState(''); var pass=pS[0], setPass=pS[1];
+    var eS=useState(''); var err=eS[0], setErr=eS[1];
+    var bS=useState(false); var busy=bS[0], setBusy=bS[1];
+    var cd=useCountdown(); var wait=cd[0], setWait=cd[1];
+    useEffect(function(){ if(props.claimable){ setList(props.claimable); setStep('pick'); } },[props.claimable]);
+    var chosen=list.filter(function(p){return p.id===pid;})[0];
+    var needsName=!!chosen && (!chosen.name || chosen.name==='Partner');
+    function sendCode(e){ e.preventDefault(); if(busy||wait) return; if(!code.trim()){ setErr('Enter the passcode you two share.'); return; }
+      setBusy(true); setErr('');
+      apiPost('/api/setup',{passcode:code.trim()}).then(function(r){ return r.json().catch(function(){return {};}).then(function(j){ return {ok:r.ok,j:j}; }); }).then(function(res){
+        if(!res.ok){ setBusy(false); setCode(''); if(res.j.error==='locked'){ setWait(res.j.wait||60); setErr('Too many wrong tries. Wait a minute, then try again.'); } else setErr('That isn’t the passcode.'+(res.j.left?(' '+res.j.left+' '+(res.j.left===1?'try':'tries')+' left.'):'')); return; }
+        return apiGet('/api/me').then(function(r){ return r.json(); }).then(function(j){ setBusy(false); setList(j.claimable||[]); setStep('pick'); });
+      }).catch(function(){ setBusy(false); setErr('Can’t reach the server. Check your connection and try again.'); });
+    }
+    function create(e){ e.preventDefault(); if(busy) return;
+      var u=user.trim().toLowerCase();
+      if(needsName && !name.trim()){ setErr('Add your name, so the other person sees who you are.'); return; }
+      if(!/^[a-z0-9._-]{3,24}$/.test(u)){ setErr('Usernames are 3–24 characters: letters, numbers, dots, dashes or underscores.'); return; }
+      if(pass.length<8){ setErr('Use at least 8 characters for your password.'); return; }
+      setBusy(true); setErr('');
+      apiPost('/api/claim',{person_id:pid,username:u,password:pass,name:needsName?name.trim():''}).then(function(r){ return r.json().catch(function(){return {};}).then(function(j){ return {ok:r.ok,j:j}; }); }).then(function(res){
+        setBusy(false);
+        if(res.ok){ lsSet('sp_last_user',u); props.onIn(); return; }
+        setErr(({taken_username:'That username is taken. Try another.',taken_person:'This person already has a sign-in. Go back and sign in instead.',short_password:'Use at least 8 characters for your password.',bad_username:'Usernames are 3–24 characters: letters, numbers, dots, dashes or underscores.'})[res.j.error]||'Couldn’t create your sign-in. Try again.');
+      }).catch(function(){ setBusy(false); setErr('Can’t reach the server. Check your connection and try again.'); });
+    }
+    var back=html`<div class="authfoot">Already set up? <button type="button" class="linkbtn" onClick=${props.onSignIn}>Sign in</button></div>`;
+    if(step==='code') return html`<div class="authpage"><form class="authcard" onSubmit=${sendCode} noValidate>
+      ${BRANDMARK}
+      <h1 class="authh">Set up your sign-in</h1>
+      <p class="authsub">Enter the passcode you two share. You only need it this once.</p>
+      <label class="lbl" for="su-code">Shared passcode</label>
+      <${PasswordField} id="su-code" value=${code} bad=${!!err&&!busy} describedby="su-err" autocomplete="off" onInput=${setCode} />
+      <${AuthError} id="su-err" text=${err} />
+      <button class="btn primary authgo" type="submit" disabled=${busy||!!wait}>${busy?'Checking…':(wait?('Try again in '+wait+'s'):'Continue')}</button>
+      ${back}
+    </form></div>`;
+    if(step==='pick') return html`<div class="authpage"><div class="authcard">
+      ${BRANDMARK}
+      <h1 class="authh">Which one is you?</h1>
+      ${list.length?html`<p class="authsub">Pick yourself, then choose a username and password only you know.</p>
+        <div class="whopick" role="radiogroup" aria-label="Which one is you">
+          ${list.map(function(p){ var un=!p.name||p.name==='Partner'; return html`<button type="button" key=${p.id} role="radio" aria-checked=${pid===p.id} class=${'whorow'+(pid===p.id?' on':'')} onClick=${function(){ setPid(p.id); setErr(''); }}>
+            <span class="av avm" style=${{background:personColor(p.id)}}>${un?'?':(p.name||'?').charAt(0).toUpperCase()}</span>
+            <span class="whorn">${un?'The other person':p.name}</span>
+            <span class=${'whoradio'+(pid===p.id?' on':'')} aria-hidden="true"></span>
+          </button>`; })}
+        </div>
+        <button class="btn primary authgo" type="button" disabled=${!pid} onClick=${function(){ setStep('make'); setErr(''); }}>Continue</button>`
+      :html`<p class="authsub">Both of you already have a sign-in.</p><button class="btn primary authgo" type="button" onClick=${props.onSignIn}>Sign in</button>`}
+      ${back}
+    </div></div>`;
+    return html`<div class="authpage"><form class="authcard" onSubmit=${create} noValidate>
+      ${BRANDMARK}
+      <h1 class="authh">${needsName?'Choose your sign-in':('Hi, '+chosen.name)}</h1>
+      <p class="authsub">${needsName?'Add your name, then a username and password only you know.':'Choose a username and a password only you know.'}</p>
+      ${needsName?html`<${Fragment}><label class="lbl" for="su-name">Your name</label><input class="fld" id="su-name" type="text" autocomplete="given-name" value=${name} onInput=${function(e){setName(e.target.value);}} /><//>`:null}
+      <label class="lbl" for="su-user">Username</label>
+      <input class="fld" id="su-user" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" aria-describedby="su-uhint" value=${user} onInput=${function(e){setUser(e.target.value);}} />
+      <div class="authhint" id="su-uhint">3–24 characters: letters, numbers, dots, dashes or underscores.</div>
+      <label class="lbl" for="su-pass">Password</label>
+      <${PasswordField} id="su-pass" value=${pass} autocomplete="new-password" describedby="su-phint" onInput=${setPass} />
+      <div class="authhint" id="su-phint">At least 8 characters.</div>
+      <${AuthError} text=${err} />
+      <button class="btn primary authgo" type="submit" disabled=${busy}>${busy?'Creating…':'Create sign-in'}</button>
+      <div class="authfoot"><button type="button" class="linkbtn" onClick=${function(){ setStep('pick'); setErr(''); }}>Back</button></div>
+    </form></div>`;
+  }
+
+  // phone: the tabs that don't fit the bar
+  function MoreSheet(props){
+    var items=[['tasks','Tasks',icons.tasks],['journal','Journal',icons.journal],['settings','Settings',icons.settings],['help','How it works',icons.help]];
+    return html`<div class="overlay moreov" onClick=${function(e){if(e.target===e.currentTarget)props.onClose();}}>
+      <div class="modal moresheet" role="dialog" aria-modal="true" aria-label="More">
+        ${items.map(function(it){ return html`<button type="button" key=${it[0]} class="morerow" onClick=${function(){props.onPick(it[0]);}}><${Icon} s=${18}>${it[2]}<//>${it[1]}</button>`; })}
+      </div>
+    </div>`;
+  }
+
   // ---- App ----
   function App(){
     var authS=useState('checking'); var auth=authS[0], setAuth=authS[1];
     var authRef=useRef(auth); authRef.current=auth;
     var stS=useState(null); var store=stS[0], setStore=stS[1];
     var vS=useState((function(){var v=lsGet('sp_view','today'); return v==='settings'?'today':v;})()); var view=vS[0], setView=vS[1];
-    // who is holding this device (a person id); older devices remembered 'me'/'partner'
-    function readWho(){ var v=lsGet('sp_who',null); if(v&&LEGACY_WHO[v]){ v=LEGACY_WHO[v]; lsSet('sp_who',v); } return v; }
-    var wS=useState(function(){ return readWho()||'p_mahesh'; }); var whoami=wS[0], setWho=wS[1];
-    var nwS=useState(function(){ return lsGet('sp_who',null)==null; }); var needWho=nwS[0], setNeedWho=nwS[1];   // this device has never said who it is
+    // who is signed in (a person, from the server's cookie)
+    var meS=useState(null); var me=meS[0], setMe=meS[1];
+    var whoami=me?me.id:'p_mahesh';
+    var clS=useState(null); var claimable=clS[0], setClaimable=clS[1];   // people still without a sign-in, during setup
+    var moreS=useState(false); var moreOpen=moreS[0], setMoreOpen=moreS[1];
     var spS=useState(lsGet('sp_space',DEFAULT_SPACE)); var space=spS[0];   // one space for now; a switcher comes with the second
     var fS=useState('all'); var filter=fS[0], setFilter=fS[1];
     var dayS=useState(TODAY); var today=dayS[0], setToday=dayS[1];
@@ -1880,7 +2489,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     function refresh(){
       var startSeq=seqRef.current;
       return apiGet('/api/state').then(function(r){
-        if(r.status===401){ setAuth('out'); return null; }
+        if(r.status===401){ loadMe(); return null; }
         if(!r.ok) throw new Error('state '+r.status);
         return r.json();
       }).then(function(j){
@@ -1896,10 +2505,23 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       });
     }
     function scheduleRefresh(){ clearTimeout(refTimer.current); refTimer.current=setTimeout(refresh,600); }
+    // signed out → sign in; passcode only → set up your sign-in; a person → load their spaces
+    function loadMe(){
+      return apiGet('/api/me').then(function(r){ if(r.status===401){ authRef.current='signin'; setAuth('signin'); return null; } if(!r.ok) throw new Error('me '+r.status); return r.json(); }).then(function(j){
+        if(!j) return;
+        if(!j.person){ setClaimable(j.claimable||[]); authRef.current='setup'; setAuth('setup'); return; }
+        setMe(j.person); authRef.current='in'; setAuth('in'); refresh(); flush();
+      }).catch(function(){ setSyncTo('offline'); clearTimeout(retryTmr.current); retryTmr.current=setTimeout(loadMe,5000); });
+    }
+    function signOut(){
+      if(outboxRef.current.length){ showToast({text:'Wait a moment: '+outboxRef.current.length+' change'+(outboxRef.current.length>1?'s are':' is')+' still sending.'}); flush(); return; }
+      apiPost('/api/logout',{}).then(function(){},function(){}).then(function(){ serverRef.current=null; setStore(null); setMe(null); setSettingsOpen(false); setPanel(null); authRef.current='signin'; setAuth('signin'); });
+    }
+    function changePassword(cur,next){ return apiPost('/api/password',{current:cur,next:next}).then(function(r){ return r.json().catch(function(){return {};}).then(function(j){ return {ok:r.ok,j:j}; }); }); }
     function labelOf(ops){ for(var i=0;i<ops.length;i++){ if(ops[i]._label) return '“'+ops[i]._label+'”'; } return 'your change'; }
     function dropFromOutbox(batch){ var ks={}; batch.forEach(function(o){ ks[o._k]=1; }); outboxRef.current=outboxRef.current.filter(function(o){ return !ks[o._k]; }); saveOutbox(outboxRef.current); }
     function flush(){
-      if(inflightRef.current || !outboxRef.current.length || authRef.current==='out') return;
+      if(inflightRef.current || !outboxRef.current.length || authRef.current!=='in') return;
       var batch=outboxRef.current.slice(0,40);
       inflightRef.current=true;
       var slow=setTimeout(function(){ setSyncTo('saving'); },1000);
@@ -1912,7 +2534,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
           if(outboxRef.current.length) flush(); else scheduleRefresh();
           return;
         }
-        if(r.status===401){ setAuth('out'); setSyncTo('expired'); return; }
+        if(r.status===401){ setSyncTo('expired'); loadMe(); return; }
         if(r.status===400){
           // the server turned these down outright; retrying won't help, so drop them and resync
           dropFromOutbox(batch); seqRef.current++; rebuild(); scheduleRefresh();
@@ -1951,7 +2573,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     // the day turns over at 4am; if you were looking at today, you move with it
     function checkDay(){ var t=logicalToday(); if(t!==TODAY){ var old=TODAY; TODAY=t; setToday(t); setSel(function(s){ return s===old?t:s; }); } }
 
-    useEffect(function(){ refresh(); flush();
+    useEffect(function(){ loadMe();
       function onVis(){ if(document.visibilityState!=='hidden'){ checkDay(); refresh(); flush(); } else { releaseAllHeld(); } }
       function onOnline(){ retryNow(); refresh(); }
       function onHide(){ releaseAllHeld(); }
@@ -1962,8 +2584,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       return function(){ window.removeEventListener('focus',onVis); document.removeEventListener('visibilitychange',onVis); window.removeEventListener('online',onOnline); window.removeEventListener('pagehide',onHide); clearInterval(iv); clearInterval(dv); };
     },[]);
     useEffect(function(){ try{ if(localStorage.getItem('sp_intro_v1')!=='1') setShowIntro(true); }catch(e){} },[]);
-    function setView2(v){ setView(v); lsSet('sp_view',v); }
-    function setWho2(w){ setWho(w); lsSet('sp_who',w); }
+    function setView2(v){ setView(v); lsSet('sp_view',v); setPanel(null); }
 
     // everything below is the current space's
     VIEW.space=space;
@@ -1996,12 +2617,16 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       var r=document.getElementById('root'); if(r){ r.setAttribute('data-radius', rd); if(bgp&&bgp.dark) r.setAttribute('data-ground','dark'); else r.removeAttribute('data-ground'); }
     }catch(e){} },[settings]);
     // while a focus session runs, sync faster so both people see start/pause/reset within a few seconds
-    useEffect(function(){ var f=focus; if(!f||f.status!=='running') return; var iv=setInterval(function(){ if(document.visibilityState!=='hidden') refresh(); },5000); return function(){ clearInterval(iv); }; },[focus&&focus.status]);
+    useEffect(function(){ var f=focus; if(!f||f.status!=='running'||Date.now()>(f.ends_at||0)) return; var iv=setInterval(function(){ if(document.visibilityState!=='hidden') refresh(); },5000); return function(){ clearInterval(iv); }; },[focus&&focus.status]);
 
     // task ops — edits send only the fields that changed
     function findTask(id){ return (tasks||[]).filter(function(t){return t.id===id;})[0]; }
     function patchTask(t,fields){ commit([{op:'patch',table:'tasks',id:t.id,fields:fields,_label:t.title}]); }
-    function toggleTask(t){ patchTask(t,{done:!t.done}); }
+    function toggleTask(t){
+      // the moment: ticking shows what it earned
+      if(!t.done && !isEventType(t.type) && showScores){ var r=taskPoints(t,TODAY,whoami); showToast({text:'+'+r.n+(r.onTime?' · done on time':'')+(r.helped?' · you helped':'')}); }
+      patchTask(t,{done:!t.done}); }
+    function takeOne(t){ if(!t) return; var was=t.owner; commit([{op:'patch',table:'tasks',id:t.id,fields:{owner:EVERYONE},_label:t.title}]); showToast({text:'“'+t.title+'” is now for both of you',action:{label:'Undo',fn:function(){ commit([{op:'patch',table:'tasks',id:t.id,fields:{owner:was}}]); }},ms:6500}); }
     function scheduleTask(t,ds,time){ patchTask(t,{date:ds,time:(time!=null?time:(t.time||''))}); }
     var carry={ onToday:function(t){ patchTask(t,{date:TODAY}); }, onPick:function(t,ds){ patchTask(t,{date:ds}); }, onUnplan:function(t){ patchTask(t,{date:'',time:''}); } };
     function moveAllToday(list){
@@ -2109,20 +2734,34 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       if(w && w.created_at>lastWaveRef.current){ lastWaveRef.current=w.created_at; if(w.sender && w.sender!==whoami){ var nm=nameOf(w.sender); showToast({emoji:w.emoji||'💛',text:nm+' sent you '+(w.emoji||'💛'),big:true}); notify(nm+' waved '+(w.emoji||'💛'),'They’re here with you.'); } }
       if(fkey!==lastFocusKeyRef.current){ var prev=lastFocusKeyRef.current; lastFocusKeyRef.current=fkey; if(f && f.status==='running' && f.started_by && f.started_by!==whoami && prev.indexOf('run:'+f.ends_at)!==0){ var fn=nameOf(f.started_by); showToast({emoji:'⏳',text:fn+' started a '+(f.minutes||25)+'-min focus'}); notify(fn+' is focusing',(f.label||'Deep work')+' · '+(f.minutes||25)+' min'); } }
     },[wave&&wave.created_at, focus&&focus.ends_at, focus&&focus.status]);
-    function saveJournal(text,tag){ var id=TODAY+'_'+whoami; var row={id:id,date:TODAY,owner:whoami,text:text,tag:tag,updated_at:Date.now(),space_id:space}; commit([{op:'upsert',table:'journal',row:row,prepend:true,_label:'tonight’s journal'}]); }
-    // names live on people now: save only the ones that changed
-    function saveSettings(nm){ var ops=[]; Object.keys(nm).forEach(function(id){ var n=(nm[id]||'').trim(); var p=personOf(id); if(n && (!p||p.name!==n)) ops.push({op:'patch',table:'people',id:id,fields:{name:n},_label:'the names'}); }); commit(ops); }
-    function pickWho(w,name){ setWho2(w); setNeedWho(false); if(name) commit([{op:'patch',table:'people',id:w,fields:{name:name},_label:'your name'}]); }
-    function switchWho(w){ setWho2(w); setFilter('all'); showToast({text:'This device is now '+nameOf(w)}); }
+    function saveJournal(text,tag,share){ var id=TODAY+'_'+whoami; var row={id:id,date:TODAY,owner:whoami,text:text,tag:tag,updated_at:Date.now(),space_id:share?space:null}; commit([{op:'upsert',table:'journal',row:row,prepend:true,_label:'tonight’s journal'}]); }
+    // you rename yourself; the other person names themselves
+    function saveMyName(name){ var p=personOf(whoami); if(name && (!p||p.name!==name)){ commit([{op:'patch',table:'people',id:whoami,fields:{name:name},_label:'your name'}]); if(me) setMe(Object.assign({},me,{name:name})); } }
+    // a finished focus session is logged once, by whoever started it, then the timer resets
+    useEffect(function(){ var f=focus; if(!f||f.status!=='running'||!f.ends_at||f.started_by!==whoami) return;
+      function finish(){ commit([{op:'upsert',table:'focus_log',row:{id:space+'_'+f.ends_at+'_'+whoami,space_id:space,person_id:whoami,minutes:f.minutes||25,label:f.label||'',ended_at:f.ends_at}},
+        {op:'upsert',table:'focus',row:Object.assign({},f,{id:space,status:'idle',label:'',ends_at:0,remaining:0,started_by:'',updated_at:Date.now()}),_label:'the focus timer'}]);
+        showToast({emoji:'⏳',text:'Focus done'+(showScores?(' · +'+PTS.focus):'')}); notify('Focus done',(f.label||'Deep work')+' · '+(f.minutes||25)+' min'); }
+      var ms=f.ends_at-Date.now(); if(ms<=0){ finish(); return; } var tm=setTimeout(finish,ms+300); return function(){ clearTimeout(tm); };
+    },[focus&&focus.status, focus&&focus.ends_at, whoami]);
 
     // memos
     var counts=useMemo(function(){ var c={today:0}; (tasks||[]).forEach(function(t){ if(!t.parent_id&&t.date===TODAY&&!t.done)c.today++; }); c.today+=carriedFrom(tasks,function(){return true;}).length; return c; },[tasks,today]);
     var projCounts=useMemo(function(){ var m={}; (tasks||[]).forEach(function(t){ if(t.project&&!t.done)m[t.project]=(m[t.project]||0)+1; }); return m; },[tasks]);
     var upcoming=useMemo(function(){ return upcomingFrom(projects,tasks); },[projects,tasks]);
+    // points this week, for this space
+    var spaceRow=((store&&store.spaces)||[]).filter(function(x){return x.id===space;})[0];
+    var showScores=scoresOn(spaceRow)&&VIEW.members.length>1;
+    var jdays={}; ((store&&store.journal_days)||[]).concat(journal||[]).forEach(function(j){ if(j.text!=null&&!(j.text||'').trim()) return; jdays[j.date+'|'+j.owner]={date:j.date,owner:j.owner}; });
+    var wkData={tasks:tasks||[],habits:habitDefs||[],habitLogs:habitLogs||[],journal:Object.keys(jdays).map(function(k){return jdays[k];}),focusLog:((store&&store.focus_log)||[]).filter(function(f){return f.space_id===space;}),members:VIEW.members};
+    var thisWeek=(store&&showScores)?scoreWeek(wkData,mondayOf(TODAY)):null;
+    var helpFor=null; if(thisWeek){ var tIdx=Math.max(0,weekDates(mondayOf(TODAY)).indexOf(TODAY)); VIEW.members.forEach(function(m){ if(!helpFor&&m!==whoami&&needsHand(tasks,mondayOf(TODAY),m,tIdx)) helpFor=m; }); }
 
-    if(auth==='out'){ return html`<${Gate} onIn=${function(){ authRef.current='checking'; setAuth('checking'); refresh(); }} />`; }
+    if(auth==='signin'){ return html`<${SignIn} onIn=${loadMe} onSetup=${function(){ setClaimable(null); authRef.current='setup'; setAuth('setup'); }} />`; }
+    if(auth==='setup'){ return html`<${Setup} claimable=${claimable} onIn=${loadMe} onSignIn=${function(){ authRef.current='signin'; setAuth('signin'); }} />`; }
     var loading=!store;
-    var openProj=(projects||[]).filter(function(p){return p.id===panel;})[0];
+    var openProj=panel?(projects||[]).filter(function(p){return p.id===panel;})[0]:null;
+    var v=(view==='week'&&!showScores)?'today':view;
     var editingTask=modal&&modal.editing;
     var modalChildren=editingTask?childrenOf(tasks,editingTask.id):[];
 
@@ -2143,45 +2782,49 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       <div class="prof"><span class="pav">${initialOf(whoami)}</span><span class="pname">${nameOf(whoami)}</span></div>
       <button class="addbtn" onClick=${function(){setModal({defaultDate:TODAY});}}>
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#1F6FEB"/><path d="M12 8v8M8 12h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>Add task</button>
-      <button class=${'nav'+(view==='today'?' sel':'')} onClick=${function(){setView2('today');}}><span style=${{display:'flex',color:view==='today'?'#195FD0':'#54606E'}}><${Icon}>${icons.today}<//></span>Today<span class="cnt">${counts.today||''}</span></button>
-      <button class=${'nav'+(view==='tasks'?' sel':'')} onClick=${function(){setView2('tasks');}}><span style=${{display:'flex',color:view==='tasks'?'#195FD0':'#54606E'}}><${Icon}>${icons.tasks}<//></span>Tasks<span class="cnt">${(tasks||[]).filter(function(t){return !t.done;}).length||''}</span></button>
-      <button class=${'nav'+(view==='calendar'?' sel':'')} onClick=${function(){setView2('calendar');}}><span style=${{display:'flex',color:view==='calendar'?'#195FD0':'#54606E'}}><${Icon}>${icons.calendar}<//></span>Calendar</button>
-      <button class=${'nav'+(view==='projects'?' sel':'')} onClick=${function(){setView2('projects');}}><span style=${{display:'flex',color:view==='projects'?'#195FD0':'#54606E'}}><${Icon}>${icons.projects}<//></span>Projects</button>
-      <button class=${'nav'+(view==='journal'?' sel':'')} onClick=${function(){setView2('journal');}}><span style=${{display:'flex',color:view==='journal'?'#195FD0':'#54606E'}}><${Icon}>${icons.journal}<//></span>Journal</button>
+      <button class=${'nav'+(v==='today'&&!openProj?' sel':'')} onClick=${function(){setView2('today');}}><span style=${{display:'flex',color:v==='today'&&!openProj?'#195FD0':'#54606E'}}><${Icon}>${icons.today}<//></span>Today<span class="cnt">${counts.today||''}</span></button>
+      ${showScores?html`<button class=${'nav'+(v==='week'&&!openProj?' sel':'')} onClick=${function(){setView2('week');}}><span style=${{display:'flex',color:v==='week'&&!openProj?'#195FD0':'#54606E'}}><${Icon}>${icons.week}<//></span>This week<span class="cnt">${thisWeek&&thisWeek.people[whoami]&&thisWeek.people[other]?(thisWeek.people[whoami].points+' · '+thisWeek.people[other].points):''}</span></button>`:null}
+      <button class=${'nav'+(v==='tasks'&&!openProj?' sel':'')} onClick=${function(){setView2('tasks');}}><span style=${{display:'flex',color:v==='tasks'&&!openProj?'#195FD0':'#54606E'}}><${Icon}>${icons.tasks}<//></span>Tasks<span class="cnt">${(tasks||[]).filter(function(t){return !t.done;}).length||''}</span></button>
+      <button class=${'nav'+(v==='calendar'&&!openProj?' sel':'')} onClick=${function(){setView2('calendar');}}><span style=${{display:'flex',color:v==='calendar'&&!openProj?'#195FD0':'#54606E'}}><${Icon}>${icons.calendar}<//></span>Calendar</button>
+      <button class=${'nav'+(v==='projects'||openProj?' sel':'')} onClick=${function(){setView2('projects');}}><span style=${{display:'flex',color:v==='projects'||openProj?'#195FD0':'#54606E'}}><${Icon}>${icons.projects}<//></span>Projects</button>
+      <button class=${'nav'+(v==='journal'&&!openProj?' sel':'')} onClick=${function(){setView2('journal');}}><span style=${{display:'flex',color:v==='journal'&&!openProj?'#195FD0':'#54606E'}}><${Icon}>${icons.journal}<//></span>Journal</button>
       <div class="sec">Projects</div>
       ${(projects||[]).filter(function(p){return !p.archived;}).map(function(p){ return html`<button class="nav" key=${p.id} onClick=${function(){setPanel(p.id);}}><span class="dot" style=${{background:p.color}}></span>${p.name}<span class="cnt">${projCounts[p.id]||''}</span></button>`; })}
       <button class="nav" style=${{color:'#195FD0',fontWeight:600}} onClick=${function(){setPEdit({});}}>+ New project</button>
       <${FocusWidget} focus=${focus} whoami=${whoami} onStart=${startFocus} onPause=${pauseFocus} onResume=${resumeFocus} onReset=${resetFocus} />
       <button class="helpbtn" onClick=${function(){setShowIntro(true);}}><span style=${{display:'flex',color:'#54606E'}}><${Icon}>${icons.help}<//></span>How it works</button>
       <button class="nav" onClick=${function(){setSettingsOpen(true);}}><span style=${{display:'flex',color:'#54606E'}}><${Icon}>${icons.settings}<//></span>Settings</button>
-      <div class="sfoot">${VIEW.members.slice(0,3).map(function(m,k){ return html`<span key=${m} class="av avm" style=${{background:personColor(m),marginLeft:k?'-8px':0,border:k?'2px solid var(--sidebar)':'0'}}>${initialOf(m)}</span>`; })}${syncTxt?html`<span class=${'syncln '+sync.st} role="status"><i class="syncdot"></i>${syncTxt}${sync.st==='error'?html` · <button class="linkbtn" onClick=${retryNow}>Retry</button>`:null}</span>`:html`<span style=${{fontWeight:500,fontSize:'12px',color:'#8A93A0',marginLeft:'4px'}}>Shared planner</span>`}</div>
+      <div class="sfoot">${VIEW.members.slice(0,3).map(function(m,k){ return html`<span key=${m} class="av avm" style=${{background:personColor(m),marginLeft:k?'-8px':0,border:k?'2px solid var(--sidebar)':'0'}}>${initialOf(m)}</span>`; })}${syncTxt?html`<span class=${'syncln '+sync.st} role="status"><i class="syncdot"></i>${syncTxt}${sync.st==='error'?html` · <button class="linkbtn" onClick=${retryNow}>Retry</button>`:null}</span>`:html`<span style=${{fontWeight:500,fontSize:'12px',color:'#8A93A0',marginLeft:'4px'}}>hate club</span>`}</div>
     </aside>`;
 
-    var titleTxt = ({today:'Today',tasks:'Tasks',calendar:'Calendar',projects:'Projects',journal:'Journal',settings:'Settings'})[view]||'Today';
+    var titleTxt = openProj?'Projects':(({today:'Today',week:'This week',tasks:'Tasks',calendar:'Calendar',projects:'Projects',journal:'Journal'})[v]||'Today');
     var content;
-    if(loading){ content=html`<div class="empty" style=${{marginTop:'60px',color:'#3C6FB0'}}><div class="big">Loading your planner…</div><div class="sub">Syncing shared data.</div></div>`; }
-    else if(view==='today'){ content=html`<${Fragment}>${showGS?html`<${GetStarted} steps=${gsSteps} done=${gsDone} onDismiss=${function(){setGsHide(true);lsSet('sp_gs_hide','1');}} />`:null}<div class="mobfocus"><${FocusWidget} focus=${focus} whoami=${whoami} onStart=${startFocus} onPause=${pauseFocus} onResume=${resumeFocus} onReset=${resetFocus} /></div><${Today} sel=${sel} filter=${filter} projects=${projects} tasks=${tasks} routines=${routines} upcoming=${upcoming} habits=${habitDefs} habitLogs=${habitLogs} topics=${topics} topicLinks=${topicLinks} settings=${settings} whoami=${whoami} onToggle=${toggleTask} onEdit=${function(t){setModal({editing:t});}} onAdd=${function(d){setModal({defaultDate:d});}} carry=${carry} onMoveAllToday=${moveAllToday} onSetHabit=${checkHabit} onStepHabit=${stepHabit} onEditHabit=${function(h){setHabitEdit(h);}} onAddHabit=${function(){setHabitEdit({});}} notes=${notes} onAddNote=${addNote} onSaveNote=${saveNoteText} onSetNoteColor=${setNoteColor} onDeleteNote=${deleteNote} onGoJournal=${function(){setView2('journal');}} onShowAll=${function(){setView2('tasks');}} /><//>`; }
-    else if(view==='tasks'){ content=html`<${TasksTable} tasks=${tasks} projects=${projects} onEdit=${function(t){setModal({editing:t});}} onToggle=${toggleTask} />`; }
-    else if(view==='calendar'){ content=html`<${Calendar} tasks=${tasks} projects=${projects} onAddDay=${function(ds){setModal({defaultDate:ds});}} onAddSlot=${function(ds,tm){setModal({defaultDate:ds,defaultTime:tm,defaultType:'event'});}} onEditTask=${function(t){setModal({editing:t});}} onOpenProject=${function(id){setPanel(id);}} onToggle=${toggleTask} onSchedule=${scheduleTask} onNewProject=${function(s,e){setPEdit({start_date:s,end_date:e});}} />`; }
-    else if(view==='projects'){ content=html`<${Projects} projects=${projects} tasks=${tasks} onOpen=${function(id){setPanel(id);}} onNew=${function(){setPEdit({});}} />`; }
+    if(loading){ content=html`<div class="empty" style=${{marginTop:'60px',color:'#3C6FB0'}}><div class="big">${sync.st==='offline'?'Can’t reach the server':'Loading your planner…'}</div><div class="sub">${sync.st==='offline'?'Trying again in a few seconds.':'Syncing shared data.'}</div></div>`; }
+    else if(openProj){ content=html`<${ProjectPage} key=${openProj.id} project=${openProj} tasks=${tasks} materials=${materials} onBack=${function(){setPanel(null);}} onToggle=${toggleTask} onEdit=${function(p){setPEdit(p);}} onEditTask=${function(t){setModal({editing:t});}} onAddItem=${addProjectItem} onAddSub=${addSubtask} onAddMaterial=${addMaterial} onDelMaterial=${delMaterial} onReopen=${reopenProject} onFinish=${finishProject} />`; }
+    else if(v==='week'){ content=html`<${WeekPage} data=${wkData} projects=${projects} onToggle=${toggleTask} onTakeOne=${takeOne} onCheer=${function(){ sendWave('💪'); }} />`; }
+    else if(v==='today'){ content=html`<${Fragment}>${showGS?html`<${GetStarted} steps=${gsSteps} done=${gsDone} onDismiss=${function(){setGsHide(true);lsSet('sp_gs_hide','1');}} />`:null}<div class="mobfocus"><${FocusWidget} focus=${focus} whoami=${whoami} onStart=${startFocus} onPause=${pauseFocus} onResume=${resumeFocus} onReset=${resetFocus} /></div><${Today} sel=${sel} filter=${filter} projects=${projects} tasks=${tasks} routines=${routines} upcoming=${upcoming} habits=${habitDefs} habitLogs=${habitLogs} topics=${topics} topicLinks=${topicLinks} settings=${settings} whoami=${whoami} onToggle=${toggleTask} onEdit=${function(t){setModal({editing:t});}} onAdd=${function(d){setModal({defaultDate:d});}} carry=${carry} onMoveAllToday=${moveAllToday} onSetHabit=${checkHabit} onStepHabit=${stepHabit} onEditHabit=${function(h){setHabitEdit(h);}} onAddHabit=${function(){setHabitEdit({});}} notes=${notes} onAddNote=${addNote} onSaveNote=${saveNoteText} onSetNoteColor=${setNoteColor} onDeleteNote=${deleteNote} onGoJournal=${function(){setView2('journal');}} onShowAll=${function(){setView2('tasks');}} score=${thisWeek} help=${helpFor} onOpenWeek=${function(){setView2('week');}} /><//>`; }
+    else if(v==='tasks'){ content=html`<${TasksTable} tasks=${tasks} projects=${projects} onEdit=${function(t){setModal({editing:t});}} onToggle=${toggleTask} />`; }
+    else if(v==='calendar'){ content=html`<${Calendar} tasks=${tasks} projects=${projects} onAddDay=${function(ds){setModal({defaultDate:ds});}} onAddSlot=${function(ds,tm){setModal({defaultDate:ds,defaultTime:tm,defaultType:'event'});}} onEditTask=${function(t){setModal({editing:t});}} onOpenProject=${function(id){setPanel(id);}} onToggle=${toggleTask} onSchedule=${scheduleTask} onNewProject=${function(s,e){setPEdit({start_date:s,end_date:e});}} />`; }
+    else if(v==='projects'){ content=html`<${Projects} projects=${projects} tasks=${tasks} onOpen=${function(id){setPanel(id);}} onNew=${function(){setPEdit({});}} onEdit=${function(p){setPEdit(p);}} onToggle=${toggleTask} onPickDates=${function(){setView2('calendar');}} />`; }
     // settings is a modal now (opened from the sidebar / mobile tab), not a view.
     else { content=html`<${Journal} entries=${journal} whoami=${whoami} pending=${jPending} offline=${sync.st==='offline'} topics=${topics} topicLinks=${topicLinks} onSave=${saveJournal} onSetTopic=${setWeekTopic} onAddTopicLink=${addTopicLink} onDelTopicLink=${delTopicLink} />`; }
 
-    var navBtns=['today','tasks','calendar','projects','journal','settings'];
+    var navBtns=showScores?['today','week','calendar','projects','more']:['today','calendar','projects','tasks','more'];
+    var NAVL={today:'Today',week:'Week',calendar:'Calendar',projects:'Projects',tasks:'Tasks',more:'More'};
     return html`<div class="app">
       ${sidebar}
       <main class="main"><div class="wrap">
         <div class="topbar">
-          <div class="brandrow"><span class="brand">SP</span><div><div class="eyebrow">Shared Planner</div><h1 class="title">${titleTxt}</h1></div></div>
+          <div class="brandrow"><span class="brand">hc</span><div><div class="eyebrow">hate club</div><h1 class="title">${titleTxt}</h1></div></div>
           <div class="ctrls">
             <button class="navcirc mobonly" style=${{width:'36px',height:'36px'}} aria-label="How it works" onClick=${function(){setShowIntro(true);}}><${Icon} s=${16}>${icons.help}<//></button>
             ${syncTxt?html`<button class=${'syncbtn mobonly '+sync.st} aria-label=${syncTxt} onClick=${function(){ showToast({text:syncTxt,action:sync.st==='error'?{label:'Retry',fn:retryNow}:null,ms:5000}); }}><i class="syncdot"></i><span class="syncw">${sync.st==='offline'?('Offline'+(sync.n?(' · '+sync.n):'')):sync.st==='error'?'Not saved':'Saving'}</span></button>`:null}
-            ${view==='today'?html`<div class="seg" role="group" aria-label="Filter"><button class=${filter==='all'?'on':''} onClick=${function(){setFilter('all');}}>All</button><button class=${filter==='mine'?'on':''} onClick=${function(){setFilter('mine');}}>Mine</button></div>`:null}
-            ${view==='projects'?html`<button class="pillbtn" onClick=${function(){setPEdit({});}}>+ New project</button>`:null}
-            ${view==='tasks'?html`<button class="pillbtn" onClick=${function(){setModal({defaultDate:TODAY});}}>+ New task</button>`:null}
+            ${v==='today'&&!openProj?html`<div class="seg" role="group" aria-label="Filter"><button class=${filter==='all'?'on':''} onClick=${function(){setFilter('all');}}>All</button><button class=${filter==='mine'?'on':''} onClick=${function(){setFilter('mine');}}>Mine</button></div>`:null}
+            ${v==='projects'&&!openProj?html`<button class="pillbtn" onClick=${function(){setPEdit({});}}>+ New project</button>`:null}
+            ${v==='tasks'&&!openProj?html`<button class="pillbtn" onClick=${function(){setModal({defaultDate:TODAY});}}>+ New task</button>`:null}
           </div>
         </div>
-        ${view==='today'&&!loading?html`<div class="datesel">
+        ${v==='today'&&!loading&&!openProj?html`<div class="datesel">
           <button class="navcirc" aria-label="Previous week" onClick=${function(){setSel(ymd(addDays(parseYmd(sel),-7)));}}>${chevL}</button>
           <div class="days">${(function(){var start=startOfWeek(parseYmd(sel));var out=[];for(var i=0;i<7;i++){(function(){var d=addDays(start,i);var ds=ymd(d);out.push(html`<button class="daycell" key=${ds} onClick=${function(){setSel(ds);}}><div class="dletter">${DOWL[d.getDay()]}</div><div class=${'ddisc'+(ds===TODAY?' today':'')+(ds===sel?' sel':'')}>${d.getDate()}</div></button>`);})();}return out;})()}</div>
           <button class="navcirc" aria-label="Next week" onClick=${function(){setSel(ymd(addDays(parseYmd(sel),7)));}}>${chevR}</button>
@@ -2189,14 +2832,13 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
         ${content}
       </div></main>
 
-      <nav class="mobnav">${navBtns.map(function(v){ var lbl=v.charAt(0).toUpperCase()+v.slice(1); return html`<button key=${v} class=${view===v?'on':''} onClick=${function(){ if(v==='settings') setSettingsOpen(true); else setView2(v); }}><${Icon} s=${20}>${icons[v]}<//>${lbl}</button>`; })}</nav>
+      <nav class="mobnav">${navBtns.map(function(k){ var on=k==='more'?(navBtns.indexOf(v)<0&&!openProj):(k==='projects'?(v==='projects'||!!openProj):(v===k&&!openProj)); return html`<button key=${k} class=${on?'on':''} aria-current=${on?'page':null} onClick=${function(){ if(k==='more') setMoreOpen(true); else setView2(k); }}><${Icon} s=${20}>${icons[k]}<//>${NAVL[k]}</button>`; })}</nav>
+      ${moreOpen?html`<${MoreSheet} onClose=${function(){setMoreOpen(false);}} onPick=${function(k){ setMoreOpen(false); if(k==='settings') setSettingsOpen(true); else if(k==='help') setShowIntro(true); else setView2(k); }} />`:null}
 
       ${modal?html`<${TaskModal} key=${editingTask?editingTask.id:'new'} parent=${editingParent} onOpenParent=${function(p){setModal({editing:p});}} editing=${modal.editing} children=${modalChildren} defaultDate=${modal.defaultDate} defaultTime=${modal.defaultTime} defaultType=${modal.defaultType} defaultProject=${modal.defaultProject} whoami=${whoami} projects=${projects} onClose=${function(){setModal(null);}} onSave=${saveTask} onDelete=${deleteTask} />`:null}
       ${pEdit?html`<${ProjectEditor} editing=${pEdit} whoami=${whoami} onClose=${function(){setPEdit(null);}} onSave=${saveProject} onDelete=${askDeleteProject} />`:null}
-      ${openProj?html`<${ProjectPanel} project=${openProj} tasks=${tasks} materials=${materials} onClose=${function(){setPanel(null);}} onToggle=${toggleTask} onEdit=${function(p){setPEdit(p);}} onEditTask=${function(t){setModal({editing:t});}} onAddItem=${addProjectItem} onAddSub=${addSubtask} onAddMaterial=${addMaterial} onDelMaterial=${delMaterial} onReopen=${reopenProject} />`:null}
-      ${needWho&&!loading?html`<${WhoModal} members=${VIEW.members} onPick=${pickWho} />`:null}
-      ${showIntro&&!needWho?html`<${Intro} onClose=${function(){setShowIntro(false);lsSet('sp_intro_v1','1');}} />`:null}
-      ${settingsOpen?html`<${SettingsModal} settings=${settings} habits=${habitDefs} whoami=${whoami} themeBg=${(settings&&settings.theme_bg)||'sky'} themeFont=${(settings&&settings.theme_font)||'inter'} themeRad=${(settings&&settings.theme_radius)||'default'} onSetTheme=${setTheme} onSaveNames=${saveSettings} onSwitchWho=${switchWho} onAddHabit=${function(){setHabitEdit({});}} onEditHabit=${function(h){setHabitEdit(h);}} onHowItWorks=${function(){setSettingsOpen(false);setShowIntro(true);}} onClose=${function(){setSettingsOpen(false);}} />`:null}
+      ${showIntro?html`<${Intro} onClose=${function(){setShowIntro(false);lsSet('sp_intro_v1','1');}} />`:null}
+      ${settingsOpen?html`<${SettingsModal} settings=${settings} habits=${habitDefs} whoami=${whoami} themeBg=${(settings&&settings.theme_bg)||'sky'} themeFont=${(settings&&settings.theme_font)||'inter'} themeRad=${(settings&&settings.theme_radius)||'default'} onSetTheme=${setTheme} me=${me} members=${VIEW.members} onSaveName=${saveMyName} onChangePassword=${changePassword} onSignOut=${signOut} onAddHabit=${function(){setHabitEdit({});}} onEditHabit=${function(h){setHabitEdit(h);}} onHowItWorks=${function(){setSettingsOpen(false);setShowIntro(true);}} onClose=${function(){setSettingsOpen(false);}} />`:null}
       ${habitEdit?html`<${HabitEditor} editing=${habitEdit.id?habitEdit:null} whoami=${whoami} onClose=${function(){setHabitEdit(null);}} onSave=${saveHabit} onDelete=${deleteHabit} />`:null}
       ${!loading?html`<div class="wavewrap">
         ${waveOpen?html`<div class="wavepick">${WAVE_EMOJIS.map(function(e){ return html`<button class="waveopt" key=${e} onClick=${function(){sendWave(e);}}>${e}</button>`; })}</div>`:null}

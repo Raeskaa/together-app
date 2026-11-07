@@ -2,7 +2,7 @@
 // Two people, one shared space, protected by a shared passcode (signed cookie).
 
 const TABLES = {
-  tasks: ['id', 'title', 'project', 'owner', 'type', 'date', 'time', 'due', 'due_time', 'done', 'subtodos', 'parent_id', 'sort', 'created_at', 'space_id'],
+  tasks: ['id', 'title', 'project', 'owner', 'type', 'date', 'time', 'due', 'due_time', 'done', 'subtodos', 'parent_id', 'sort', 'created_at', 'space_id', 'done_at', 'done_by'],
   projects: ['id', 'name', 'color', 'owner', 'kind', 'start_date', 'end_date', 'description', 'archived', 'sort', 'created_at', 'space_id'],
   project_materials: ['id', 'project_id', 'title', 'url', 'sort', 'created_at'],
   journal: ['id', 'date', 'owner', 'text', 'tag', 'updated_at', 'space_id'],
@@ -15,6 +15,7 @@ const TABLES = {
   people: ['id', 'name', 'color', 'created_at'],
   spaces: ['id', 'name', 'kind', 'created_at'],
   members: ['id', 'space_id', 'person_id', 'role', 'joined_at'],
+  focus_log: ['id', 'space_id', 'person_id', 'minutes', 'label', 'ended_at'],
 };
 
 // Everything lives in a space. Until there is more than one, rows without one belong to this one.
@@ -26,7 +27,8 @@ const PERSON_COLS = ['owner', 'sender', 'started_by'];
 function normalizeRow(table, row, isNew) {
   const r = { ...row };
   for (const c of PERSON_COLS) if (c in r && r[c] in LEGACY_OWNER) r[c] = LEGACY_OWNER[r[c]];
-  if (isNew && TABLES[table].includes('space_id') && !r.space_id) r.space_id = DEFAULT_SPACE;
+  // a journal entry without a space is private on purpose; every other row lives in one
+  if (isNew && table !== 'journal' && TABLES[table].includes('space_id') && !r.space_id) r.space_id = DEFAULT_SPACE;
   if ((table === 'focus' && r.id === 'shared') || (table === 'waves' && r.id === 'latest')) r.id = DEFAULT_SPACE;
   if (table === 'journal' && typeof r.id === 'string') r.id = r.id.replace(/^(\d{4}-\d{2}-\d{2})_(me|partner)$/, (m, d, o) => d + '_' + LEGACY_OWNER[o]);
   return r;
@@ -62,22 +64,72 @@ async function hmac(secret, msg) {
   const sig = await crypto.subtle.sign('HMAC', key, enc.encode(msg));
   return [...new Uint8Array(sig)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
-async function makeToken(secret) {
-  const body = 'v1.' + (Date.now() + MAXAGE * 1000);
+// v1.<exp>.<sig> is the old shared-passcode cookie: it can only set up an account.
+// v2.<person>.<exp>.<sig> is a signed-in person.
+async function makeToken(secret, personId) {
+  const exp = Date.now() + MAXAGE * 1000;
+  const body = personId ? 'v2.' + personId + '.' + exp : 'v1.' + exp;
   return body + '.' + (await hmac(secret, body));
 }
-async function verifyToken(secret, token) {
-  if (!token) return false;
-  const parts = token.split('.');
-  if (parts.length !== 3 || parts[0] !== 'v1') return false;
-  const exp = Number(parts[1]);
-  if (!exp || Date.now() > exp) return false;
-  const good = await hmac(secret, 'v1.' + exp);
-  if (good.length !== parts[2].length) return false;
+function sameString(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false;
   let diff = 0;
-  for (let i = 0; i < good.length; i++) diff |= good.charCodeAt(i) ^ parts[2].charCodeAt(i);
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
   return diff === 0;
 }
+// null | { person: null } (passcode only) | { person: 'p_…' }
+async function readToken(secret, token) {
+  if (!token) return null;
+  const parts = token.split('.');
+  let body, sig, exp, person = null;
+  if (parts[0] === 'v1' && parts.length === 3) { exp = Number(parts[1]); body = 'v1.' + parts[1]; sig = parts[2]; }
+  else if (parts[0] === 'v2' && parts.length === 4) { person = parts[1]; exp = Number(parts[2]); body = parts.slice(0, 3).join('.'); sig = parts[3]; }
+  else return null;
+  if (!exp || Date.now() > exp) return null;
+  return sameString(await hmac(secret, body), sig) ? { person } : null;
+}
+function sessionCookie(url, token) {
+  const sec = url.protocol === 'https:' ? '; Secure' : '';
+  return `${COOKIE}=${token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${MAXAGE}${sec}`;
+}
+
+// ---- passwords: PBKDF2-SHA256 with a random salt per person ----
+// 50k rounds is ~4 ms, well inside the Workers free-plan 10 ms CPU budget; stored per person so it can be raised later.
+const PBKDF2_ITER = 50000;
+const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+function unhex(h) { const a = new Uint8Array(h.length / 2); for (let i = 0; i < a.length; i++) a[i] = parseInt(h.substr(i * 2, 2), 16); return a; }
+async function hashPassword(password, saltHex, iter) {
+  const key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+  const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: unhex(saltHex), iterations: iter }, key, 256);
+  return hex(bits);
+}
+async function newPasswordFields(password) {
+  const salt = hex(crypto.getRandomValues(new Uint8Array(16)));
+  return { pass_salt: salt, pass_iter: PBKDF2_ITER, pass_hash: await hashPassword(password, salt, PBKDF2_ITER) };
+}
+const USERNAME_RE = /^[a-z0-9._-]{3,24}$/;
+const MIN_PASSWORD = 8;
+
+// ---- too many wrong tries: 5, then a 1-minute wait ----
+const LOCK_AFTER = 5;
+const LOCK_MS = 60 * 1000;
+async function lockOf(env, key) {
+  return (await env.DB.prepare('SELECT fails, locked_until FROM login_attempts WHERE key=?1').bind(key).first()) || { fails: 0, locked_until: 0 };
+}
+async function noteFail(env, key) {
+  const st = await lockOf(env, key);
+  const fails = (st.fails || 0) + 1;
+  const lockedUntil = fails >= LOCK_AFTER ? Date.now() + LOCK_MS : 0;
+  await env.DB.prepare('INSERT INTO login_attempts (key,fails,locked_until) VALUES (?1,?2,?3) ON CONFLICT(key) DO UPDATE SET fails=excluded.fails, locked_until=excluded.locked_until')
+    .bind(key, lockedUntil ? 0 : fails, lockedUntil).run();
+  return lockedUntil ? { locked: true, wait: Math.ceil(LOCK_MS / 1000) } : { left: LOCK_AFTER - fails };
+}
+async function locked(env, key) {
+  const st = await lockOf(env, key);
+  return st.locked_until && Date.now() < st.locked_until ? Math.ceil((st.locked_until - Date.now()) / 1000) : 0;
+}
+const clearFails = (env, key) => env.DB.prepare('DELETE FROM login_attempts WHERE key=?1').bind(key).run();
+
 function cookie(req, name) {
   const c = req.headers.get('cookie') || '';
   const m = c.match(new RegExp('(?:^|; )' + name + '=([^;]+)'));
@@ -105,25 +157,100 @@ export default {
 async function api(req, env, url) {
   const p = url.pathname;
 
+  const ip = req.headers.get('cf-connecting-ip') || 'local';
+
+  // Sign in with your own username + password.
   if (p === '/api/login' && req.method === 'POST') {
     const b = await req.json().catch(() => ({}));
-    const real = (env.PLANNER_PASSCODE || '').trim();
-    if (!real) return json({ ok: false, error: 'No passcode configured on the server.' }, 500);
-    if ((b.passcode || '').trim() === real) {
-      const token = await makeToken(secret(env));
-      const sec = url.protocol === 'https:' ? '; Secure' : '';
-      const set = `${COOKIE}=${token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${MAXAGE}${sec}`;
-      return json({ ok: true }, 200, { 'set-cookie': set });
+    const username = String(b.username || '').trim().toLowerCase();
+    const password = String(b.password || '');
+    if (!username || !password) return json({ ok: false, error: 'missing' }, 400);
+    const key = 'u:' + username;
+    const wait = await locked(env, key);
+    if (wait) return json({ ok: false, error: 'locked', wait }, 429);
+    const person = await env.DB.prepare('SELECT id, pass_hash, pass_salt, pass_iter FROM people WHERE username=?1').bind(username).first();
+    const ok = !!(person && person.pass_hash && sameString(await hashPassword(password, person.pass_salt, person.pass_iter || PBKDF2_ITER), person.pass_hash));
+    if (!ok) {
+      const f = await noteFail(env, key);
+      return json({ ok: false, error: f.locked ? 'locked' : 'wrong', left: f.left || 0, wait: f.wait || 0 }, f.locked ? 429 : 401);
     }
-    return json({ ok: false, error: 'Wrong passcode.' }, 401);
+    await clearFails(env, key);
+    return json({ ok: true }, 200, { 'set-cookie': sessionCookie(url, await makeToken(secret(env), person.id)) });
+  }
+  // First time: the shared passcode opens setup (only setup) so each of you can make your own sign-in.
+  if (p === '/api/setup' && req.method === 'POST') {
+    const b = await req.json().catch(() => ({}));
+    const real = (env.PLANNER_PASSCODE || '').trim();
+    if (!real) return json({ ok: false, error: 'no_passcode' }, 500);
+    const key = 'pc:' + ip;
+    const wait = await locked(env, key);
+    if (wait) return json({ ok: false, error: 'locked', wait }, 429);
+    if (!sameString(String(b.passcode || '').trim(), real)) {
+      const f = await noteFail(env, key);
+      return json({ ok: false, error: f.locked ? 'locked' : 'wrong', left: f.left || 0, wait: f.wait || 0 }, f.locked ? 429 : 401);
+    }
+    await clearFails(env, key);
+    return json({ ok: true }, 200, { 'set-cookie': sessionCookie(url, await makeToken(secret(env), null)) });
   }
   if (p === '/api/logout' && req.method === 'POST') {
     return json({ ok: true }, 200, { 'set-cookie': `${COOKIE}=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0` });
   }
 
-  if (!(await verifyToken(secret(env), cookie(req, COOKIE)))) return json({ error: 'unauthorized' }, 401);
+  const tok = await readToken(secret(env), cookie(req, COOKIE));
+  if (!tok) return json({ error: 'unauthorized' }, 401);
 
-  if (p === '/api/state' && req.method === 'GET') return json(await loadState(env));
+  // Who am I? A passcode-only cookie gets the people who still need a sign-in.
+  if (p === '/api/me' && req.method === 'GET') {
+    if (!tok.person) {
+      const open = await env.DB.prepare("SELECT id, name FROM people WHERE pass_hash IS NULL OR pass_hash='' ORDER BY created_at").all();
+      return json({ person: null, claimable: open.results || [] });
+    }
+    const me = await env.DB.prepare('SELECT id, name, color, username FROM people WHERE id=?1').bind(tok.person).first();
+    return me ? json({ person: me }) : json({ error: 'unauthorized' }, 401);
+  }
+  // Make your sign-in: pick yourself, choose a username + password.
+  if (p === '/api/claim' && req.method === 'POST') {
+    const b = await req.json().catch(() => ({}));
+    const pid = String(b.person_id || '');
+    const username = String(b.username || '').trim().toLowerCase();
+    const password = String(b.password || '');
+    const name = String(b.name || '').trim();
+    if (!USERNAME_RE.test(username)) return json({ ok: false, error: 'bad_username' }, 400);
+    if (password.length < MIN_PASSWORD) return json({ ok: false, error: 'short_password' }, 400);
+    const person = await env.DB.prepare('SELECT id, pass_hash FROM people WHERE id=?1').bind(pid).first();
+    if (!person) return json({ ok: false, error: 'no_person' }, 404);
+    if (person.pass_hash) return json({ ok: false, error: 'taken_person' }, 409);
+    const clash = await env.DB.prepare('SELECT id FROM people WHERE username=?1 AND id!=?2').bind(username, pid).first();
+    if (clash) return json({ ok: false, error: 'taken_username' }, 409);
+    const f = await newPasswordFields(password);
+    await env.DB.prepare("UPDATE people SET username=?1, pass_hash=?2, pass_salt=?3, pass_iter=?4, name=COALESCE(NULLIF(?5,''), name) WHERE id=?6")
+      .bind(username, f.pass_hash, f.pass_salt, f.pass_iter, name, pid).run();
+    return json({ ok: true }, 200, { 'set-cookie': sessionCookie(url, await makeToken(secret(env), pid)) });
+  }
+
+  // Everything else needs a signed-in person.
+  if (!tok.person) return json({ error: 'account_needed' }, 401);
+  const me = tok.person;
+
+  if (p === '/api/password' && req.method === 'POST') {
+    const b = await req.json().catch(() => ({}));
+    const key = 'u:' + me;
+    const wait = await locked(env, key);
+    if (wait) return json({ ok: false, error: 'locked', wait }, 429);
+    const person = await env.DB.prepare('SELECT pass_hash, pass_salt, pass_iter FROM people WHERE id=?1').bind(me).first();
+    if (!person || !sameString(await hashPassword(String(b.current || ''), person.pass_salt, person.pass_iter || PBKDF2_ITER), person.pass_hash)) {
+      const f = await noteFail(env, key);
+      return json({ ok: false, error: f.locked ? 'locked' : 'wrong', left: f.left || 0 }, f.locked ? 429 : 401);
+    }
+    const next = String(b.next || '');
+    if (next.length < MIN_PASSWORD) return json({ ok: false, error: 'short_password' }, 400);
+    await clearFails(env, key);
+    const f = await newPasswordFields(next);
+    await env.DB.prepare('UPDATE people SET pass_hash=?1, pass_salt=?2, pass_iter=?3 WHERE id=?4').bind(f.pass_hash, f.pass_salt, f.pass_iter, me).run();
+    return json({ ok: true });
+  }
+
+  if (p === '/api/state' && req.method === 'GET') return json(await loadState(env, me));
 
   // The app's outbox: a list of changes applied together in one D1 batch (all or nothing).
   if (p === '/api/ops' && req.method === 'POST') {
@@ -131,7 +258,7 @@ async function api(req, env, url) {
     if (!Array.isArray(ops) || ops.length > 100) return json({ error: 'bad ops' }, 400);
     let stmts;
     try {
-      stmts = ops.flatMap((o) => opStatements(env, o));
+      stmts = ops.flatMap((o) => opStatements(env, o, me));
     } catch (e) {
       return json({ error: String((e && e.message) || e) }, 400);
     }
@@ -140,7 +267,7 @@ async function api(req, env, url) {
   }
 
   if (p === '/api/op' && req.method === 'POST') {
-    await applyOp(env, await req.json());
+    await applyOp(env, await req.json(), me);
     return json({ ok: true });
   }
   if (p === '/api/habit' && req.method === 'POST') {
@@ -170,24 +297,30 @@ function parseJSON(v, fallback) {
   }
 }
 
-async function loadState(env) {
-  const [settings, projects, materials, routines, tasks, journal, habitDefs, habitLogs, topics, topicLinks, notes, focus, waves, people, spaces, members] = await Promise.all([
+async function loadState(env, me) {
+  // only the spaces you're in; journal entries are yours, or shared into one of your spaces
+  const MINE = 'SELECT space_id FROM members WHERE person_id=?1';
+  const inMine = (t, order) => env.DB.prepare('SELECT * FROM ' + t + ' WHERE space_id IN (' + MINE + ') OR space_id IS NULL ORDER BY ' + order).bind(me).all();
+  const [settings, projects, materials, routines, tasks, journal, habitDefs, habitLogs, topics, topicLinks, notes, focus, waves, people, spaces, members, focusLog, journalDays] = await Promise.all([
     env.DB.prepare('SELECT key,value FROM settings').all(),
-    env.DB.prepare('SELECT * FROM projects ORDER BY sort, created_at').all(),
+    inMine('projects', 'sort, created_at'),
     env.DB.prepare('SELECT * FROM project_materials ORDER BY sort, created_at').all(),
     env.DB.prepare('SELECT id,title,"start" AS start,"end" AS end,owner,days,note,sort FROM routines ORDER BY sort, "start"').all(),
-    env.DB.prepare('SELECT * FROM tasks ORDER BY created_at').all(),
-    env.DB.prepare('SELECT * FROM journal ORDER BY date DESC').all(),
-    env.DB.prepare('SELECT * FROM habits ORDER BY sort, created_at').all(),
+    inMine('tasks', 'created_at'),
+    env.DB.prepare('SELECT * FROM journal WHERE owner=?1 OR space_id IN (' + MINE + ') ORDER BY date DESC').bind(me).all(),
+    inMine('habits', 'sort, created_at'),
     env.DB.prepare('SELECT date,habit,value FROM habit_logs').all(),
-    env.DB.prepare('SELECT * FROM topics ORDER BY week DESC, created_at DESC').all(),
+    inMine('topics', 'week DESC, created_at DESC'),
     env.DB.prepare('SELECT * FROM topic_links ORDER BY sort, created_at').all(),
-    env.DB.prepare('SELECT * FROM notes ORDER BY created_at DESC').all(),
-    env.DB.prepare('SELECT * FROM focus').all(),
-    env.DB.prepare('SELECT * FROM waves').all(),
-    env.DB.prepare('SELECT * FROM people ORDER BY created_at').all(),
-    env.DB.prepare('SELECT * FROM spaces ORDER BY created_at').all(),
-    env.DB.prepare('SELECT * FROM members ORDER BY joined_at').all(),
+    inMine('notes', 'created_at DESC'),
+    env.DB.prepare('SELECT * FROM focus WHERE id IN (' + MINE + ')').bind(me).all(),
+    env.DB.prepare('SELECT * FROM waves WHERE id IN (' + MINE + ')').bind(me).all(),
+    env.DB.prepare("SELECT id, name, color, created_at, (pass_hash IS NOT NULL AND pass_hash!='') AS claimed FROM people WHERE id=?1 OR id IN (SELECT person_id FROM members WHERE space_id IN (" + MINE + ')) ORDER BY created_at').bind(me).all(),
+    env.DB.prepare('SELECT * FROM spaces WHERE id IN (' + MINE + ') ORDER BY created_at').bind(me).all(),
+    env.DB.prepare('SELECT * FROM members WHERE space_id IN (' + MINE + ') ORDER BY joined_at').bind(me).all(),
+    env.DB.prepare('SELECT * FROM focus_log WHERE space_id IN (' + MINE + ') ORDER BY ended_at').bind(me).all(),
+    // which days each person in your spaces wrote, for the week board: dates only, never the text of a private entry
+    env.DB.prepare("SELECT date, owner FROM journal WHERE trim(coalesce(text,''))!='' AND owner IN (SELECT person_id FROM members WHERE space_id IN (" + MINE + '))').bind(me).all(),
   ]);
   const rowFor = (rows, ids) => (rows.results || []).find((r) => ids.includes(r.id)) || null;
 
@@ -215,6 +348,9 @@ async function loadState(env) {
     people: people.results || [],
     spaces: spaces.results || [],
     members: members.results || [],
+    focus_log: focusLog.results || [],
+    journal_days: journalDays.results || [],
+    me,
   };
 }
 
@@ -233,8 +369,23 @@ function toCol(c, v) {
 }
 
 // One outbox change → the D1 statements for it. Throws on anything not whitelisted.
-function opStatements(env, o) {
+function opStatements(env, o, me) {
   if (!o || typeof o !== 'object') throw new Error('bad op');
+  // the server records who finished a task and when, so points can't be claimed from the browser
+  if (o.table === 'tasks' && o.op === 'patch' && o.fields && 'done' in o.fields) {
+    o = { ...o, fields: { ...o.fields, done_at: o.fields.done ? Date.now() : null, done_by: o.fields.done ? me : null } };
+  }
+  if (o.table === 'tasks' && o.op === 'upsert' && o.row) {
+    o = { ...o, row: { ...o.row, done_at: o.row.done ? (o.row.done_at || Date.now()) : null, done_by: o.row.done ? (o.row.done_by || me) : null } };
+  }
+  // people, spaces and members aren't edited from the app, except your own name and colour
+  if (o.table === 'people') {
+    if (o.op !== 'patch' || o.id !== me) throw new Error('you can only rename yourself');
+    o = { ...o, fields: { name: o.fields && o.fields.name, color: o.fields && o.fields.color } };
+    if (o.fields.color == null) delete o.fields.color;
+    if (o.fields.name == null) delete o.fields.name;
+  }
+  if (o.table === 'spaces' || o.table === 'members') throw new Error('read only');
   if (o.op === 'settings') {
     const patch = o.patch || {};
     return Object.keys(patch).map((k) =>
@@ -280,7 +431,8 @@ function opStatements(env, o) {
   throw new Error('bad op');
 }
 
-async function applyOp(env, b) {
+async function applyOp(env, b, me) {
+  if (b && ['people', 'spaces', 'members'].includes(b.table)) throw new Error('read only');
   const table = b.table;
   const cols = TABLES[table];
   if (!cols) throw new Error('bad table');

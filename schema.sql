@@ -2,7 +2,10 @@
 -- People belong to spaces (members). Every project, task, habit, note, topic and journal entry has a space_id.
 -- Owners are a person id (p_…) or 'everyone'.
 
-CREATE TABLE IF NOT EXISTS people (id TEXT PRIMARY KEY, name TEXT, color TEXT, created_at INTEGER);
+CREATE TABLE IF NOT EXISTS people (id TEXT PRIMARY KEY, name TEXT, color TEXT, created_at INTEGER, username TEXT, pass_hash TEXT, pass_salt TEXT, pass_iter INTEGER);
+CREATE UNIQUE INDEX IF NOT EXISTS people_username ON people(username);
+CREATE TABLE IF NOT EXISTS login_attempts (key TEXT PRIMARY KEY, fails INTEGER, locked_until INTEGER);
+CREATE TABLE IF NOT EXISTS focus_log (id TEXT PRIMARY KEY, space_id TEXT, person_id TEXT, minutes INTEGER, label TEXT, ended_at INTEGER);
 CREATE TABLE IF NOT EXISTS spaces (id TEXT PRIMARY KEY, name TEXT, kind TEXT, created_at INTEGER);  -- kind: partner | friends | team | solo
 CREATE TABLE IF NOT EXISTS members (id TEXT PRIMARY KEY, space_id TEXT, person_id TEXT, role TEXT, joined_at INTEGER);  -- id = <space_id>:<person_id>
 
@@ -58,7 +61,9 @@ CREATE TABLE IF NOT EXISTS tasks (
   parent_id  TEXT,              -- set => this row is a subtask of parent_id
   sort       INTEGER,
   created_at INTEGER,
-  space_id   TEXT
+  space_id   TEXT,
+  done_at    INTEGER,           -- when it was ticked (set by the server)
+  done_by    TEXT               -- who ticked it (set by the server)
 );
 
 CREATE TABLE IF NOT EXISTS journal (

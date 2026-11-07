@@ -2,7 +2,7 @@
 
 > One responsive file (`public/index.html`), so "web" = desktop width (>820px) and "mobile" = phone width (≤820px).
 
-**Last reconciled:** 2026-11-05, Trust pass
+**Last reconciled:** 2026-11-08, own sign-ins + This week + Projects views
 
 Legend: ✅ done · 🟡 partial · ⬜ todo · 🚫 deliberately different
 
@@ -19,6 +19,18 @@ Legend: ✅ done · 🟡 partial · ⬜ todo · 🚫 deliberately different
 | Subtask of X (edit sheet) | ✅ | ✅ | |
 | Journal saved state | ✅ | ✅ | |
 | Projects › Finished | ✅ | ✅ | |
+
+## 8 Nov build
+
+| Piece | Desktop | Phone | Notes |
+|---|---|---|---|
+| Sign in / setup | ✅ centred card | ✅ same card, full width | |
+| Settings › Account | ✅ | ✅ (More › Settings) | |
+| This week | ✅ 3-column dashboard | ✅ one column; chart redrawn narrower so its text stays readable | |
+| Today score strip | ✅ | ✅ | |
+| Projects views | ✅ Table · Lanes · Timeline · Cards | ✅ table → list rows, lanes scroll sideways, timeline scrolls | |
+| Project page | ✅ full page | ✅ facts wrap 2-up, table scrolls | |
+| Tabs | sidebar + This week | 🚫 Today · Week · Calendar · Projects · More | the bar can't hold 7 |
 
 ## Known phone gaps (GAPS.md tier 3, not yet done)
 
