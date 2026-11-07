@@ -12,7 +12,7 @@ Legend: ✅ done · 🟡 partial · ⬜ todo · 🚫 deliberately different
 |---|---|---|---|
 | From earlier (Today) | ✅ top of the day card | ✅ same, rows wrap | |
 | Who's this? | ✅ centred modal | ✅ full screen | |
-| This device / Switch | ✅ Settings › People | ✅ Settings tab › People | |
+| ~~This device / Switch~~ | replaced by sign-in (8 Nov) | replaced by sign-in (8 Nov) | |
 | Sync status | ✅ sidebar footer line | 🚫 top-bar pill (dot + short word), tap for the full text | no sidebar on the phone |
 | Undo / Retry toast | ✅ bottom centre | ✅ above the tab bar | |
 | Confirm delete | ✅ centred modal | 🚫 bottom sheet | on purpose |
