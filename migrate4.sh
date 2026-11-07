@@ -6,7 +6,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 echo "──────── account check ────────"
-echo "Must be your PERSONAL account (mahesh-3dd). Ctrl-C if it's Trueleap."
+echo "Must be the mahesh@trueleap.io account that hosts hate club (workers subdomain mahesh-3dd). Ctrl-C if it isn't."
 npx wrangler whoami
 echo
 
