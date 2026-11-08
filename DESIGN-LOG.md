@@ -4,7 +4,7 @@
 
 ---
 
-## 2026-11-08: Built: Home H1, Calendar Day, Settings › Claude (local-verified, NOT deployed)
+## 2026-11-08: Built: Home H1, Calendar Day, Settings › Claude (LIVE 8 Nov: the live page matches `0b402bc`, `/mcp` answers from the new worker)
 
 **Request:** "Yes, build all 3".
 
