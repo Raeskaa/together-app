@@ -2,7 +2,7 @@
 
 > One responsive file (`public/index.html`), so "web" = desktop width (>820px) and "mobile" = phone width (≤820px).
 
-**Last reconciled:** 2026-11-08, own sign-ins + This week + Projects views
+**Last reconciled:** 2026-11-08, motion pass
 
 Legend: ✅ done · 🟡 partial · ⬜ todo · 🚫 deliberately different
 
@@ -31,6 +31,17 @@ Legend: ✅ done · 🟡 partial · ⬜ todo · 🚫 deliberately different
 | Projects views | ✅ Table · Lanes · Timeline · Cards | ✅ table → list rows, lanes scroll sideways, timeline scrolls | |
 | Project page | ✅ full page | ✅ facts wrap 2-up, table scrolls | |
 | Tabs | sidebar + This week | 🚫 Today · Week · Calendar · Projects · More | the bar can't hold 7 |
+
+## Motion pass (8 Nov)
+
+| Piece | Desktop | Phone | Notes |
+|---|---|---|---|
+| Tick chip, strike, count-up, bars | ✅ | ✅ | |
+| Sheets enter / exit | ✅ from the right | 🚫 from the bottom | on purpose |
+| Modals, toasts, row fold | ✅ | ✅ | |
+| Lead crown, confetti, wave hearts, flame | ✅ | ✅ | |
+| Hover lift | ✅ mouse only | 🚫 none | no hover on touch |
+| Tick buzz | 🚫 none | 🟡 Android only | iPhones block vibration from websites |
 
 ## Known phone gaps (GAPS.md tier 3, not yet done)
 

@@ -4,6 +4,63 @@
 
 ---
 
+## 2026-11-08: Motion pass, same identity (built, local-verified, not deployed)
+
+**Request:** "keep the identity same but work on animation, transitions etc". Brief: `BRIEF-motion.md`, approved with "Yes, build it". Same blue, Inter, sky ground. Only movement changed.
+
+**Shipped (20 moments in the brief)**
+- **Tick:** the check pops, the strike draws left to right, a "+N" chip floats up from the box. It replaces the toast on every tick. Untick reverses it, with no chip.
+- **Numbers count up** (450 ms): Today strip, sidebar, This week, leaderboard.
+- **Bars and runners glide:** project bars, strip, race and timeline. Runners take 600 ms on the on-screen curve.
+- **Lead change:** the crown drops onto the new leader with a small bounce, plus a toast: "You took the lead" or "{name} took the lead".
+- **Confetti** in your two colours plus blue, when you win the week (shown once, on the Monday after) or finish a project.
+- **Wave:** the burst stays, and 6 small hearts drift up.
+- **Streak grows:** the flame bumps.
+- **Focus ends:** the ring completes, then one soft pulse, then it resets.
+- **Every exit now animates:**
+  - sheets slide back out (from the bottom on the phone)
+  - modals fade and shrink slightly
+  - toasts drop out
+  - rows fold away when deleted or moved to today, and Undo brings them back
+- **Small touches:**
+  - a wrong password shakes the field
+  - every button presses to `scale .97`
+  - a 10 ms buzz on Android, only straight after a real tap
+- **Cut, on purpose:** switching tabs and project views, and habit +/−, stay instant.
+
+**How**
+- **Tokens in `:root`:**
+  - `--ease-out` (the curve that was already there)
+  - `--ease-move`
+  - `--ease-pop` (rare moments only)
+- **CSS transitions** for anything that can be re-triggered; `element.animate` for one-shot moments.
+- **`useLinger`** holds a closing sheet, modal or toast for its exit, then unmounts it. A quick reopen lands fully open.
+- **`canvas-confetti` 1.9.3**, loaded from jsdelivr only the first time it's needed. No motion library.
+- **Reduced motion:** fades and colour changes stay. Slides, scales and bounces go. Confetti, hearts, chip and shake are off. Numbers and bars jump to their value.
+
+**Fixed while verifying**
+- cdnjs serves only the CommonJS build of canvas-confetti (`module is not defined`). Switched to jsdelivr `dist/confetti.browser.js`.
+- New-row arrival lost its class on quick re-renders. Now each row is timestamped the first time it's seen, and only rows from the last 400 ms animate in. Rows on first load don't animate.
+
+**Verified locally:**
+- tick → chip, strike, score 8 → 18, server `done_by` set
+- sheet close and quick reopen; settings exit
+- note delete + Undo
+- carry fold, row arrival
+- lead toast + crown
+- wave hearts
+- confetti on Finish project
+- the reduced-motion rule present
+- no console errors beyond the browser refusing vibrate on synthetic clicks
+
+**Not checked:** the phone slide-up on a real device. Test data was cleaned up.
+
+**Design system:** no new colours, sizes or components. Only motion tokens and classes were added: `.stk`, `.ptchip`, `.wpart`, `.closing`, `.fresh`, `.bump`, `.rowin`.
+
+**Parity impact:** both widths. The phone sheets enter from the bottom instead of the right, on purpose (see `PARITY.md`).
+
+---
+
 ## 2026-11-08: Everything picked: own sign-ins, points + This week, Projects views, project page (built, local-verified, not deployed)
 
 **Request:** "complete all, dont wait for mobbin things". Built from the approved briefs and canvas picks. Sign-in is my own design, since the Mobbin refs never came.
