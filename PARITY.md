@@ -2,7 +2,7 @@
 
 > One responsive file (`public/index.html`), so "web" = desktop width (>820px) and "mobile" = phone width (≤820px).
 
-**Last reconciled:** 2026-11-08, motion pass
+**Last reconciled:** 2026-11-08, Home H1 + Calendar Day + Settings › Claude
 
 Legend: ✅ done · 🟡 partial · ⬜ todo · 🚫 deliberately different
 
@@ -43,12 +43,23 @@ Legend: ✅ done · 🟡 partial · ⬜ todo · 🚫 deliberately different
 | Hover lift | ✅ mouse only | 🚫 none | no hover on touch |
 | Tick buzz | 🚫 none | 🟡 Android only | iPhones block vibration from websites |
 
+## Home H1 · Calendar Day · Claude (8 Nov)
+
+| Piece | Desktop | Phone | Notes |
+|---|---|---|---|
+| Score pill | ✅ "X leads by N · a – b" | ✅ "N ahead / behind" | |
+| Quick add, list, done fold | ✅ | ✅ | |
+| Rail (Partner · Coming up · Tonight) | ✅ beside the list | 🚫 under the list | on purpose |
+| Calendar Day | ✅ hour timeline + side lists | 🚫 day strip + list of times | on purpose |
+| Drag onto an hour | ✅ drag, or click then click | 🟡 click then click | no drag on touch |
+| Settings › Claude | ✅ | ✅ | |
+
 ## Known phone gaps (GAPS.md tier 3, not yet done)
 
 | Gap | Phone |
 |---|---|
 | Not installable (no manifest or icon) | ⬜ |
 | Week strip clips Saturday at 375px | ⬜ |
-| Calendar week shows 3 of 7 days, no day view | 🟡 Day view designed (canvas, 8 Nov), not built |
+| Calendar week shows 3 of 7 days, no day view | ✅ Day view: day strip + list of times (8 Nov) |
 | No add button without scrolling | ⬜ |
 | Note colour and delete are hover-only | ⬜ |

@@ -4,6 +4,55 @@
 
 ---
 
+## 2026-11-08: Built: Home H1, Calendar Day, Settings › Claude (local-verified, NOT deployed)
+
+**Request:** "Yes, build all 3".
+
+**Home (H1)** in `Today`:
+- **Header:** a score pill sits beside All · Mine ("Tester leads by 4 · 18 – 22", or "6 ahead" on the phone). It opens This week, and the crown drops when the lead changes. The old score strip and the "Coming up" chip row are gone from Home.
+- **Quick add** (Enter) adds a task to the selected day.
+- **The list:** From earlier stays as it was. Then "Today · N left", where events don't count toward "left". Then routines, then open tasks.
+- **Done tasks** fold into "N done today · +pts". A task you just ticked stays 1.6 s, so the strike and the +points chip are seen, then it folds away.
+- **The rail:** your partner (done today, overdue, Give a hand · +5 → This week) · Coming up · Tonight (journal).
+- **Below,** full width: Habits & focus and On your mind, unchanged ("like how it is rn").
+- **Under 1000 px** the rail stacks under the list.
+
+**Calendar · Day** (a new first button; the mode is remembered in `sp_calmode`):
+- **The timeline (07–23):** routines, timed tasks and events. Overlaps sit side by side, your partner's items are grey, and the now-line has a time label.
+- **All day row:** due dates, project starts and deadlines, untimed events.
+- **Beside it:** "Anytime today" and "To schedule". Drag a task onto an hour, or click it and then an hour.
+- **Nothing timed:** an empty card with "Add with a time" and "Show the hours".
+- **The phone:** a 7-day strip, then the day as a list of times with the now-line.
+- **Routines** are now passed to the Calendar.
+
+**Settings › Claude** (`ClaudeSettings`, General › Claude · New):
+- **Off:** "Make my private link".
+- **On:**
+  - the link, masked, shown in full on focus, with Copy
+  - a neutral warning, the 3 steps, what Claude can do, Last used
+  - Make a new link (asks first, because the old link dies) and Turn off
+- **If the server can't be reached:** an error with Try again.
+
+**Verified locally** on seeded data, now deleted:
+- **Home:** the pill, quick add, the tick → hold → fold (+10 chip, "You took the lead" toast), and the rail.
+- **Day view:**
+  - timed and partner items, the now-line, pick-then-click to 15:00, drag-drop to 20:00
+  - the empty day
+  - the phone list
+- **Settings:** off → on.
+- **Phone:** no horizontal overflow on Calendar Day. A grid min-width bug was fixed on the way.
+- No console errors.
+
+**Not checked:**
+- a real Android/iPhone
+- real Claude connecting to the deployed link (needs the deploy)
+
+**Known:** the Today week strip still clips at 375 px (an old PARITY gap, not new).
+
+**Deploy:** frontend plus worker, no migration (`claude_links` creates itself). Command: `cd /Users/design/shared-planner && npx wrangler deploy`.
+
+---
+
 ## 2026-11-08: H1 picked · Calendar day view · Claude connector (designs on canvas; connector built, not deployed)
 
 **Request:**
