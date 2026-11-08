@@ -49,6 +49,6 @@ Legend: ✅ done · 🟡 partial · ⬜ todo · 🚫 deliberately different
 |---|---|
 | Not installable (no manifest or icon) | ⬜ |
 | Week strip clips Saturday at 375px | ⬜ |
-| Calendar week shows 3 of 7 days, no day view | ⬜ |
+| Calendar week shows 3 of 7 days, no day view | 🟡 Day view designed (canvas, 8 Nov), not built |
 | No add button without scrolling | ⬜ |
 | Note colour and delete are hover-only | ⬜ |

@@ -164,3 +164,6 @@ INSERT OR IGNORE INTO habits (id,name,kind,owner,unit,target,caption,color,sort,
   ('cigs','Cigarettes','count','p_mahesh','cigs',76,'4 → 1 pack by 30 Nov','#C2704B',1,1762050000000,'s_hateclub'),
   ('read','Read · 1 hour','check','p_mahesh','',NULL,'Build the streak','#1F6FEB',2,1762050000001,'s_hateclub'),
   ('art','Art & posting','check','p_mahesh','',NULL,'','#2E9E6B',3,1762050000002,'s_hateclub');
+
+-- Claude's private link per person (ver bumps to kill old links)
+CREATE TABLE IF NOT EXISTS claude_links (person_id TEXT PRIMARY KEY, ver INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 0, created_at INTEGER, last_used_at INTEGER, last_action TEXT);

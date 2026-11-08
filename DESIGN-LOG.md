@@ -4,6 +4,56 @@
 
 ---
 
+## 2026-11-08: H1 picked · Calendar day view · Claude connector (designs on canvas; connector built, not deployed)
+
+**Request:**
+> "I like H1 but the habit cards and the on your mind has to be like how it is rn, I like the card layouts rather than just pills" · "the H4 one, the calendar is so beautiful, can we add it to the calendar page … the home like this wouldn't work because we both actually don't have a schedule" · "can we make a claude MCP? which can create a kill tasks when done"
+
+**Designs** (canvas https://claude.ai/artifact/25zw9iYyovGXj73Yxah5di, Page 1)
+- **H1 (picked):**
+  - redrawn with today's habit cards (count card with 7-day bars and the 44 px −/+, Daily card with streaks, This week's topic) and today's On your mind note cards, full width under the list and rail
+  - the rail keeps Partner, Coming up, Tonight
+  - the phone frame shows the Daily card
+- **Calendar · Day:**
+  - a 4th mode next to Week · Month · Timeline: the H4 hour timeline (now-line, both of you side by side, all-day row for deadlines), with "Anytime today" and "To schedule" lists to drag from
+  - **Calendar · Day, nothing timed:** the day you'll usually have ("That's normal for you two"), with "Add with a time" and "Show the hours"
+  - **phone:** day strip, a vertical list of times, Anytime. This also fills the PARITY gap "Calendar week shows 3 of 7 days, no day view".
+- **Settings › Claude:**
+  - a new item under General: your private link with Copy, a neutral warning ("Anyone with this link can add and finish tasks as you"), 3 steps to add it to Claude, what Claude can do, Last used
+  - buttons: Make a new link · Turn off
+- Every frame was rendered and checked before publishing. The phone row moved down to make room for the taller H1.
+
+**Claude connector (built in `src/claude.js`, wired in `src/worker.js`; local-verified, NOT deployed)**
+- **MCP over Streamable HTTP**, stateless JSON, at `/mcp/<private link>` (also `/mcp` with a bearer token, for Claude Code).
+- **Tools:**
+  - `list_tasks` (today / overdue / upcoming / no_date / done_today / all_open; who; project)
+  - `add_task` (title, date, time, due, project by name, who, subtask_of)
+  - `complete_task`
+  - `reopen_task`
+  - `move_task`
+- **There's no delete tool, on purpose.** "Kill" means tick off.
+- **Writes go through `opStatements`,** so the server stamps `done_by` / `done_at` and points work as in the app. Claude's reply states the points (+10, on time +5, help +5).
+- **Dates:** in IST (Asia/Kolkata), and a day starts at 4am like the app. It reads "today", "tomorrow", weekdays and YYYY-MM-DD.
+- **The link:**
+  - it is `hc_<person>.<HMAC(SESSION_SECRET, claude:person:ver)>`, kept in `claude_links` (version and on/off; the table is created if missing, so there's no migration)
+  - "Make a new link" and "Turn off" bump the version, so old links die
+  - a wrong link answers 404
+  - it breaks if SESSION_SECRET is rotated, which is one more reason never to run `deploy.sh`
+- **`/api/claude`** (signed in): GET gives the status and link, POST `{action:'new'|'off'}` changes it.
+- **Verified locally:**
+  - initialize (2025-06-18), the initialized notification (202), tools/list
+  - add, a bad day, today, tick off by words (+15 on time), helping your partner (+15), done today
+  - two matches ask which one
+  - reopen, move to Friday
+  - last-used saved, bearer ping, GET is 405, off kills the link
+  - the state shows `done_by` = you
+  - test tasks deleted
+- **Not built yet:** the Settings › Claude screen, so after deploying there's no button to get a link yet.
+
+**Next:** Mahesh says yes to the three designs. Then build H1 + Calendar Day + Settings › Claude, then deploy it all together.
+
+---
+
 ## 2026-11-08: Home, five versions on the variants canvas (design only, nothing built)
 
 **Request:** "use claude artifact and create some better UI of home - how can home be some versions". Brief: `BRIEF-home.md`, approved with "Yes, build all 5".

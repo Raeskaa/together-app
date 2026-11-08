@@ -1,4 +1,5 @@
 // Shared Planner — Cloudflare Worker: static assets + small JSON API over D1.
+import { handleMcp, claudeApi } from './claude.js';
 // Two people, one shared space, protected by a shared passcode (signed cookie).
 
 const TABLES = {
@@ -138,10 +139,22 @@ function cookie(req, name) {
 function secret(env) {
   return env.SESSION_SECRET || 'dev-only-secret';
 }
+// what the Claude connector borrows from here
+function claudeDeps(env) {
+  return { hmac, sameString, secret: secret(env), opStatements };
+}
 
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
+    // Claude's private link: /mcp/<token> (or /mcp with a bearer token)
+    if (url.pathname === '/mcp' || url.pathname.startsWith('/mcp/')) {
+      try {
+        return await handleMcp(req, env, url, claudeDeps(env));
+      } catch (e) {
+        return json({ jsonrpc: '2.0', id: null, error: { code: -32603, message: 'Server error' } }, 500);
+      }
+    }
     if (url.pathname.startsWith('/api/')) {
       try {
         return await api(req, env, url);
@@ -231,6 +244,9 @@ async function api(req, env, url) {
   // Everything else needs a signed-in person.
   if (!tok.person) return json({ error: 'account_needed' }, 401);
   const me = tok.person;
+
+  // Settings › Claude: your private link, make a new one, or turn it off
+  if (p === '/api/claude') return claudeApi(req, env, url, me, claudeDeps(env));
 
   if (p === '/api/password' && req.method === 'POST') {
     const b = await req.json().catch(() => ({}));
