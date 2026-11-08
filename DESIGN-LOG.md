@@ -4,6 +4,39 @@
 
 ---
 
+## 2026-11-08: Home, five versions on the variants canvas (design only, nothing built)
+
+**Request:** "use claude artifact and create some better UI of home - how can home be some versions". Brief: `BRIEF-home.md`, approved with "Yes, build all 5".
+
+**Made** (canvas https://claude.ai/artifact/25zw9iYyovGXj73Yxah5di, Page 1, rows "Home · five ways" and "Home · on the phone"). The same Thursday in all of them: Partner leads 64–58, 2 overdue.
+- **H1 · One list:** the day leads, the score is a pill, habits are chips, slim right rail (Partner, Coming up, topic, notes, journal)
+- **H2 · Me | Us:** my day on the left, then Us on the right (race to 100, points by day, Partner's day with "Give a hand · +5", Coming up, Wave back)
+- **H3 · Game board:** the head-to-head band, a "Best next move" card, points on every row, Points so far, Partner could use a hand, Streaks
+- **H4 · Day plan:** an hour timeline with a now-line, plus an Anytime list beside it ("drag onto a time")
+- **H5 · Bento:** tiles for Today, Race, Partner, Habits, Focus, Coming up, Topic, Notes
+
+Each has a desktop frame (1440) and a phone frame (390×844).
+
+**Assumed** (Mahesh didn't answer brief decisions 2–3):
+- notes stay in H1 and H5 only, so the pick also answers the notes question
+- Get started isn't shown, because it's a day-zero state
+
+**Checked:**
+- rendered every frame locally before publishing
+- fixed:
+  - routine rows didn't line up with task rows
+  - "Partner" was clipped in the race
+  - H3 total said 41, corrected to 45
+  - in H4 the now-label covered 15:00 and the focus block was clipped
+  - the H5 wave overlapped a tile
+- references: Mobbin's Hilos ("Recommended next"), Plain (quick add), Attio home
+
+**Canvas:** Mahesh had added a Page 2 (Artboard 1) meanwhile. The index was rebuilt on his version, so nothing of his was lost.
+
+**Next:** Mahesh picks a version (or mixes). Then draw its states (day zero, clear day, heavy day, behind, tied, Sunday, offline), then build.
+
+---
+
 ## 2026-11-08: Motion pass, same identity (LIVE 8 Nov: the live page matches `af592a6`)
 
 **Request:** "keep the identity same but work on animation, transitions etc". Brief: `BRIEF-motion.md`, approved with "Yes, build it". Same blue, Inter, sky ground. Only movement changed.
