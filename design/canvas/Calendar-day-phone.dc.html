@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Calendar · Day · phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+
+body{margin:0;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:#15171A;-webkit-font-smoothing:antialiased;background:#EAF3FF}
+a{color:#195FD0;text-decoration:none}a:hover{color:#15171A}
+button{font-family:inherit;cursor:pointer}
+.app{display:flex;flex-wrap:wrap;align-items:stretch;min-height:960px;background:radial-gradient(1100px 760px at 78% 12%,rgba(255,255,255,.9),transparent 60%),radial-gradient(900px 680px at 12% 82%,rgba(255,255,255,.5),transparent 55%),linear-gradient(162deg,#3FA0FF 0%,#6FBAFF 20%,#A6D5FF 40%,#D6ECFF 62%,#F5FAFF 85%)}
+.side{flex:1 0 232px;max-width:232px;box-sizing:border-box;padding:16px 10px;display:flex;flex-direction:column;gap:2px}
+.prof{display:flex;align-items:center;gap:10px;padding:4px 10px 12px;font-weight:600;font-size:14px}
+.pav{width:26px;height:26px;border-radius:99px;background:#15171A;color:#fff;font-size:11px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}
+.addb{display:flex;align-items:center;gap:10px;padding:7px 10px;font-weight:600;font-size:14px;color:#195FD0;border:0;background:none;text-align:left}
+.nav{display:flex;align-items:center;gap:11px;padding:7px 10px;border-radius:8px;font-size:14px;font-weight:500;color:#2F343B;border:0;background:none;width:100%;text-align:left;box-sizing:border-box}
+.nav svg{color:#54606E;flex:none}
+.nav.on{background:#fff;color:#195FD0;font-weight:600;box-shadow:0 1px 3px rgba(20,60,130,.12)}
+.nav.on svg{color:#195FD0}
+.cnt{margin-left:auto;font-size:12px;font-weight:500;color:#4B5866;font-variant-numeric:tabular-nums}
+.sec{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3C5F8C;padding:16px 10px 4px}
+.dot{width:8px;height:8px;border-radius:99px;display:inline-block;flex:none}
+.sfoot{margin-top:auto;display:flex;flex-direction:column;gap:2px;padding-top:12px}
+.sfoot .nav{font-size:13.5px}
+.club{display:flex;align-items:center;gap:8px;padding:10px 10px 4px;font-size:12px;color:#3F4B59}
+.main{flex:999 1 560px;min-width:0;box-sizing:border-box;margin:10px;background:#fff;border:1px solid #E5EAF1;border-radius:16px;box-shadow:0 12px 40px rgba(20,60,130,.12);padding:28px 36px 44px;position:relative}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brandrow{display:flex;align-items:center;gap:14px}
+.mark{width:40px;height:40px;border-radius:11px;background:#15171A;color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;letter-spacing:-.02em;flex:none}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#3C6FB0}
+h1{margin:0;font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.15}
+h2{margin:0;font-size:15px;font-weight:700;letter-spacing:-.005em}
+.btnp{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:10px;background:#15171A;color:#fff;font-weight:600;font-size:13px;padding:9px 14px;white-space:nowrap}
+.btng{display:inline-flex;align-items:center;gap:7px;border:1px solid #DCE3EC;border-radius:10px;background:#fff;color:#15171A;font-weight:600;font-size:13px;padding:8px 12px;white-space:nowrap}
+.btns{display:inline-flex;align-items:center;gap:6px;border:1px solid #DCE3EC;border-radius:8px;background:#fff;color:#15171A;font-weight:600;font-size:12px;padding:5px 9px;white-space:nowrap}
+.av{width:24px;height:24px;border-radius:99px;color:#fff;font-size:10.5px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;flex:none;box-shadow:0 0 0 2px #fff}
+.am{background:#15171A}.ap{background:#5B6B86}
+.avs{display:inline-flex}.avs .av+.av{margin-left:-8px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;border-radius:99px;padding:3px 9px;white-space:nowrap}
+.soon{color:#85560F;background:#FBF1E6}
+.calm{color:#46505D;background:#EEF2F7}
+.over{color:#A3392C;background:#FCEAE7}
+.okp{color:#1D6842;background:#E3F4EA}
+.muted{color:#4B5866}
+.tnum{font-variant-numeric:tabular-nums}
+.chk{width:18px;height:18px;border-radius:99px;border:1.6px solid #AEB8C5;background:#fff;flex:none;box-sizing:border-box;padding:0;display:inline-flex;align-items:center;justify-content:center}
+.chk.on{background:#1F6FEB;border-color:#1F6FEB}
+.seg{display:inline-flex;align-items:center;gap:2px;background:#F1F4F8;border-radius:999px;padding:3px}
+.seg button{border:0;background:none;border-radius:999px;padding:6px 13px;font-weight:500;font-size:12.5px;color:#3A4350}
+.seg button.on{background:#fff;color:#15171A;font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.lbl{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3C6FB0}
+.lnk{font-size:12.5px;font-weight:600;color:#195FD0;display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+/* week strip */
+.wks{display:grid;grid-template-columns:auto repeat(7,minmax(0,1fr)) auto;gap:6px;align-items:center;margin-top:20px}
+.wkn{width:28px;height:28px;border-radius:8px;border:0;background:none;color:#4B5866;display:flex;align-items:center;justify-content:center;padding:0}
+.wd{border:0;background:none;border-radius:10px;padding:7px 0 6px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:600;color:#3C6FB0}
+.wd b{font-size:15px;font-weight:600;color:#2F343B;font-variant-numeric:tabular-nums}
+.wd i{width:4px;height:4px;border-radius:99px;background:#9DB3CF;display:block}
+.wd i.no{background:transparent}
+.wd.t{background:#EEF4FF}.wd.t b{color:#195FD0}.wd.t i{background:#1F6FEB}
+/* rows */
+.ghd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 2px 6px}
+.trow{display:flex;align-items:center;gap:12px;padding:10px 2px;border-top:1px solid #EEF2F7;font-size:14px;min-height:24px}
+.ghd+.trow{border-top:0}
+.tt{flex:1;min-width:0;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tt.done{color:#6B7480;text-decoration:line-through;text-decoration-color:#AEB8C5}
+.proj{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:#4B5866;white-space:nowrap}
+.time{width:92px;flex:none;font-size:12.5px;color:#4B5866;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rt{width:18px;height:18px;flex:none;display:inline-flex;align-items:center;justify-content:center;color:#3C6FB0}
+.pts{font-size:12px;font-weight:600;color:#1D6842;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pts.earned{background:#E3F4EA;border-radius:99px;padding:2px 8px}
+.qadd{display:flex;align-items:center;gap:10px;border:1px dashed #C9D5E5;border-radius:10px;padding:9px 12px;color:#4B5866;font-size:14px;margin-top:18px}
+.qadd label{flex:1;display:flex}
+.qadd input{flex:1;border:0;outline:0;font:inherit;background:transparent;color:#15171A;padding:0}
+.qadd input::placeholder{color:#5E6875}
+.kbd{font-size:11px;color:#4B5866;border:1px solid #DCE3EC;border-radius:5px;padding:1px 6px;font-weight:500}
+.donel{display:flex;align-items:center;gap:8px;padding:11px 2px;border-top:1px solid #EEF2F7;font-size:13px;color:#4B5866;width:100%;border-left:0;border-right:0;border-bottom:0;background:none;text-align:left}
+/* habits */
+.hchips{display:flex;flex-wrap:wrap;gap:8px}
+.hchip{display:inline-flex;align-items:center;gap:8px;border:1px solid #DCE3EC;border-radius:99px;padding:5px 12px 5px 6px;font-size:13px;font-weight:500;background:#fff;color:#15171A;white-space:nowrap;min-height:24px}
+.hchip .chk{width:18px;height:18px}
+.hchip.on{background:#F3F8FF;border-color:#BFD5F7}
+.streak{display:inline-flex;align-items:center;gap:3px;font-size:12px;color:#A8501F;font-weight:600}
+.step{width:24px;height:24px;border-radius:99px;border:1px solid #DCE3EC;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:14px;line-height:1;color:#15171A;padding:0}
+.cnum{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+.note{background:linear-gradient(180deg,#FFF3BE,#FFEEA6);border:1px solid #F1DE84;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.45;color:#3B3520}
+.wave{position:absolute;right:24px;bottom:24px;width:44px;height:44px;border-radius:99px;border:1px solid #DCE3EC;background:#fff;box-shadow:0 6px 18px rgba(20,60,130,.14);display:flex;align-items:center;justify-content:center;color:#C2496B;padding:0}
+.card{border:1px solid #E5EAF1;border-radius:14px;padding:4px 18px 10px;background:#fff}
+.cardhd{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 0 6px}
+/* race */
+.track{position:relative;height:28px}
+.track .ln{position:absolute;left:0;right:0;top:13px;height:2px;background:#E3E9F1;border-radius:2px}
+.track .fl{position:absolute;right:-2px;top:5px;color:#4B5866}
+.track .rn{position:absolute;top:2px;transform:translateX(-50%)}
+.mbar{height:6px;border-radius:99px;background:#E8EDF4;position:relative;overflow:hidden}
+.mbar i{position:absolute;left:0;top:0;bottom:0;border-radius:99px;display:block}
+/* phone */
+.ph{width:390px;height:844px;box-sizing:border-box;background:#fff;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.phtop{padding:16px 16px 0;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.phtop h1{font-size:24px}
+.phbody{flex:1;overflow:hidden;padding:0 16px}
+.tabs{display:flex;border-top:1px solid #E5EAF1;background:#FBFDFF;padding:8px 0 22px;flex:none}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;border:0;background:none;font-size:10.5px;font-weight:500;color:#5E6875;min-height:44px}
+.tab.on{color:#195FD0;font-weight:600}
+.ph .wks{grid-template-columns:repeat(7,minmax(0,1fr));margin-top:14px;gap:2px}
+.ph .trow{min-height:30px}
+.addc{width:44px;height:44px;border-radius:99px;border:0;background:#15171A;color:#fff;display:flex;align-items:center;justify-content:center;padding:0;flex:none}
+
+</style>
+<style>
+.spill{display:inline-flex;align-items:center;gap:8px;border:1px solid #E5EAF1;background:#F7F9FC;border-radius:99px;padding:6px 12px;font-size:13px;font-weight:600;color:#15171A;white-space:nowrap}
+.spill svg{color:#5B6B86}.spill:hover{border-color:#BFD5F7;color:#15171A}
+.h4g{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:28px;margin-top:18px;align-items:start}
+.tl{position:relative;border:1px solid #E5EAF1;border-radius:14px;padding:10px 14px 10px 0;height:664px;box-sizing:border-box;overflow:hidden}
+.hr{position:absolute;left:0;right:0;height:46px;border-top:1px solid #EEF2F7;display:flex}
+.hr span{width:60px;flex:none;text-align:right;padding-right:12px;box-sizing:border-box;font-size:11.5px;color:#4B5866;font-variant-numeric:tabular-nums;transform:translateY(-8px);background:#fff;height:16px}
+.hr:first-child{border-top:0}
+.blk{position:absolute;left:68px;right:14px;border-radius:9px;padding:7px 11px;box-sizing:border-box;font-size:13px;display:flex;align-items:flex-start;gap:9px;overflow:hidden}
+.blk .bt{font-weight:600}
+.blk .bs{font-size:12px;color:#4B5866;font-variant-numeric:tabular-nums}
+.b-rt{background:#EEF4FF;border:1px solid #D3E2FB}
+.b-cl{background:#F3F5F9;border:1px solid #DCE3EC}
+.b-fo{background:#fff;border:1.5px dashed #8DB4F2}
+.b-tk{background:#fff;border:1px solid #DCE3EC;box-shadow:0 1px 2px rgba(20,60,130,.06);align-items:center}
+.b-dn{background:#F7F9FC;border:1px solid #EEF2F7;align-items:center}
+.now{position:absolute;left:60px;right:0;height:0;border-top:2px solid #1F6FEB}
+.now b{position:absolute;right:8px;top:-21px;background:#1F6FEB;color:#fff;font-size:11px;font-weight:600;border-radius:99px;padding:2px 7px;font-variant-numeric:tabular-nums}
+.now i{position:absolute;left:-5px;top:-6px;width:10px;height:10px;border-radius:99px;background:#1F6FEB}
+.any .trow{padding:9px 2px}
+.grip{color:#8A9BB0;display:flex;flex:none}
+.hint{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#4B5866;background:#F7F9FC;border-radius:10px;padding:9px 12px;margin-top:12px}
+@media (max-width:1000px){.h4g{grid-template-columns:1fr}}
+
+.cbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:20px}
+.navb{width:30px;height:30px;border-radius:8px;border:1px solid #DCE3EC;background:#fff;color:#2F343B;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.dd{display:inline-flex;align-items:center;gap:8px;border:1px solid #DCE3EC;border-radius:99px;background:#fff;padding:6px 12px;font-size:12.5px;font-weight:500;color:#15171A}
+.dttl{font-size:15px;font-weight:700;margin-left:6px}
+.cg{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,1fr);gap:24px;margin-top:16px;align-items:start}
+.allday{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border:1px solid #E5EAF1;border-radius:12px;padding:9px 12px;margin-bottom:10px;font-size:13px}
+.allday .lbl{width:52px}
+.b-pt{background:#F1F3F7;border:1px solid #D9DFE8}
+.side3 .sbox{border:1px solid #E5EAF1;border-radius:14px;padding:4px 16px 12px;margin-bottom:14px}
+.emptyday{border:1px dashed #C9D5E5;border-radius:14px;padding:56px 24px;text-align:center;background:#FBFCFE}
+@media (max-width:1000px){.cg{grid-template-columns:1fr}}
+
+</style>
+</helmet>
+<div class="ph"><div class="phtop"><div class="brandrow" style="gap:12px"><span class="mark" style="width:36px;height:36px">hc</span><div><div class="eyebrow">hate club</div><h1>Calendar</h1></div></div><button type="button" class="addc" aria-label="Add a task"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div><div class="phbody"><div class="seg" role="group" aria-label="View" style="display:flex;margin-top:12px"><button type="button" class="on" style="flex:1">Day</button><button type="button" class="" style="flex:1">Week</button><button type="button" class="" style="flex:1">Month</button></div><nav class="wks" aria-label="Pick a day"><button type="button" class="wd">M<b>9</b><i class=""></i></button><button type="button" class="wd">T<b>10</b><i class=""></i></button><button type="button" class="wd">W<b>11</b><i class=""></i></button><button type="button" class="wd t" aria-current="date">T<b>12</b><i class=""></i></button><button type="button" class="wd">F<b>13</b><i class=""></i></button><button type="button" class="wd">S<b>14</b><i class="no"></i></button><button type="button" class="wd">S<b>15</b><i class="no"></i></button></nav>
+<div style="margin-top:8px"><div style="display:flex;gap:12px;align-items:stretch;padding:4px 0"><span class="tnum muted" style="width:44px;flex:none;font-size:12px;padding-top:9px;text-align:right">09:00</span><div class="blk b-dn" style="position:static;flex:1;min-width:0"><button type="button" class="chk on" aria-label="Mark D&amp;AD brief not done"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6.2l2.2 2.2 4.8-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></button><span class="tt done" style="font-weight:500">D&amp;AD brief: pick a category</span><span class="pts earned">+15</span></div></div><div style="display:flex;gap:12px;align-items:stretch;padding:4px 0"><span class="tnum muted" style="width:44px;flex:none;font-size:12px;padding-top:9px;text-align:right">10:00</span><div class="blk b-rt" style="position:static;flex:1;min-width:0"><span class="rt"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M17 2l3 3-3 3M4 11V9a4 4 0 014-4h12M7 22l-3-3 3-3M20 13v2a4 4 0 01-4 4H4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg></span><div><div class="bt">Studio</div><div class="bs">10:00–12:00</div></div></div></div><div style="display:flex;gap:12px;align-items:stretch;padding:4px 0"><span class="tnum muted" style="width:44px;flex:none;font-size:12px;padding-top:9px;text-align:right">10:30</span><div class="blk b-pt" style="position:static;flex:1;min-width:0"><span class="av ap">P</span><div><div class="bt">Print shop · proofs</div><div class="bs">Partner · 10:30–12:30</div></div></div></div><div style="display:flex;gap:12px;align-items:stretch;padding:4px 0"><span class="tnum muted" style="width:44px;flex:none;font-size:12px;padding-top:9px;text-align:right">14:00</span><div class="blk b-cl" style="position:static;flex:1;min-width:0"><span class="rt"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M17 2l3 3-3 3M4 11V9a4 4 0 014-4h12M7 22l-3-3 3-3M20 13v2a4 4 0 01-4 4H4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg></span><div><div class="bt">Class</div><div class="bs">14:00–16:00 · you both</div></div></div></div><div style="display:flex;align-items:center;gap:8px;margin:6px 0"><span style="width:44px;text-align:right;font-size:11px;font-weight:700;color:#195FD0" class="tnum">15:10</span><span style="flex:1;border-top:2px solid #1F6FEB;position:relative"><i style="position:absolute;left:-5px;top:-6px;width:10px;height:10px;border-radius:99px;background:#1F6FEB"></i></span></div><div style="display:flex;gap:12px;align-items:stretch;padding:4px 0"><span class="tnum muted" style="width:44px;flex:none;font-size:12px;padding-top:9px;text-align:right">16:20</span><div class="blk b-fo" style="position:static;flex:1;min-width:0"><span class="rt" style="color:#195FD0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"></circle><path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></span><div><div class="bt" style="color:#195FD0">Focus · SOP draft</div><div class="bs" style="color:#195FD0">planned, 50 min</div></div></div></div><div style="display:flex;gap:12px;align-items:stretch;padding:4px 0"><span class="tnum muted" style="width:44px;flex:none;font-size:12px;padding-top:9px;text-align:right">17:30</span><div class="blk b-tk" style="position:static;flex:1;min-width:0"><button type="button" class="chk" aria-label="Mark Call with the Kimondo team done"></button><span class="bt tt">Call with the Kimondo team</span></div></div></div><div class="ghd"><span class="lbl">Anytime today · 4</span><a class="lnk" href="#">+ Add</a></div><div class="trow"><button type="button" class="chk" aria-label="Mark Reply to Sajal about the case study done"></button><span class="tt">Reply to Sajal about the case study</span><span class="pill over">Tue</span><span class="av am">M</span></div>
+<div class="trow"><button type="button" class="chk" aria-label="Mark Finish Statement of Purpose draft done"></button><span class="tt">Finish Statement of Purpose draft</span><span class="pill soon">Tomorrow</span><span class="av am">M</span></div>
+</div><nav class="tabs" aria-label="Main"><button type="button" class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 11.5 12 4.5l8 7M6 10v9a1 1 0 001 1h10a1 1 0 001-1v-9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>Today</button><button type="button" class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 4h8v5a4 4 0 01-8 0V4zM8 6H5a3 3 0 003 4M16 6h3a3 3 0 01-3 4M12 13v4M8.5 20h7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>Week</button><button type="button" class="tab on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5" stroke="currentColor" stroke-width="1.7"></rect><path d="M4 9.5h16M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>Calendar</button><button type="button" class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7.5A1.5 1.5 0 015.5 6h3.2a1.5 1.5 0 011.2.6l.9 1.2a1.5 1.5 0 001.2.6H18.5A1.5 1.5 0 0120 9.9V18a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 014 18V7.5z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>Projects</button><button type="button" class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="5" cy="12" r="1.7" fill="currentColor"></circle><circle cx="12" cy="12" r="1.7" fill="currentColor"></circle><circle cx="19" cy="12" r="1.7" fill="currentColor"></circle></svg>More</button></nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

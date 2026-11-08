@@ -1,10 +1,60 @@
 # DESIGN LOG
 
-> Append-only. Newest at the top. One entry per design pass. Keep it factual: paths, what shipped, what didn't.
+> **How this file works.** "Where hate club stands" (just below) is rewritten every pass, so a cold session can read it alone. The entries under it are append-only, newest first, one per design pass. Keep it factual: paths, what shipped, what didn't.
+
+## Where hate club stands (refreshed 2026-11-08 night, before an account switch)
+
+**Live:**
+- **Site:** https://shared-planner.mahesh-3dd.workers.dev, running app commit `0b402bc` (logs to `6248fe7`). Checked: the live page sha = build, `/mcp` answers.
+- **Hosting:** Cloudflare account `3ddd20c68cd38c9b2dad37782db8a154` (mahesh@trueleap.io, subdomain mahesh-3dd). Mahesh approved this as an exception to the no-Trueleap-deploys rule.
+- **Repo:** `/Users/design/shared-planner` (git `main`, no remote). Stack: Cloudflare Worker + D1 + one-file Preact/htm `public/index.html`.
+
+**Every screen, what it is now, and where its design lives**
+
+| Surface | Now (all live) | Design source | Code |
+|---|---|---|---|
+| Sign in / first-time setup | your own username + password; the shared passcode only opens setup | canvas `Login` · `BRIEF-projects-scoreboard.md` | `SignIn`, `Setup` · worker `/api/login` `/api/setup` `/api/claim` |
+| **Home (Today)** | **H1**: score pill in the header, quick add, From earlier, open list + done fold, rail (partner · Coming up · Tonight), habit cards + notes unchanged | canvas `Home-H1-*` · `BRIEF-home.md` | `Today`, `ScorePill` |
+| This week | S3 dashboard + S1/S2 parts, points, needs a hand, last week | canvas `Week-S*` | `WeekPage`, `scoreWeek` |
+| Calendar | **Day** (new) · Week · Month · Timeline | canvas `Calendar-day*` | `Calendar` (`dv-*`) |
+| Projects | Table · Lanes · Timeline · Cards + the project page | canvas `Main`, `Projects-*`, `Project-page-table` | `Projects`, `ProjectPage` |
+| Tasks · Journal | table · private journal per person | — | `TasksTable`, `Journal` |
+| Settings | Account · Habits · Notifications · **Claude** · Appearance · About | canvas `Settings-claude` | `SettingsModal`, `ClaudeSettings` |
+| Claude connector | MCP at `/mcp/<private link>`: list / add / tick off / reopen / move, no delete | entry below (8 Nov) | `src/claude.js`, table `claude_links` |
+| Motion | tick chip, count-up, exits, lead crown, confetti, reduced motion | `BRIEF-motion.md` | helpers in `index.html` |
+
+**Canvas:** https://claude.ai/artifact/25zw9iYyovGXj73Yxah5di. It's private to the Claude account that made it. **A full copy is in `design/canvas/`**: every artboard, the index, a README mapping rows → picked / built, and the scripts that made the frames.
+
+**Locked:**
+- **Identity:** blue `#1F6FEB`, ink `#15171A`, Inter, sky gradient ground, a white sheet (radius 16). A rebrand was rejected: "keep the identity same".
+- **Points:** task 10 · subtask 3 · on time +5 · helping +5 · habit 2 · journal 2 · focus 3. The week runs Mon–Sun, the day turns at 4am (IST), and the race is to 100.
+- **Home and Calendar:** Home stays a list, because "we both don't have a schedule". The hour timeline lives in Calendar › Day.
+- **Two people only for now:** multiple partners and invites come later (Mahesh, 8 Nov).
+- **Claude connector:** acts as the person; ticking off is "kill", and there's no delete.
+
+**Open, not started (ask before starting any):**
+- **People and accounts:** invites / more partners; password reset by email.
+- **Calendar:** the calendar week starts Sunday while points run Mon–Sun.
+- **Phone:**
+  - Today's week strip clips at 375 px
+  - not installable yet (no manifest)
+  - no check on a real phone so far
+- **Claude:** no real connection to the deployed link tested yet.
+- **GAPS.md tier 2:** reminders, the background notifications, habits for past days, etc.
+
+**Rules:**
+- **Deploying:**
+  - deploy = `cd /Users/design/shared-planner && npx wrangler deploy`, then re-check with `?t=` (the edge cache lags)
+  - every deploy needs Mahesh's go-ahead
+  - **never `deploy.sh`**: it rotates SESSION_SECRET, which logs you both out and kills every Claude link
+- **Working:**
+  - local dev = launch config `hate-club` (:8787); test sign-ins are in `.dev.vars` comments (git-ignored, never repeat them)
+  - design gate: brief → Mahesh's yes → build → log here + `PARITY.md`
+  - other files: `GAPS.md` (audit), `BRIEF-*.md` (one per pass)
 
 ---
 
-## 2026-11-08: Built: Home H1, Calendar Day, Settings › Claude (LIVE 8 Nov: the live page matches `0b402bc`, `/mcp` answers from the new worker)
+## 2026-11-08: Built: Home H1, Calendar Day, Settings › Claude: LIVE (`0b402bc`; the live page matches, `/mcp` answers from the new worker)
 
 **Request:** "Yes, build all 3".
 
@@ -53,7 +103,7 @@
 
 ---
 
-## 2026-11-08: H1 picked · Calendar day view · Claude connector (designs on canvas; connector built, not deployed)
+## 2026-11-08: H1 picked · Calendar day view · Claude connector (designs on the canvas; the connector built here; all live in the entry above)
 
 **Request:**
 > "I like H1 but the habit cards and the on your mind has to be like how it is rn, I like the card layouts rather than just pills" · "the H4 one, the calendar is so beautiful, can we add it to the calendar page … the home like this wouldn't work because we both actually don't have a schedule" · "can we make a claude MCP? which can create a kill tasks when done"
@@ -103,7 +153,7 @@
 
 ---
 
-## 2026-11-08: Home, five versions on the variants canvas (design only, nothing built)
+## 2026-11-08: Home, five versions on the variants canvas (design only; H1 picked next)
 
 **Request:** "use claude artifact and create some better UI of home - how can home be some versions". Brief: `BRIEF-home.md`, approved with "Yes, build all 5".
 
@@ -193,7 +243,7 @@ Each has a desktop frame (1440) and a phone frame (390×844).
 
 ---
 
-## 2026-11-08: Everything picked: own sign-ins, points + This week, Projects views, project page (built, local-verified, not deployed)
+## 2026-11-08: Everything picked: own sign-ins, points + This week, Projects views, project page: LIVE (8 Nov 01:55 IST, via `migrate4.sh`)
 
 **Request:** "complete all, dont wait for mobbin things". Built from the approved briefs and canvas picks. Sign-in is my own design, since the Mobbin refs never came.
 
@@ -264,7 +314,7 @@ Each has a desktop frame (1440) and a phone frame (390×844).
 - password reset by email (for now Mahesh resets one by clearing that person's sign-in)
 - Calendar and the Today date strip still start weeks on Sunday, while points use Mon–Sun (weekly topics are keyed by Sunday)
 
-## 2026-11-08: Spaces structure (data only, screens unchanged)
+## 2026-11-08: Spaces structure (data only, screens unchanged): LIVE (via `migrate4.sh`, which includes migrate3)
 
 **Request:** "Yes, build it now" (`BRIEF-people-spaces.md` decision 1): build for partner / friends / teams now, keep the two-person screens.
 
@@ -282,7 +332,7 @@ Each has a desktop frame (1440) and a phone frame (390×844).
 
 **Not done:** the space switcher (it appears with the second space), invites, real accounts (the sign-in redesign waits for Mahesh's Mobbin refs), and brief decisions 2–4 (they only matter once a second space exists; the journal stays visible inside the space, as before).
 
-## 2026-11-05: Variants canvas: Projects redesign, This week scoreboard, sign-in (design only, nothing built)
+## 2026-11-05: Variants canvas: Projects redesign, This week scoreboard, sign-in (design only; picks built and live 8 Nov)
 
 **Surface:** both (desktop frames + one phone frame)
 **Request:** "I hate the projects board · make 4–5 variants before anything · gamify, who's winning, who needs help · empty states · table/list · ID + password each". Brief `BRIEF-projects-scoreboard.md`, approved with the recommended answers.
@@ -313,7 +363,7 @@ Each has a desktop frame (1440) and a phone frame (390×844).
 - Sign-in: **rejected ("shitty")**. Mahesh is sending Mobbin references; redesign after those arrive.
 - New requirement: **more than one partner**. A has one romantic partner, several friends, and teams with B and C, so a shared task lives in a shared project inside a team. It's two people for now, but the structure must allow this later (`BRIEF-people-spaces.md`).
 
-## 2026-11-05: Trust pass (GAPS.md tier 1)
+## 2026-11-05: Trust pass (GAPS.md tier 1): LIVE (`978f10d`)
 
 **Surface:** both (one responsive file, `public/index.html`), plus the worker (`src/worker.js`)
 **Request:** "find gaps, analyze first" → Trust pass first → brief `BRIEF-trust-pass.md` → approved with all recommended answers (D1–D6)

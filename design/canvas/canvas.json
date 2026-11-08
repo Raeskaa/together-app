@@ -1,0 +1,349 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Artboard-v10d.dc.html": {
+      "h": 600,
+      "page": "page-y4i3gh",
+      "title": "Artboard 1",
+      "w": 800,
+      "x": 0,
+      "y": 0
+    },
+    "Login.dc.html": {
+      "h": 900,
+      "title": "Sign in \u00b7 who, password, wrong password",
+      "w": 1440,
+      "x": 0,
+      "y": 5000
+    },
+    "Main.dc.html": {
+      "expand": "fill",
+      "h": 960,
+      "title": "A \u00b7 Table (Miro-style list)",
+      "w": 1440,
+      "x": 0,
+      "y": 300
+    },
+    "Project-page-table.dc.html": {
+      "expand": "fill",
+      "h": 960,
+      "title": "Inside a project \u00b7 Table view",
+      "w": 1440,
+      "x": 2870,
+      "y": 2000
+    },
+    "Projects-B-lanes.dc.html": {
+      "expand": "fill",
+      "h": 960,
+      "title": "B \u00b7 Deadline lanes",
+      "w": 1440,
+      "x": 1520,
+      "y": 300
+    },
+    "Projects-C-timeline.dc.html": {
+      "expand": "fill",
+      "h": 960,
+      "title": "C \u00b7 Timeline, 12 weeks",
+      "w": 1440,
+      "x": 3040,
+      "y": 300
+    },
+    "Projects-D-nextsteps.dc.html": {
+      "expand": "fill",
+      "h": 1280,
+      "title": "D \u00b7 Next-step list",
+      "w": 1440,
+      "x": 4560,
+      "y": 300
+    },
+    "Projects-E-cards.dc.html": {
+      "expand": "fill",
+      "h": 960,
+      "title": "E \u00b7 Dense cards",
+      "w": 1440,
+      "x": 6080,
+      "y": 300
+    },
+    "Projects-empty-filter.dc.html": {
+      "h": 560,
+      "title": "Empty \u00b7 filter matches nothing",
+      "w": 720,
+      "x": 800,
+      "y": 2000
+    },
+    "Projects-empty-finished.dc.html": {
+      "h": 560,
+      "title": "Empty \u00b7 all finished",
+      "w": 720,
+      "x": 1600,
+      "y": 2000
+    },
+    "Projects-empty-none.dc.html": {
+      "h": 560,
+      "title": "Empty \u00b7 no projects yet",
+      "w": 720,
+      "x": 0,
+      "y": 2000
+    },
+    "Projects-phone.dc.html": {
+      "h": 844,
+      "title": "Phone \u00b7 Projects",
+      "w": 390,
+      "x": 2400,
+      "y": 2000
+    },
+    "Week-S1-head-to-head.dc.html": {
+      "expand": "fill",
+      "h": 1120,
+      "title": "S1 \u00b7 Head-to-head",
+      "w": 1440,
+      "x": 0,
+      "y": 3380
+    },
+    "Week-S2-race.dc.html": {
+      "expand": "fill",
+      "h": 1120,
+      "title": "S2 \u00b7 Race to 100",
+      "w": 1440,
+      "x": 1520,
+      "y": 3380
+    },
+    "Week-S3-dashboard.dc.html": {
+      "expand": "fill",
+      "h": 1200,
+      "title": "S3 \u00b7 Dashboard",
+      "w": 1440,
+      "x": 3040,
+      "y": 3380
+    },
+    "Week-empty-monday.dc.html": {
+      "expand": "fill",
+      "h": 760,
+      "title": "This week \u00b7 Monday morning (empty)",
+      "w": 1440,
+      "x": 6080,
+      "y": 3380
+    },
+    "Week-today-strip.dc.html": {
+      "expand": "fill",
+      "h": 760,
+      "title": "Today \u00b7 score strip",
+      "w": 1440,
+      "x": 4560,
+      "y": 3380
+    },
+    "Home-H1-one-list.dc.html": {
+      "x": 0,
+      "y": 6500,
+      "w": 1440,
+      "h": 1500,
+      "title": "H1 \u00b7 One list (picked)",
+      "expand": "fill"
+    },
+    "Home-H1-phone.dc.html": {
+      "x": 0,
+      "y": 8400,
+      "w": 390,
+      "h": 844,
+      "title": "H1 \u00b7 phone"
+    },
+    "Home-H2-me-us.dc.html": {
+      "x": 1520,
+      "y": 6500,
+      "w": 1440,
+      "h": 1080,
+      "title": "H2 \u00b7 Me | Us",
+      "expand": "fill"
+    },
+    "Home-H2-phone.dc.html": {
+      "x": 1520,
+      "y": 8400,
+      "w": 390,
+      "h": 844,
+      "title": "H2 \u00b7 phone"
+    },
+    "Home-H3-game-board.dc.html": {
+      "x": 3040,
+      "y": 6500,
+      "w": 1440,
+      "h": 1080,
+      "title": "H3 \u00b7 Game board",
+      "expand": "fill"
+    },
+    "Home-H3-phone.dc.html": {
+      "x": 3040,
+      "y": 8400,
+      "w": 390,
+      "h": 844,
+      "title": "H3 \u00b7 phone"
+    },
+    "Home-H4-day-plan.dc.html": {
+      "x": 4560,
+      "y": 6500,
+      "w": 1440,
+      "h": 1000,
+      "title": "H4 \u00b7 Day plan",
+      "expand": "fill"
+    },
+    "Home-H4-phone.dc.html": {
+      "x": 4560,
+      "y": 8400,
+      "w": 390,
+      "h": 844,
+      "title": "H4 \u00b7 phone"
+    },
+    "Home-H5-bento.dc.html": {
+      "x": 6080,
+      "y": 6500,
+      "w": 1440,
+      "h": 1000,
+      "title": "H5 \u00b7 Bento",
+      "expand": "fill"
+    },
+    "Home-H5-phone.dc.html": {
+      "x": 6080,
+      "y": 8400,
+      "w": 390,
+      "h": 844,
+      "title": "H5 \u00b7 phone"
+    },
+    "Calendar-day.dc.html": {
+      "x": 0,
+      "y": 9800,
+      "w": 1440,
+      "h": 1000,
+      "title": "Calendar \u00b7 Day",
+      "expand": "fill"
+    },
+    "Calendar-day-empty.dc.html": {
+      "x": 1520,
+      "y": 9800,
+      "w": 1440,
+      "h": 760,
+      "title": "Calendar \u00b7 Day, nothing timed",
+      "expand": "fill"
+    },
+    "Calendar-day-phone.dc.html": {
+      "x": 3040,
+      "y": 9800,
+      "w": 390,
+      "h": 844,
+      "title": "Calendar \u00b7 Day \u00b7 phone"
+    },
+    "Settings-claude.dc.html": {
+      "x": 3510,
+      "y": 9800,
+      "w": 1120,
+      "h": 720,
+      "title": "Settings \u203a Claude"
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-11-05T12:40:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "t1": {
+      "kind": "title1",
+      "maxW": 7520,
+      "text": "Projects \u00b7 five ways to see them",
+      "w": 240,
+      "x": 0,
+      "y": 0
+    },
+    "t2": {
+      "kind": "title1",
+      "maxW": 4310,
+      "text": "Projects \u00b7 empty states, phone, inside a project",
+      "w": 240,
+      "x": 0,
+      "y": 1700
+    },
+    "t3": {
+      "kind": "title1",
+      "maxW": 7520,
+      "text": "This week \u00b7 who's ahead, who needs a hand",
+      "w": 240,
+      "x": 0,
+      "y": 3080
+    },
+    "t4": {
+      "kind": "title1",
+      "maxW": 1440,
+      "text": "Sign in \u00b7 one each",
+      "w": 240,
+      "x": 0,
+      "y": 4700
+    },
+    "t5": {
+      "x": 0,
+      "y": 6200,
+      "text": "Home \u00b7 five ways",
+      "kind": "title1",
+      "maxW": 7520
+    },
+    "t6": {
+      "x": 0,
+      "y": 8160,
+      "text": "Home \u00b7 on the phone",
+      "kind": "title1",
+      "maxW": 6470
+    },
+    "t7": {
+      "x": 0,
+      "y": 9560,
+      "text": "Calendar \u00b7 a day view \u00b7 and Claude",
+      "kind": "title1",
+      "maxW": 4630
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Projects-B-lanes.dc.html",
+    "Projects-C-timeline.dc.html",
+    "Projects-D-nextsteps.dc.html",
+    "Projects-E-cards.dc.html",
+    "Projects-empty-none.dc.html",
+    "Projects-empty-filter.dc.html",
+    "Projects-empty-finished.dc.html",
+    "Projects-phone.dc.html",
+    "Project-page-table.dc.html",
+    "Week-S1-head-to-head.dc.html",
+    "Week-S2-race.dc.html",
+    "Week-S3-dashboard.dc.html",
+    "Week-today-strip.dc.html",
+    "Week-empty-monday.dc.html",
+    "Login.dc.html",
+    "Artboard-v10d.dc.html",
+    "Home-H1-one-list.dc.html",
+    "Home-H1-phone.dc.html",
+    "Home-H2-me-us.dc.html",
+    "Home-H2-phone.dc.html",
+    "Home-H3-game-board.dc.html",
+    "Home-H3-phone.dc.html",
+    "Home-H4-day-plan.dc.html",
+    "Home-H4-phone.dc.html",
+    "Home-H5-bento.dc.html",
+    "Home-H5-phone.dc.html",
+    "Calendar-day.dc.html",
+    "Calendar-day-empty.dc.html",
+    "Calendar-day-phone.dc.html",
+    "Settings-claude.dc.html"
+  ],
+  "pages": [
+    {
+      "id": "page-1",
+      "name": "Page 1"
+    },
+    {
+      "id": "page-y4i3gh",
+      "name": "Page 2"
+    }
+  ],
+  "title": "hate club \u00b7 Projects + This week"
+}

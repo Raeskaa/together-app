@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Projects · phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:#15171A;-webkit-font-smoothing:antialiased;background:#EAF3FF}
+a{color:#195FD0;text-decoration:none}a:hover{color:#15171A}
+button{font-family:inherit;cursor:pointer}
+.app{display:flex;flex-wrap:wrap;align-items:stretch;min-height:960px;background:radial-gradient(1100px 760px at 78% 12%,rgba(255,255,255,.9),transparent 60%),radial-gradient(900px 680px at 12% 82%,rgba(255,255,255,.5),transparent 55%),linear-gradient(162deg,#3FA0FF 0%,#6FBAFF 20%,#A6D5FF 40%,#D6ECFF 62%,#F5FAFF 85%)}
+.side{flex:1 0 232px;max-width:232px;box-sizing:border-box;padding:16px 10px;display:flex;flex-direction:column;gap:2px}
+.prof{display:flex;align-items:center;gap:10px;padding:4px 10px 12px;font-weight:600;font-size:14px}
+.pav{width:26px;height:26px;border-radius:99px;background:#15171A;color:#fff;font-size:11px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}
+.addb{display:flex;align-items:center;gap:10px;padding:7px 10px;font-weight:600;font-size:14px;color:#195FD0;border:0;background:none;text-align:left}
+.nav{display:flex;align-items:center;gap:11px;padding:7px 10px;border-radius:8px;font-size:14px;font-weight:500;color:#2F343B;border:0;background:none;width:100%;text-align:left;box-sizing:border-box}
+.nav svg{color:#54606E;flex:none}
+.nav.on{background:#fff;color:#195FD0;font-weight:600;box-shadow:0 1px 3px rgba(20,60,130,.12)}
+.nav.on svg{color:#195FD0}
+.cnt{margin-left:auto;font-size:12px;font-weight:500;color:#4B5866}
+.sec{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3C5F8C;padding:16px 10px 4px}
+.dot{width:8px;height:8px;border-radius:99px;display:inline-block;flex:none}
+.sfoot{margin-top:auto;display:flex;align-items:center;gap:8px;padding:12px 10px 4px;font-size:12px;color:#3F4B59}
+.main{flex:999 1 560px;min-width:0;box-sizing:border-box;margin:10px;background:#fff;border:1px solid #E5EAF1;border-radius:16px;box-shadow:0 12px 40px rgba(20,60,130,.12);padding:28px 36px 44px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brandrow{display:flex;align-items:center;gap:14px}
+.mark{width:40px;height:40px;border-radius:11px;background:#15171A;color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;letter-spacing:-.02em}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#3C6FB0}
+h1{margin:0;font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.15}
+.btnp{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:10px;background:#15171A;color:#fff;font-weight:600;font-size:13.5px;padding:10px 14px}
+.btng{display:inline-flex;align-items:center;gap:8px;border:1px solid #DCE3EC;border-radius:10px;background:#fff;color:#15171A;font-weight:600;font-size:13px;padding:8px 12px}
+.tool{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:24px}
+.lab{font-size:12.5px;color:#4B5866;font-weight:500}
+.dd{display:inline-flex;align-items:center;gap:8px;border:1px solid #DCE3EC;border-radius:9px;background:#fff;padding:7px 10px 7px 12px;font-size:13px;font-weight:500;color:#15171A}
+.vt{display:inline-flex;border:1px solid #DCE3EC;border-radius:9px;overflow:hidden;margin-left:auto}
+.vt button{border:0;background:#fff;padding:7px 9px;color:#4B5866;display:flex}
+.vt button.on{background:#EEF2F7;color:#15171A}
+.av{width:24px;height:24px;border-radius:99px;color:#fff;font-size:10.5px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;flex:none;box-shadow:0 0 0 2px #fff}
+.am{background:#15171A}.ap{background:#5B6B86}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;border-radius:99px;padding:3px 9px;white-space:nowrap}
+.soon{color:#85560F;background:#FBF1E6}
+.calm{color:#46505D;background:#EEF2F7}
+.over{color:#A3392C;background:#FCEAE7}
+.okp{color:#1D6842;background:#E3F4EA}
+.bar{height:6px;border-radius:99px;background:#E8EDF4;overflow:hidden}
+.bar i{display:block;height:100%;background:#1F6FEB;border-radius:99px}
+.muted{color:#4B5866}
+.chk{width:18px;height:18px;border-radius:99px;border:1.6px solid #AEB8C5;background:#fff;flex:none;box-sizing:border-box;padding:0}
+.kebab{border:0;background:none;color:#4B5866;padding:6px;border-radius:6px;display:flex}
+.tbl{margin-top:14px;border:1px solid #E5EAF1;border-radius:12px;overflow-x:auto}
+.tr{display:grid;grid-template-columns:minmax(190px,1.3fr) minmax(230px,1.7fr) 150px 110px 92px 120px 36px;align-items:center;column-gap:16px;padding:0 16px;min-height:60px;border-top:1px solid #EEF2F7;min-width:1000px}
+.th{min-height:40px;background:#F8FAFD;border-top:0;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#4B5866}
+.grp{padding:9px 16px;background:#FBFCFE;border-top:1px solid #EEF2F7;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3C6FB0;min-width:1000px}
+.pname{font-weight:600;font-size:14.5px}
+.kind{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#4B5866;margin-top:2px}
+.cell{display:flex;align-items:center;gap:9px;min-width:0;font-size:13.5px}
+.tnum{font-variant-numeric:tabular-nums}
+</style>
+<style>
+.ph{width:390px;height:844px;box-sizing:border-box;background:#fff;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.phtop{padding:18px 16px 0;display:flex;align-items:center;justify-content:space-between}
+.addc{width:44px;height:44px;border-radius:99px;border:0;background:#15171A;color:#fff;display:flex;align-items:center;justify-content:center}
+.chips{display:flex;gap:8px;padding:16px 16px 4px;overflow-x:auto}
+.chip2{flex:none;border:1px solid #DCE3EC;background:#fff;border-radius:99px;padding:8px 14px;font-size:13.5px;font-weight:500;color:#2F343B;min-height:36px}
+.chip2.on{background:#15171A;border-color:#15171A;color:#fff;font-weight:600}
+.sortl{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 6px;font-size:12.5px;color:#4B5866}
+.list{flex:1;overflow:hidden;padding:0 16px}
+.prow{display:flex;flex-direction:column;gap:6px;padding:13px 0;border-top:1px solid #EEF2F7}
+.prow:first-child{border-top:0}
+.pr1{display:flex;align-items:center;gap:9px}
+.pr1 .pname{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px}
+.pr2{display:flex;align-items:center;gap:8px;font-size:13px;padding-left:17px;flex-wrap:wrap}
+.pr3{display:flex;align-items:center;gap:8px;padding-left:17px;font-size:12px;color:#4B5866}
+.pr3 .bar{flex:1}
+.grp2{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3C6FB0;padding:14px 0 4px}
+.tabs{display:flex;border-top:1px solid #E5EAF1;background:#FBFDFF;padding:8px 0 22px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;border:0;background:none;font-size:10.5px;font-weight:500;color:#5E6875;min-height:44px}
+.tab.on{color:#195FD0;font-weight:600}
+</style>
+</helmet>
+<div class="ph">
+  <div class="phtop">
+    <div class="brandrow"><span class="mark" style="width:36px;height:36px">hc</span><div><div class="eyebrow">hate club</div><h1 style="font-size:24px">Projects</h1></div></div>
+    <button type="button" class="addc" aria-label="New project"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"></path></svg></button>
+  </div>
+  <div class="chips" role="group" aria-label="Show">
+    <button type="button" class="chip2 on">All · 6</button><button type="button" class="chip2">Mine · 3</button><button type="button" class="chip2">Theirs · 1</button><button type="button" class="chip2">Both · 2</button><button type="button" class="chip2">Finished</button>
+  </div>
+  <div class="sortl"><span>Soonest deadline first</span><button type="button" class="kebab" aria-label="Sort and view options"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></button></div>
+  <div class="list">
+    <div class="grp2">Next 2 weeks</div>
+        <div class="prow">
+          <div class="pr1"><span class="dot" style="background:#2E9E6B"></span><span class="pname">STP</span><span class="pill soon">7d</span><span class="av am">M</span></div>
+          <div class="pr2"><span class="muted">No tasks yet ·</span><a href="#">+ Add one</a></div>
+          
+        </div>
+        <div class="prow">
+          <div class="pr1"><span class="dot" style="background:#1F6FEB"></span><span class="pname">Kimondo</span><span class="pill soon">10d</span><span style="display:inline-flex"><span class="av am">M</span><span class="av ap" style="margin-left:-8px">P</span></span></div>
+          <div class="pr2"><span class="muted">Next ·</span><b style="font-weight:600">Website</b><span class="pill soon">tomorrow</span></div>
+          <div class="pr3"><div class="bar"><i style="width:33%"></i></div><span class="tnum">1 of 3</span></div>
+        </div>
+        <div class="prow">
+          <div class="pr1"><span class="dot" style="background:#B0529E"></span><span class="pname">Assignments</span><span class="pill soon">13d</span><span class="av ap">P</span></div>
+          <div class="pr2"><span class="muted">Next ·</span><b style="font-weight:600">Pratul Assignments</b></div>
+          <div class="pr3"><div class="bar"><i style="width:0%"></i></div><span class="tnum">0 of 2</span></div>
+        </div>
+    <div class="grp2">Later</div>
+        <div class="prow">
+          <div class="pr1"><span class="dot" style="background:#C2704B"></span><span class="pname">Portfolio</span><span class="pill calm">17d</span><span class="av am">M</span></div>
+          <div class="pr2"><span class="muted">No tasks yet ·</span><a href="#">+ Add one</a></div>
+          
+        </div>
+        <div class="prow">
+          <div class="pr1"><span class="dot" style="background:#4F5B76"></span><span class="pname">D&amp;AD New Blood</span><span class="pill calm">116d</span><span style="display:inline-flex"><span class="av am">M</span><span class="av ap" style="margin-left:-8px">P</span></span></div>
+          <div class="pr2"><span class="muted">No tasks yet ·</span><a href="#">+ Add one</a></div>
+          
+        </div>
+        <div class="prow">
+          <div class="pr1"><span class="dot" style="background:#7A5BD8"></span><span class="pname">Social Media Presence</span><span class="pill calm">144d</span><span class="av am">M</span></div>
+          <div class="pr2"><span class="muted">No tasks yet ·</span><a href="#">+ Add one</a></div>
+          
+        </div>
+  </div>
+  <nav class="tabs" aria-label="Main">
+    <button type="button" class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 11.5 12 4.5l8 7M6 10v9a1 1 0 001 1h10a1 1 0 001-1v-9" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"></path></svg>Today</button>
+    <button type="button" class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5" stroke="currentColor" stroke-width="1.7"></rect><path d="M4 9.5h16M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg>Calendar</button>
+    <button type="button" class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 4h8v5a4 4 0 01-8 0V4zM8 6H5a3 3 0 003 4M16 6h3a3 3 0 01-3 4M12 13v4M8.5 20h7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>Week</button>
+    <button type="button" class="tab on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7.5A1.5 1.5 0 015.5 6h3.2a1.5 1.5 0 011.2.6l.9 1.2a1.5 1.5 0 001.2.6H18.5A1.5 1.5 0 0120 9.9V18a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 014 18V7.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path></svg>Projects</button>
+    <button type="button" class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="5" cy="12" r="1.7" fill="currentColor"></circle><circle cx="12" cy="12" r="1.7" fill="currentColor"></circle><circle cx="19" cy="12" r="1.7" fill="currentColor"></circle></svg>More</button>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

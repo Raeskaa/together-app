@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Projects · empty · all finished</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:#15171A;-webkit-font-smoothing:antialiased;background:#EAF3FF}
+a{color:#195FD0;text-decoration:none}a:hover{color:#15171A}
+button{font-family:inherit;cursor:pointer}
+.app{display:flex;flex-wrap:wrap;align-items:stretch;min-height:960px;background:radial-gradient(1100px 760px at 78% 12%,rgba(255,255,255,.9),transparent 60%),radial-gradient(900px 680px at 12% 82%,rgba(255,255,255,.5),transparent 55%),linear-gradient(162deg,#3FA0FF 0%,#6FBAFF 20%,#A6D5FF 40%,#D6ECFF 62%,#F5FAFF 85%)}
+.side{flex:1 0 232px;max-width:232px;box-sizing:border-box;padding:16px 10px;display:flex;flex-direction:column;gap:2px}
+.prof{display:flex;align-items:center;gap:10px;padding:4px 10px 12px;font-weight:600;font-size:14px}
+.pav{width:26px;height:26px;border-radius:99px;background:#15171A;color:#fff;font-size:11px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}
+.addb{display:flex;align-items:center;gap:10px;padding:7px 10px;font-weight:600;font-size:14px;color:#195FD0;border:0;background:none;text-align:left}
+.nav{display:flex;align-items:center;gap:11px;padding:7px 10px;border-radius:8px;font-size:14px;font-weight:500;color:#2F343B;border:0;background:none;width:100%;text-align:left;box-sizing:border-box}
+.nav svg{color:#54606E;flex:none}
+.nav.on{background:#fff;color:#195FD0;font-weight:600;box-shadow:0 1px 3px rgba(20,60,130,.12)}
+.nav.on svg{color:#195FD0}
+.cnt{margin-left:auto;font-size:12px;font-weight:500;color:#4B5866}
+.sec{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3C5F8C;padding:16px 10px 4px}
+.dot{width:8px;height:8px;border-radius:99px;display:inline-block;flex:none}
+.sfoot{margin-top:auto;display:flex;align-items:center;gap:8px;padding:12px 10px 4px;font-size:12px;color:#3F4B59}
+.main{flex:999 1 560px;min-width:0;box-sizing:border-box;margin:10px;background:#fff;border:1px solid #E5EAF1;border-radius:16px;box-shadow:0 12px 40px rgba(20,60,130,.12);padding:28px 36px 44px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brandrow{display:flex;align-items:center;gap:14px}
+.mark{width:40px;height:40px;border-radius:11px;background:#15171A;color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;letter-spacing:-.02em}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#3C6FB0}
+h1{margin:0;font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.15}
+.btnp{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:10px;background:#15171A;color:#fff;font-weight:600;font-size:13.5px;padding:10px 14px}
+.btng{display:inline-flex;align-items:center;gap:8px;border:1px solid #DCE3EC;border-radius:10px;background:#fff;color:#15171A;font-weight:600;font-size:13px;padding:8px 12px}
+.tool{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:24px}
+.lab{font-size:12.5px;color:#4B5866;font-weight:500}
+.dd{display:inline-flex;align-items:center;gap:8px;border:1px solid #DCE3EC;border-radius:9px;background:#fff;padding:7px 10px 7px 12px;font-size:13px;font-weight:500;color:#15171A}
+.vt{display:inline-flex;border:1px solid #DCE3EC;border-radius:9px;overflow:hidden;margin-left:auto}
+.vt button{border:0;background:#fff;padding:7px 9px;color:#4B5866;display:flex}
+.vt button.on{background:#EEF2F7;color:#15171A}
+.av{width:24px;height:24px;border-radius:99px;color:#fff;font-size:10.5px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;flex:none;box-shadow:0 0 0 2px #fff}
+.am{background:#15171A}.ap{background:#5B6B86}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;border-radius:99px;padding:3px 9px;white-space:nowrap}
+.soon{color:#85560F;background:#FBF1E6}
+.calm{color:#46505D;background:#EEF2F7}
+.over{color:#A3392C;background:#FCEAE7}
+.okp{color:#1D6842;background:#E3F4EA}
+.bar{height:6px;border-radius:99px;background:#E8EDF4;overflow:hidden}
+.bar i{display:block;height:100%;background:#1F6FEB;border-radius:99px}
+.muted{color:#4B5866}
+.chk{width:18px;height:18px;border-radius:99px;border:1.6px solid #AEB8C5;background:#fff;flex:none;box-sizing:border-box;padding:0}
+.kebab{border:0;background:none;color:#4B5866;padding:6px;border-radius:6px;display:flex}
+.tbl{margin-top:14px;border:1px solid #E5EAF1;border-radius:12px;overflow-x:auto}
+.tr{display:grid;grid-template-columns:minmax(190px,1.3fr) minmax(230px,1.7fr) 150px 110px 92px 120px 36px;align-items:center;column-gap:16px;padding:0 16px;min-height:60px;border-top:1px solid #EEF2F7;min-width:1000px}
+.th{min-height:40px;background:#F8FAFD;border-top:0;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#4B5866}
+.grp{padding:9px 16px;background:#FBFCFE;border-top:1px solid #EEF2F7;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3C6FB0;min-width:1000px}
+.pname{font-weight:600;font-size:14.5px}
+.kind{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#4B5866;margin-top:2px}
+.cell{display:flex;align-items:center;gap:9px;min-width:0;font-size:13.5px}
+.tnum{font-variant-numeric:tabular-nums}
+</style>
+<style>
+.frame{width:720px;height:560px;box-sizing:border-box;padding:18px;background:linear-gradient(162deg,#6FBAFF 0%,#A6D5FF 35%,#D6ECFF 65%,#F5FAFF 100%)}
+.card{height:100%;box-sizing:border-box;background:#fff;border:1px solid #E5EAF1;border-radius:16px;box-shadow:0 12px 40px rgba(20,60,130,.12);padding:22px 26px;display:flex;flex-direction:column}
+.es{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding:10px 40px}
+.esi{width:64px;height:64px;border-radius:18px;background:#E8F1FF;color:#195FD0;display:flex;align-items:center;justify-content:center;margin-bottom:6px}
+.es h2{margin:0;font-size:19px;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+.es p{margin:0;font-size:13.5px;line-height:1.55;color:#4B5866;max-width:380px}
+.esa{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;justify-content:center}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:9px;padding:7px 10px;font-size:13px;font-weight:600;background:#E8F1FF;color:#195FD0;border:1px solid #CFE0FB}
+</style>
+</helmet>
+<div class="frame"><div class="card">
+      <div class="top">
+        <div class="brandrow"><span class="mark">hc</span><div><div class="eyebrow">hate club</div><h1 style="font-size:24px">Projects</h1></div></div>
+        <button type="button" class="btnp"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>New project</button>
+      </div>
+      <div class="es">
+        <span class="esi" style="background:#E3F4EA;color:#1D6842"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 21V4M6 4h10l-2 3.5L16 11H6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+        <h2>Every project is finished</h2>
+        <p>All 6 are done. They stay under Finished, with their tasks and links, whenever you want to look back.</p>
+        <div class="esa"><button type="button" class="btnp">New project</button><button type="button" class="btng">See finished · 6</button></div>
+      </div>
+</div></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":720,"height":560}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

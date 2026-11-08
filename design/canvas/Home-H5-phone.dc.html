@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>H5 · Bento · phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+
+body{margin:0;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:#15171A;-webkit-font-smoothing:antialiased;background:#EAF3FF}
+a{color:#195FD0;text-decoration:none}a:hover{color:#15171A}
+button{font-family:inherit;cursor:pointer}
+.app{display:flex;flex-wrap:wrap;align-items:stretch;min-height:960px;background:radial-gradient(1100px 760px at 78% 12%,rgba(255,255,255,.9),transparent 60%),radial-gradient(900px 680px at 12% 82%,rgba(255,255,255,.5),transparent 55%),linear-gradient(162deg,#3FA0FF 0%,#6FBAFF 20%,#A6D5FF 40%,#D6ECFF 62%,#F5FAFF 85%)}
+.side{flex:1 0 232px;max-width:232px;box-sizing:border-box;padding:16px 10px;display:flex;flex-direction:column;gap:2px}
+.prof{display:flex;align-items:center;gap:10px;padding:4px 10px 12px;font-weight:600;font-size:14px}
+.pav{width:26px;height:26px;border-radius:99px;background:#15171A;color:#fff;font-size:11px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}
+.addb{display:flex;align-items:center;gap:10px;padding:7px 10px;font-weight:600;font-size:14px;color:#195FD0;border:0;background:none;text-align:left}
+.nav{display:flex;align-items:center;gap:11px;padding:7px 10px;border-radius:8px;font-size:14px;font-weight:500;color:#2F343B;border:0;background:none;width:100%;text-align:left;box-sizing:border-box}
+.nav svg{color:#54606E;flex:none}
+.nav.on{background:#fff;color:#195FD0;font-weight:600;box-shadow:0 1px 3px rgba(20,60,130,.12)}
+.nav.on svg{color:#195FD0}
+.cnt{margin-left:auto;font-size:12px;font-weight:500;color:#4B5866;font-variant-numeric:tabular-nums}
+.sec{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3C5F8C;padding:16px 10px 4px}
+.dot{width:8px;height:8px;border-radius:99px;display:inline-block;flex:none}
+.sfoot{margin-top:auto;display:flex;flex-direction:column;gap:2px;padding-top:12px}
+.sfoot .nav{font-size:13.5px}
+.club{display:flex;align-items:center;gap:8px;padding:10px 10px 4px;font-size:12px;color:#3F4B59}
+.main{flex:999 1 560px;min-width:0;box-sizing:border-box;margin:10px;background:#fff;border:1px solid #E5EAF1;border-radius:16px;box-shadow:0 12px 40px rgba(20,60,130,.12);padding:28px 36px 44px;position:relative}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brandrow{display:flex;align-items:center;gap:14px}
+.mark{width:40px;height:40px;border-radius:11px;background:#15171A;color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;letter-spacing:-.02em;flex:none}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#3C6FB0}
+h1{margin:0;font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.15}
+h2{margin:0;font-size:15px;font-weight:700;letter-spacing:-.005em}
+.btnp{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:10px;background:#15171A;color:#fff;font-weight:600;font-size:13px;padding:9px 14px;white-space:nowrap}
+.btng{display:inline-flex;align-items:center;gap:7px;border:1px solid #DCE3EC;border-radius:10px;background:#fff;color:#15171A;font-weight:600;font-size:13px;padding:8px 12px;white-space:nowrap}
+.btns{display:inline-flex;align-items:center;gap:6px;border:1px solid #DCE3EC;border-radius:8px;background:#fff;color:#15171A;font-weight:600;font-size:12px;padding:5px 9px;white-space:nowrap}
+.av{width:24px;height:24px;border-radius:99px;color:#fff;font-size:10.5px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;flex:none;box-shadow:0 0 0 2px #fff}
+.am{background:#15171A}.ap{background:#5B6B86}
+.avs{display:inline-flex}.avs .av+.av{margin-left:-8px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;border-radius:99px;padding:3px 9px;white-space:nowrap}
+.soon{color:#85560F;background:#FBF1E6}
+.calm{color:#46505D;background:#EEF2F7}
+.over{color:#A3392C;background:#FCEAE7}
+.okp{color:#1D6842;background:#E3F4EA}
+.muted{color:#4B5866}
+.tnum{font-variant-numeric:tabular-nums}
+.chk{width:18px;height:18px;border-radius:99px;border:1.6px solid #AEB8C5;background:#fff;flex:none;box-sizing:border-box;padding:0;display:inline-flex;align-items:center;justify-content:center}
+.chk.on{background:#1F6FEB;border-color:#1F6FEB}
+.seg{display:inline-flex;align-items:center;gap:2px;background:#F1F4F8;border-radius:999px;padding:3px}
+.seg button{border:0;background:none;border-radius:999px;padding:6px 13px;font-weight:500;font-size:12.5px;color:#3A4350}
+.seg button.on{background:#fff;color:#15171A;font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.lbl{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3C6FB0}
+.lnk{font-size:12.5px;font-weight:600;color:#195FD0;display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+/* week strip */
+.wks{display:grid;grid-template-columns:auto repeat(7,minmax(0,1fr)) auto;gap:6px;align-items:center;margin-top:20px}
+.wkn{width:28px;height:28px;border-radius:8px;border:0;background:none;color:#4B5866;display:flex;align-items:center;justify-content:center;padding:0}
+.wd{border:0;background:none;border-radius:10px;padding:7px 0 6px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:600;color:#3C6FB0}
+.wd b{font-size:15px;font-weight:600;color:#2F343B;font-variant-numeric:tabular-nums}
+.wd i{width:4px;height:4px;border-radius:99px;background:#9DB3CF;display:block}
+.wd i.no{background:transparent}
+.wd.t{background:#EEF4FF}.wd.t b{color:#195FD0}.wd.t i{background:#1F6FEB}
+/* rows */
+.ghd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 2px 6px}
+.trow{display:flex;align-items:center;gap:12px;padding:10px 2px;border-top:1px solid #EEF2F7;font-size:14px;min-height:24px}
+.ghd+.trow{border-top:0}
+.tt{flex:1;min-width:0;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tt.done{color:#6B7480;text-decoration:line-through;text-decoration-color:#AEB8C5}
+.proj{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:#4B5866;white-space:nowrap}
+.time{width:92px;flex:none;font-size:12.5px;color:#4B5866;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rt{width:18px;height:18px;flex:none;display:inline-flex;align-items:center;justify-content:center;color:#3C6FB0}
+.pts{font-size:12px;font-weight:600;color:#1D6842;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pts.earned{background:#E3F4EA;border-radius:99px;padding:2px 8px}
+.qadd{display:flex;align-items:center;gap:10px;border:1px dashed #C9D5E5;border-radius:10px;padding:9px 12px;color:#4B5866;font-size:14px;margin-top:18px}
+.qadd label{flex:1;display:flex}
+.qadd input{flex:1;border:0;outline:0;font:inherit;background:transparent;color:#15171A;padding:0}
+.qadd input::placeholder{color:#5E6875}
+.kbd{font-size:11px;color:#4B5866;border:1px solid #DCE3EC;border-radius:5px;padding:1px 6px;font-weight:500}
+.donel{display:flex;align-items:center;gap:8px;padding:11px 2px;border-top:1px solid #EEF2F7;font-size:13px;color:#4B5866;width:100%;border-left:0;border-right:0;border-bottom:0;background:none;text-align:left}
+/* habits */
+.hchips{display:flex;flex-wrap:wrap;gap:8px}
+.hchip{display:inline-flex;align-items:center;gap:8px;border:1px solid #DCE3EC;border-radius:99px;padding:5px 12px 5px 6px;font-size:13px;font-weight:500;background:#fff;color:#15171A;white-space:nowrap;min-height:24px}
+.hchip .chk{width:18px;height:18px}
+.hchip.on{background:#F3F8FF;border-color:#BFD5F7}
+.streak{display:inline-flex;align-items:center;gap:3px;font-size:12px;color:#A8501F;font-weight:600}
+.step{width:24px;height:24px;border-radius:99px;border:1px solid #DCE3EC;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:14px;line-height:1;color:#15171A;padding:0}
+.cnum{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+.note{background:linear-gradient(180deg,#FFF3BE,#FFEEA6);border:1px solid #F1DE84;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.45;color:#3B3520}
+.wave{position:absolute;right:24px;bottom:24px;width:44px;height:44px;border-radius:99px;border:1px solid #DCE3EC;background:#fff;box-shadow:0 6px 18px rgba(20,60,130,.14);display:flex;align-items:center;justify-content:center;color:#C2496B;padding:0}
+.card{border:1px solid #E5EAF1;border-radius:14px;padding:4px 18px 10px;background:#fff}
+.cardhd{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 0 6px}
+/* race */
+.track{position:relative;height:28px}
+.track .ln{position:absolute;left:0;right:0;top:13px;height:2px;background:#E3E9F1;border-radius:2px}
+.track .fl{position:absolute;right:-2px;top:5px;color:#4B5866}
+.track .rn{position:absolute;top:2px;transform:translateX(-50%)}
+.mbar{height:6px;border-radius:99px;background:#E8EDF4;position:relative;overflow:hidden}
+.mbar i{position:absolute;left:0;top:0;bottom:0;border-radius:99px;display:block}
+/* phone */
+.ph{width:390px;height:844px;box-sizing:border-box;background:#fff;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.phtop{padding:16px 16px 0;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.phtop h1{font-size:24px}
+.phbody{flex:1;overflow:hidden;padding:0 16px}
+.tabs{display:flex;border-top:1px solid #E5EAF1;background:#FBFDFF;padding:8px 0 22px;flex:none}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;border:0;background:none;font-size:10.5px;font-weight:500;color:#5E6875;min-height:44px}
+.tab.on{color:#195FD0;font-weight:600}
+.ph .wks{grid-template-columns:repeat(7,minmax(0,1fr));margin-top:14px;gap:2px}
+.ph .trow{min-height:30px}
+.addc{width:44px;height:44px;border-radius:99px;border:0;background:#15171A;color:#fff;display:flex;align-items:center;justify-content:center;padding:0;flex:none}
+
+</style>
+<style>
+
+.bento{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px;margin-top:20px}
+.tile{border:1px solid #E5EAF1;border-radius:14px;padding:14px 16px;background:#fff;min-width:0;box-sizing:border-box}
+.tile .th{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.s7{grid-column:span 7}.s5{grid-column:span 5}.s4{grid-column:span 4}.s3{grid-column:span 3}.s8{grid-column:span 8}.s6{grid-column:span 6}
+.r2{grid-row:span 2}
+.tile .th+.trow{border-top:0}
+.ring{position:relative;width:96px;height:96px;margin:2px auto 10px}
+.ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+.sc2{display:flex;align-items:flex-end;gap:18px;margin:4px 0 12px}
+.sc2 .n{font-size:32px;font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.sc2 .w{font-size:12px;font-weight:600;color:#4B5866;margin-bottom:4px}
+.hl{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:13.5px}
+@media (max-width:1000px){.s7,.s5,.s4,.s3,.s8,.s6{grid-column:span 12}.r2{grid-row:auto}}
+
+</style>
+</helmet>
+<div class="ph"><div class="phtop"><div class="brandrow" style="gap:12px"><span class="mark" style="width:36px;height:36px">hc</span><div><div class="eyebrow">Thu, 12 November</div><h1>Today</h1></div></div><button type="button" class="addc" aria-label="Add a task"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div>
+<div class="phbody"><div class="bento" style="gap:10px;margin-top:14px"><section class="tile" style="grid-column:span 12;padding:10px 14px 4px" aria-label="Today"><div class="th" style="margin-bottom:2px"><h2>Today · 4 left</h2><span class="muted" style="font-size:12px">2 done</span></div><div class="trow"><button type="button" class="chk" aria-label="Mark Reply to Sajal about the case study done"></button><span class="tt">Reply to Sajal about the case study</span><span class="pill over">Since Tue</span><span class="av am">M</span></div>
+<div class="trow"><button type="button" class="chk" aria-label="Mark Finish Statement of Purpose draft done"></button><span class="tt">Finish Statement of Purpose draft</span><span class="pill soon">Tomorrow</span><span class="av am">M</span></div>
+<div class="trow"><button type="button" class="chk" aria-label="Mark Kimondo moodboard v2 done"></button><span class="tt">Kimondo moodboard v2</span><span class="avs"><span class="av am">M</span><span class="av ap">P</span></span></div>
+<a class="lnk" href="#" style="padding:8px 0 10px">1 more</a></section><section class="tile" style="grid-column:span 6;padding:12px" aria-label="Race"><div class="w muted" style="font-size:11px;font-weight:600">RACE TO 100</div><div style="display:flex;align-items:baseline;gap:6px;margin:6px 0 2px"><span class="cnum" style="font-size:24px">58</span><span class="muted" style="font-size:12px">vs 64</span></div><div class="muted" style="font-size:12px">6 behind</div></section><section class="tile" style="grid-column:span 6;padding:12px;background:#FFF8F6;border-color:#F0D9D4" aria-label="Partner"><div class="muted" style="font-size:11px;font-weight:600">PARTNER</div><div style="font-size:14px;font-weight:600;margin:6px 0 6px">2 overdue</div><button type="button" class="btns"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 13V6.5a1.5 1.5 0 013 0V12M11 6.5V5a1.5 1.5 0 013 0v7M14 6.5a1.5 1.5 0 013 0V14a6 6 0 01-6 6h-.6a6 6 0 01-4.8-2.4L4.3 15a1.5 1.5 0 012.3-1.9L8 14.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>Help · +5</button></section><section class="tile" style="grid-column:span 6;padding:12px" aria-label="Habits"><div class="muted" style="font-size:11px;font-weight:600">HABITS · 1 OF 3</div><div class="hl" style="padding:6px 0 0"><button type="button" class="chk on" aria-label="Mark Read 1 hour not done"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6.2l2.2 2.2 4.8-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></button><span class="tt" style="font-size:13px">Read 1h</span><span class="streak"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3c1 3 4 4.6 4 9a4 4 0 01-8 0c0-2 1-3.2 1-3.2s.6 2.2 2 2.2c0-3-1.2-5 1-8z" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"></path></svg>6</span></div><div class="hl" style="padding:6px 0 0"><button type="button" class="chk" aria-label="Mark Walk 8k steps done"></button><span class="tt" style="font-size:13px">Walk 8k</span></div><div class="hl" style="padding:6px 0 0"><button type="button" class="chk" aria-label="Mark No phone after 11 done"></button><span class="tt" style="font-size:13px">No phone</span></div></section><section class="tile" style="grid-column:span 6;padding:12px;text-align:center" aria-label="Focus"><div class="muted" style="font-size:11px;font-weight:600;text-align:left">FOCUS</div><div style="transform:scale(.7);margin:-14px 0 -18px"><div class="ring" aria-hidden="true"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="40" stroke="#E8EDF4" stroke-width="7" fill="none"></circle><circle cx="48" cy="48" r="40" stroke="#1F6FEB" stroke-width="7" fill="none" stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="251.3" transform="rotate(-90 48 48)"></circle></svg><b>25:00</b></div></div><button type="button" class="btnp" style="width:100%;justify-content:center;padding:8px">Start 25 min</button></section><section class="tile" style="grid-column:span 12;padding:10px 14px" aria-label="Coming up"><div class="muted" style="font-size:11px;font-weight:600">COMING UP</div><div class="hl"><span class="dot" style="background:#2E9E6B"></span><span class="tt">Statement of Purpose</span><span class="pill soon">1d</span></div><div class="hl"><span class="dot" style="background:#4F5B76"></span><span class="tt">D&amp;AD New Blood</span><span class="pill calm">6d</span></div></section></div></div><nav class="tabs" aria-label="Main"><button type="button" class="tab on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 11.5 12 4.5l8 7M6 10v9a1 1 0 001 1h10a1 1 0 001-1v-9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>Today</button><button type="button" class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 4h8v5a4 4 0 01-8 0V4zM8 6H5a3 3 0 003 4M16 6h3a3 3 0 01-3 4M12 13v4M8.5 20h7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>Week</button><button type="button" class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5" stroke="currentColor" stroke-width="1.7"></rect><path d="M4 9.5h16M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>Calendar</button><button type="button" class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7.5A1.5 1.5 0 015.5 6h3.2a1.5 1.5 0 011.2.6l.9 1.2a1.5 1.5 0 001.2.6H18.5A1.5 1.5 0 0120 9.9V18a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 014 18V7.5z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>Projects</button><button type="button" class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="5" cy="12" r="1.7" fill="currentColor"></circle><circle cx="12" cy="12" r="1.7" fill="currentColor"></circle><circle cx="19" cy="12" r="1.7" fill="currentColor"></circle></svg>More</button></nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

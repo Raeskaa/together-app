@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Projects · A · Table</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:#15171A;-webkit-font-smoothing:antialiased;background:#EAF3FF}
+a{color:#195FD0;text-decoration:none}a:hover{color:#15171A}
+button{font-family:inherit;cursor:pointer}
+.app{display:flex;flex-wrap:wrap;align-items:stretch;min-height:960px;background:radial-gradient(1100px 760px at 78% 12%,rgba(255,255,255,.9),transparent 60%),radial-gradient(900px 680px at 12% 82%,rgba(255,255,255,.5),transparent 55%),linear-gradient(162deg,#3FA0FF 0%,#6FBAFF 20%,#A6D5FF 40%,#D6ECFF 62%,#F5FAFF 85%)}
+.side{flex:1 0 232px;max-width:232px;box-sizing:border-box;padding:16px 10px;display:flex;flex-direction:column;gap:2px}
+.prof{display:flex;align-items:center;gap:10px;padding:4px 10px 12px;font-weight:600;font-size:14px}
+.pav{width:26px;height:26px;border-radius:99px;background:#15171A;color:#fff;font-size:11px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}
+.addb{display:flex;align-items:center;gap:10px;padding:7px 10px;font-weight:600;font-size:14px;color:#195FD0;border:0;background:none;text-align:left}
+.nav{display:flex;align-items:center;gap:11px;padding:7px 10px;border-radius:8px;font-size:14px;font-weight:500;color:#2F343B;border:0;background:none;width:100%;text-align:left;box-sizing:border-box}
+.nav svg{color:#54606E;flex:none}
+.nav.on{background:#fff;color:#195FD0;font-weight:600;box-shadow:0 1px 3px rgba(20,60,130,.12)}
+.nav.on svg{color:#195FD0}
+.cnt{margin-left:auto;font-size:12px;font-weight:500;color:#4B5866}
+.sec{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3C5F8C;padding:16px 10px 4px}
+.dot{width:8px;height:8px;border-radius:99px;display:inline-block;flex:none}
+.sfoot{margin-top:auto;display:flex;align-items:center;gap:8px;padding:12px 10px 4px;font-size:12px;color:#3F4B59}
+.main{flex:999 1 560px;min-width:0;box-sizing:border-box;margin:10px;background:#fff;border:1px solid #E5EAF1;border-radius:16px;box-shadow:0 12px 40px rgba(20,60,130,.12);padding:28px 36px 44px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brandrow{display:flex;align-items:center;gap:14px}
+.mark{width:40px;height:40px;border-radius:11px;background:#15171A;color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;letter-spacing:-.02em}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#3C6FB0}
+h1{margin:0;font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.15}
+.btnp{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:10px;background:#15171A;color:#fff;font-weight:600;font-size:13.5px;padding:10px 14px}
+.btng{display:inline-flex;align-items:center;gap:8px;border:1px solid #DCE3EC;border-radius:10px;background:#fff;color:#15171A;font-weight:600;font-size:13px;padding:8px 12px}
+.tool{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:24px}
+.lab{font-size:12.5px;color:#4B5866;font-weight:500}
+.dd{display:inline-flex;align-items:center;gap:8px;border:1px solid #DCE3EC;border-radius:9px;background:#fff;padding:7px 10px 7px 12px;font-size:13px;font-weight:500;color:#15171A}
+.vt{display:inline-flex;border:1px solid #DCE3EC;border-radius:9px;overflow:hidden;margin-left:auto}
+.vt button{border:0;background:#fff;padding:7px 9px;color:#4B5866;display:flex}
+.vt button.on{background:#EEF2F7;color:#15171A}
+.av{width:24px;height:24px;border-radius:99px;color:#fff;font-size:10.5px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;flex:none;box-shadow:0 0 0 2px #fff}
+.am{background:#15171A}.ap{background:#5B6B86}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;border-radius:99px;padding:3px 9px;white-space:nowrap}
+.soon{color:#85560F;background:#FBF1E6}
+.calm{color:#46505D;background:#EEF2F7}
+.over{color:#A3392C;background:#FCEAE7}
+.okp{color:#1D6842;background:#E3F4EA}
+.bar{height:6px;border-radius:99px;background:#E8EDF4;overflow:hidden}
+.bar i{display:block;height:100%;background:#1F6FEB;border-radius:99px}
+.muted{color:#4B5866}
+.chk{width:18px;height:18px;border-radius:99px;border:1.6px solid #AEB8C5;background:#fff;flex:none;box-sizing:border-box;padding:0}
+.kebab{border:0;background:none;color:#4B5866;padding:6px;border-radius:6px;display:flex}
+.tbl{margin-top:14px;border:1px solid #E5EAF1;border-radius:12px;overflow-x:auto}
+.tr{display:grid;grid-template-columns:minmax(190px,1.3fr) minmax(230px,1.7fr) 150px 110px 92px 120px 36px;align-items:center;column-gap:16px;padding:0 16px;min-height:60px;border-top:1px solid #EEF2F7;min-width:1000px}
+.th{min-height:40px;background:#F8FAFD;border-top:0;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#4B5866}
+.grp{padding:9px 16px;background:#FBFCFE;border-top:1px solid #EEF2F7;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3C6FB0;min-width:1000px}
+.pname{font-weight:600;font-size:14.5px}
+.kind{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#4B5866;margin-top:2px}
+.cell{display:flex;align-items:center;gap:9px;min-width:0;font-size:13.5px}
+.tnum{font-variant-numeric:tabular-nums}
+</style>
+</helmet>
+<div class="app">
+  <aside class="side" aria-label="Main">
+    <div class="prof"><span class="pav">M</span>Mahesh</div>
+    <button type="button" class="addb"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#1F6FEB"></circle><path d="M12 8v8M8 12h8" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg>Add task</button>
+    <button type="button" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 11.5 12 4.5l8 7M6 10v9a1 1 0 001 1h10a1 1 0 001-1v-9" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"></path></svg>Today<span class="cnt">3</span></button>
+    <button type="button" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 4h8v5a4 4 0 01-8 0V4zM8 6H5a3 3 0 003 4M16 6h3a3 3 0 01-3 4M12 13v4M8.5 20h7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>This week<span class="cnt">58 · 34</span></button>
+    <button type="button" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><path d="M4 5.6l1.3 1.4L7.7 4M4 11.6l1.3 1.4L7.7 10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>Tasks<span class="cnt">9</span></button>
+    <button type="button" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5" stroke="currentColor" stroke-width="1.7"></rect><path d="M4 9.5h16M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg>Calendar</button>
+    <button type="button" class="nav on"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7.5A1.5 1.5 0 015.5 6h3.2a1.5 1.5 0 011.2.6l.9 1.2a1.5 1.5 0 001.2.6H18.5A1.5 1.5 0 0120 9.9V18a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 014 18V7.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path></svg>Projects<span class="cnt">6</span></button>
+    <button type="button" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 4.5h10a2 2 0 012 2V20l-6-2.5V4.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path><path d="M5 4.5a2 2 0 00-2 2V18l2-.8" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg>Journal</button>
+    <div class="sec">Projects</div>
+    <button type="button" class="nav"><span class="dot" style="background:#2E9E6B"></span>STP<span class="cnt">7d</span></button>
+    <button type="button" class="nav"><span class="dot" style="background:#1F6FEB"></span>Kimondo<span class="cnt">10d</span></button>
+    <button type="button" class="nav"><span class="dot" style="background:#B0529E"></span>Assignments<span class="cnt">13d</span></button>
+    <button type="button" class="nav"><span class="dot" style="background:#C2704B"></span>Portfolio<span class="cnt">17d</span></button>
+    <button type="button" class="nav"><span class="dot" style="background:#4F5B76"></span>D&amp;AD New Blood</button>
+    <button type="button" class="nav"><span class="dot" style="background:#7A5BD8"></span>Social Media Presence</button>
+    <div class="sfoot"><span class="av am">M</span><span class="av ap" style="margin-left:-10px">P</span>hate club</div>
+  </aside>
+
+  <main class="main">
+    <div class="top">
+      <div class="brandrow"><span class="mark">hc</span><div><div class="eyebrow">hate club</div><h1>Projects</h1></div></div>
+      <button type="button" class="btnp"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>New project</button>
+    </div>
+
+    <div class="tool">
+      <span class="lab">Filter by</span>
+      <button type="button" class="dd">Active<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+      <button type="button" class="dd">Owned by everyone<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+      <span class="lab" style="margin-left:8px">Sort by</span>
+      <button type="button" class="dd">Deadline<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+      <div class="vt" role="group" aria-label="View">
+        <button type="button" aria-label="Cards"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7"></rect><rect x="13" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7"></rect><rect x="4" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7"></rect><rect x="13" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7"></rect></svg></button>
+        <button type="button" class="on" aria-label="List"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></button>
+      </div>
+    </div>
+    <p class="muted" style="margin:12px 2px 0;font-size:13px">6 active · 3 due in the next 2 weeks · 4 have no tasks yet</p>
+
+    <div class="tbl">
+      <div class="tr th"><span>Project</span><span>Next up</span><span>Progress</span><span>Deadline</span><span>Left</span><span>Owner</span><span></span></div>
+
+      <div class="grp">Due in the next 2 weeks · 3</div>
+      <div class="tr">
+        <div class="cell"><span class="dot" style="background:#2E9E6B"></span><div><div class="pname">STP</div><div class="kind">Project</div></div></div>
+        <div class="cell muted">No tasks yet · <a href="#">+ Add the first task</a></div>
+        <div class="cell muted">—</div>
+        <div class="cell tnum">Thu 12 Nov</div>
+        <div class="cell"><span class="pill soon">7 days</span></div>
+        <div class="cell"><span class="av am">M</span>Mahesh</div>
+        <button type="button" class="kebab" aria-label="More for STP"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"></circle><circle cx="12" cy="12" r="1.6" fill="currentColor"></circle><circle cx="19" cy="12" r="1.6" fill="currentColor"></circle></svg></button>
+      </div>
+      <div class="tr" style="background:#F6F9FE">
+        <div class="cell"><span class="dot" style="background:#1F6FEB"></span><div><div class="pname">Kimondo</div><div class="kind">Project</div></div></div>
+        <div class="cell"><button type="button" class="chk" aria-label="Mark Website done"></button>Website<span class="pill soon">Due tomorrow</span></div>
+        <div class="cell tnum"><div class="bar" style="width:80px"><i style="width:33%"></i></div>1 of 3</div>
+        <div class="cell tnum">Sun 15 Nov</div>
+        <div class="cell"><span class="pill soon">10 days</span></div>
+        <div class="cell"><span style="display:inline-flex"><span class="av am">M</span><span class="av ap" style="margin-left:-8px">P</span></span>Both</div>
+        <button type="button" class="kebab" aria-label="More for Kimondo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"></circle><circle cx="12" cy="12" r="1.6" fill="currentColor"></circle><circle cx="19" cy="12" r="1.6" fill="currentColor"></circle></svg></button>
+      </div>
+      <div class="tr">
+        <div class="cell"><span class="dot" style="background:#B0529E"></span><div><div class="pname">Assignments</div><div class="kind">Project</div></div></div>
+        <div class="cell"><button type="button" class="chk" aria-label="Mark Pratul Assignments done"></button>Pratul Assignments<span class="muted" style="font-size:12px">no date</span></div>
+        <div class="cell tnum"><div class="bar" style="width:80px"><i style="width:0%"></i></div>0 of 2</div>
+        <div class="cell tnum">Wed 18 Nov</div>
+        <div class="cell"><span class="pill soon">13 days</span></div>
+        <div class="cell"><span class="av ap">P</span>Partner</div>
+        <button type="button" class="kebab" aria-label="More for Assignments"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"></circle><circle cx="12" cy="12" r="1.6" fill="currentColor"></circle><circle cx="19" cy="12" r="1.6" fill="currentColor"></circle></svg></button>
+      </div>
+
+      <div class="grp">Later · 3</div>
+      <div class="tr">
+        <div class="cell"><span class="dot" style="background:#C2704B"></span><div><div class="pname">Portfolio</div><div class="kind">Branding</div></div></div>
+        <div class="cell muted">No tasks yet · <a href="#">+ Add the first task</a></div>
+        <div class="cell muted">—</div>
+        <div class="cell tnum">Sun 22 Nov</div>
+        <div class="cell"><span class="pill calm">17 days</span></div>
+        <div class="cell"><span class="av am">M</span>Mahesh</div>
+        <button type="button" class="kebab" aria-label="More for Portfolio"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"></circle><circle cx="12" cy="12" r="1.6" fill="currentColor"></circle><circle cx="19" cy="12" r="1.6" fill="currentColor"></circle></svg></button>
+      </div>
+      <div class="tr">
+        <div class="cell"><span class="dot" style="background:#4F5B76"></span><div><div class="pname">D&amp;AD New Blood</div><div class="kind">Project</div></div></div>
+        <div class="cell muted">No tasks yet · <a href="#">+ Add the first task</a></div>
+        <div class="cell muted">—</div>
+        <div class="cell tnum">Mon 1 Mar</div>
+        <div class="cell"><span class="pill calm">116 days</span></div>
+        <div class="cell"><span style="display:inline-flex"><span class="av am">M</span><span class="av ap" style="margin-left:-8px">P</span></span>Both</div>
+        <button type="button" class="kebab" aria-label="More for D&amp;AD New Blood"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"></circle><circle cx="12" cy="12" r="1.6" fill="currentColor"></circle><circle cx="19" cy="12" r="1.6" fill="currentColor"></circle></svg></button>
+      </div>
+      <div class="tr">
+        <div class="cell"><span class="dot" style="background:#7A5BD8"></span><div><div class="pname">Social Media Presence</div><div class="kind">Branding</div></div></div>
+        <div class="cell muted">No tasks yet · <a href="#">+ Add the first task</a></div>
+        <div class="cell muted">—</div>
+        <div class="cell tnum">Mon 29 Mar</div>
+        <div class="cell"><span class="pill calm">144 days</span></div>
+        <div class="cell"><span class="av am">M</span>Mahesh</div>
+        <button type="button" class="kebab" aria-label="More for Social Media Presence"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"></circle><circle cx="12" cy="12" r="1.6" fill="currentColor"></circle><circle cx="19" cy="12" r="1.6" fill="currentColor"></circle></svg></button>
+      </div>
+    </div>
+    <button type="button" class="btng" style="margin-top:14px">Finished · 0<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":960}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>This week · S2 · Race</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:#15171A;-webkit-font-smoothing:antialiased;background:#EAF3FF}
+a{color:#195FD0;text-decoration:none}a:hover{color:#15171A}
+button{font-family:inherit;cursor:pointer}
+.app{display:flex;flex-wrap:wrap;align-items:stretch;min-height:960px;background:radial-gradient(1100px 760px at 78% 12%,rgba(255,255,255,.9),transparent 60%),radial-gradient(900px 680px at 12% 82%,rgba(255,255,255,.5),transparent 55%),linear-gradient(162deg,#3FA0FF 0%,#6FBAFF 20%,#A6D5FF 40%,#D6ECFF 62%,#F5FAFF 85%)}
+.side{flex:1 0 232px;max-width:232px;box-sizing:border-box;padding:16px 10px;display:flex;flex-direction:column;gap:2px}
+.prof{display:flex;align-items:center;gap:10px;padding:4px 10px 12px;font-weight:600;font-size:14px}
+.pav{width:26px;height:26px;border-radius:99px;background:#15171A;color:#fff;font-size:11px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}
+.addb{display:flex;align-items:center;gap:10px;padding:7px 10px;font-weight:600;font-size:14px;color:#195FD0;border:0;background:none;text-align:left}
+.nav{display:flex;align-items:center;gap:11px;padding:7px 10px;border-radius:8px;font-size:14px;font-weight:500;color:#2F343B;border:0;background:none;width:100%;text-align:left;box-sizing:border-box}
+.nav svg{color:#54606E;flex:none}
+.nav.on{background:#fff;color:#195FD0;font-weight:600;box-shadow:0 1px 3px rgba(20,60,130,.12)}
+.nav.on svg{color:#195FD0}
+.cnt{margin-left:auto;font-size:12px;font-weight:500;color:#4B5866}
+.sec{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3C5F8C;padding:16px 10px 4px}
+.dot{width:8px;height:8px;border-radius:99px;display:inline-block;flex:none}
+.sfoot{margin-top:auto;display:flex;align-items:center;gap:8px;padding:12px 10px 4px;font-size:12px;color:#3F4B59}
+.main{flex:999 1 560px;min-width:0;box-sizing:border-box;margin:10px;background:#fff;border:1px solid #E5EAF1;border-radius:16px;box-shadow:0 12px 40px rgba(20,60,130,.12);padding:28px 36px 44px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brandrow{display:flex;align-items:center;gap:14px}
+.mark{width:40px;height:40px;border-radius:11px;background:#15171A;color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;letter-spacing:-.02em}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#3C6FB0}
+h1{margin:0;font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.15}
+.btnp{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:10px;background:#15171A;color:#fff;font-weight:600;font-size:13.5px;padding:10px 14px}
+.btng{display:inline-flex;align-items:center;gap:8px;border:1px solid #DCE3EC;border-radius:10px;background:#fff;color:#15171A;font-weight:600;font-size:13px;padding:8px 12px}
+.tool{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:24px}
+.lab{font-size:12.5px;color:#4B5866;font-weight:500}
+.dd{display:inline-flex;align-items:center;gap:8px;border:1px solid #DCE3EC;border-radius:9px;background:#fff;padding:7px 10px 7px 12px;font-size:13px;font-weight:500;color:#15171A}
+.vt{display:inline-flex;border:1px solid #DCE3EC;border-radius:9px;overflow:hidden;margin-left:auto}
+.vt button{border:0;background:#fff;padding:7px 9px;color:#4B5866;display:flex}
+.vt button.on{background:#EEF2F7;color:#15171A}
+.av{width:24px;height:24px;border-radius:99px;color:#fff;font-size:10.5px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;flex:none;box-shadow:0 0 0 2px #fff}
+.am{background:#15171A}.ap{background:#5B6B86}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;border-radius:99px;padding:3px 9px;white-space:nowrap}
+.soon{color:#85560F;background:#FBF1E6}
+.calm{color:#46505D;background:#EEF2F7}
+.over{color:#A3392C;background:#FCEAE7}
+.okp{color:#1D6842;background:#E3F4EA}
+.bar{height:6px;border-radius:99px;background:#E8EDF4;overflow:hidden}
+.bar i{display:block;height:100%;background:#1F6FEB;border-radius:99px}
+.muted{color:#4B5866}
+.chk{width:18px;height:18px;border-radius:99px;border:1.6px solid #AEB8C5;background:#fff;flex:none;box-sizing:border-box;padding:0}
+.kebab{border:0;background:none;color:#4B5866;padding:6px;border-radius:6px;display:flex}
+.tbl{margin-top:14px;border:1px solid #E5EAF1;border-radius:12px;overflow-x:auto}
+.tr{display:grid;grid-template-columns:minmax(190px,1.3fr) minmax(230px,1.7fr) 150px 110px 92px 120px 36px;align-items:center;column-gap:16px;padding:0 16px;min-height:60px;border-top:1px solid #EEF2F7;min-width:1000px}
+.th{min-height:40px;background:#F8FAFD;border-top:0;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#4B5866}
+.grp{padding:9px 16px;background:#FBFCFE;border-top:1px solid #EEF2F7;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3C6FB0;min-width:1000px}
+.pname{font-weight:600;font-size:14.5px}
+.kind{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#4B5866;margin-top:2px}
+.cell{display:flex;align-items:center;gap:9px;min-width:0;font-size:13.5px}
+.tnum{font-variant-numeric:tabular-nums}
+</style>
+<style>
+.app{min-height:1120px}
+.segc{display:inline-flex;background:#F1F4F8;border-radius:9px;padding:3px}
+.segc button{border:0;background:none;border-radius:7px;padding:6px 12px;font-size:13px;font-weight:500;color:#3F4B59}
+.segc button.on{background:#fff;color:#15171A;font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.box{border:1px solid #E5EAF1;border-radius:14px;padding:18px 20px;background:#fff}
+.boxh{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.boxh h2{margin:0;font-size:15px;font-weight:700}
+.big{font-size:56px;font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.pts{font-size:14px;font-weight:600;color:#4B5866;margin-left:6px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}
+.st{background:#F6F8FB;border-radius:10px;padding:10px 12px}
+.stk{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#4B5866}
+.stv{font-size:22px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.minor{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:12.5px;color:#3F4B59}
+.lead{border-color:#BFD5F7;box-shadow:0 0 0 3px #E8F1FF}
+.crown{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#85560F;background:#FBF1E6;border-radius:99px;padding:3px 10px}
+.help{display:flex;align-items:center;gap:16px;flex-wrap:wrap;border:1px solid #E5EAF1;background:#F7F9FC;border-radius:14px;padding:14px 18px}
+.hg{width:36px;height:36px;border-radius:99px;background:#fff;border:1px solid #E5EAF1;display:flex;align-items:center;justify-content:center;color:#B4792B;flex:none}
+.ht{flex:1;min-width:260px}
+.ht b{font-size:14.5px}
+.ht p{margin:3px 0 0;font-size:13px;color:#4B5866}
+.ol{list-style:none;margin:10px 0 0;padding:0}
+.ol li{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid #EEF2F7;font-size:13.5px}
+.ol li:first-child{border-top:0}
+.olt{flex:1;min-width:0}
+.chart{display:flex;align-items:flex-end;gap:0;height:170px;margin-top:14px;padding-left:28px;position:relative;border-bottom:1px solid #DCE3EC}
+.gl{position:absolute;left:28px;right:0;border-top:1px dashed #E5EAF1}
+.gll{position:absolute;left:0;font-size:10.5px;color:#4B5866;transform:translateY(-50%);font-variant-numeric:tabular-nums}
+.day{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:5px;height:100%;position:relative}
+.b1,.b2{width:18px;border-radius:5px 5px 2px 2px;position:relative}
+.b1{background:#15171A}.b2{background:#8FA0BC}
+.bv{position:absolute;top:-17px;left:50%;transform:translateX(-50%);font-size:10.5px;font-weight:600;color:#2F343B;font-variant-numeric:tabular-nums}
+.fut{width:41px;height:100%;border:1px dashed #DCE3EC;border-bottom:0;border-radius:6px 6px 0 0;box-sizing:border-box}
+.days{display:flex;padding-left:28px;margin-top:6px}
+.days span{flex:1;text-align:center;font-size:11.5px;font-weight:600;color:#4B5866}
+.days span.t{color:#195FD0}
+.key{display:flex;gap:14px;font-size:12px;color:#3F4B59;margin-top:10px}
+.key i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.wins{font-size:13px;color:#3F4B59;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.race{margin-top:22px}
+.lanehd{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.track{position:relative;margin:26px 8px 6px 120px}
+.ln{position:relative;height:44px;display:flex;align-items:center}
+.lnlab{position:absolute;left:-120px;width:110px;display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600}
+.rail{position:absolute;left:0;right:0;height:8px;border-radius:99px;background:#EEF2F7}
+.fill{position:absolute;left:0;height:8px;border-radius:99px}
+.runner{position:absolute;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center}
+.runner .av{width:32px;height:32px;font-size:12px;box-shadow:0 0 0 3px #fff,0 2px 6px rgba(0,0,0,.15)}
+.rv{position:absolute;top:-18px;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ticks{position:relative;height:22px;margin:4px 8px 0 120px}
+.tk{position:absolute;transform:translateX(-50%);font-size:11px;font-weight:600;color:#4B5866;font-variant-numeric:tabular-nums}
+.pace{position:absolute;top:-10px;bottom:-26px;width:0;border-left:2px dashed #3C6FB0}
+.pacel{position:absolute;bottom:-30px;transform:translateX(-50%);font-size:11px;font-weight:700;color:#3C6FB0;white-space:nowrap;background:#fff;padding:0 4px}
+.goal{position:absolute;right:-8px;top:-30px;font-size:11px;font-weight:700;color:#15171A;display:flex;align-items:center;gap:4px}
+.feeds{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+.fe{list-style:none;margin:12px 0 0;padding:0}
+.fe li{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #EEF2F7;font-size:13.5px}
+.fe li:first-child{border-top:0}
+.fd{width:34px;flex:none;font-size:11.5px;font-weight:600;color:#4B5866}
+.fx{flex:1;min-width:0}
+.plus{font-size:12.5px;font-weight:700;color:#1D6842;font-variant-numeric:tabular-nums}
+</style>
+</helmet>
+<div class="app">
+  <aside class="side" aria-label="Main">
+    <div class="prof"><span class="pav">M</span>Mahesh</div>
+    <button type="button" class="addb"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#1F6FEB"></circle><path d="M12 8v8M8 12h8" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg>Add task</button>
+    <button type="button" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 11.5 12 4.5l8 7M6 10v9a1 1 0 001 1h10a1 1 0 001-1v-9" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"></path></svg>Today<span class="cnt">3</span></button>
+    <button type="button" class="nav on"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 4h8v5a4 4 0 01-8 0V4zM8 6H5a3 3 0 003 4M16 6h3a3 3 0 01-3 4M12 13v4M8.5 20h7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>This week<span class="cnt">58 · 34</span></button>
+    <button type="button" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><path d="M4 5.6l1.3 1.4L7.7 4M4 11.6l1.3 1.4L7.7 10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>Tasks<span class="cnt">9</span></button>
+    <button type="button" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5" stroke="currentColor" stroke-width="1.7"></rect><path d="M4 9.5h16M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg>Calendar</button>
+    <button type="button" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7.5A1.5 1.5 0 015.5 6h3.2a1.5 1.5 0 011.2.6l.9 1.2a1.5 1.5 0 001.2.6H18.5A1.5 1.5 0 0120 9.9V18a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 014 18V7.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path></svg>Projects<span class="cnt">6</span></button>
+    <button type="button" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 4.5h10a2 2 0 012 2V20l-6-2.5V4.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path><path d="M5 4.5a2 2 0 00-2 2V18l2-.8" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg>Journal</button>
+    <div class="sec">Projects</div>
+    <button type="button" class="nav"><span class="dot" style="background:#2E9E6B"></span>STP<span class="cnt">7d</span></button>
+    <button type="button" class="nav"><span class="dot" style="background:#1F6FEB"></span>Kimondo<span class="cnt">10d</span></button>
+    <button type="button" class="nav"><span class="dot" style="background:#B0529E"></span>Assignments<span class="cnt">13d</span></button>
+    <button type="button" class="nav"><span class="dot" style="background:#C2704B"></span>Portfolio<span class="cnt">17d</span></button>
+    <button type="button" class="nav"><span class="dot" style="background:#4F5B76"></span>D&amp;AD New Blood</button>
+    <button type="button" class="nav"><span class="dot" style="background:#7A5BD8"></span>Social Media Presence</button>
+    <div class="sfoot"><span class="av am">M</span><span class="av ap" style="margin-left:-10px">P</span>hate club</div>
+  </aside>
+  <main class="main">
+    <div class="top">
+      <div class="brandrow"><span class="mark">hc</span><div><div class="eyebrow">Mon 2 – Sun 8 Nov · day 4 of 7</div><h1>This week</h1></div></div>
+      <div style="display:flex;gap:12px;align-items:center"><div class="segc" role="group" aria-label="Week"><button type="button" class="on">This week</button><button type="button">Last week</button></div><a href="#" style="font-size:13px;font-weight:600">How points work</a></div>
+    </div>
+    <section class="box race" aria-label="Race to 100">
+      <div class="lanehd"><div><h2 style="margin:0;font-size:17px">Race to 100 by Sunday</h2><p class="muted" style="margin:4px 0 0;font-size:13px">Today is day 4 of 7, so 57 points is on pace.</p></div><span class="crown"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 18l-1-10 5 4 4-7 4 7 5-4-1 10z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path></svg>You lead by 24</span></div>
+      <div class="track">
+        <span class="goal"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 21V4M6 4h10l-2 3.5L16 11H6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"></path></svg>100</span>
+        <span class="pace" style="left:57%"></span>
+        <div class="ln"><span class="lnlab"><span class="av am">M</span>You</span><span class="rail"></span><span class="fill" style="width:58%;background:#15171A"></span><span class="runner" style="left:58%"><span class="rv">58</span><span class="av am">M</span></span></div>
+        <div class="ln"><span class="lnlab"><span class="av ap">P</span>Partner</span><span class="rail"></span><span class="fill" style="width:34%;background:#8FA0BC"></span><span class="runner" style="left:34%"><span class="rv">34</span><span class="av ap">P</span></span></div>
+        <span class="pacel" style="left:57%">On pace · 57</span>
+      </div>
+      <div class="ticks" style="margin-top:28px"><span class="tk" style="left:0%">0</span><span class="tk" style="left:25%">25</span><span class="tk" style="left:50%">50</span><span class="tk" style="left:75%">75</span><span class="tk" style="left:100%">100</span></div>
+    </section>
+    <div class="help" style="margin-top:16px">
+      <span class="hg"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v3M5.6 5.6l2.1 2.1M3 12h3M12 21a7 7 0 100-14 7 7 0 000 14z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><path d="M12 10v4l2.5 1.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg></span>
+      <div class="ht"><b>Partner is 23 behind pace</b><p>3 tasks are overdue. Taking one moves it to Both, and you both get the points.</p></div>
+      <button type="button" class="btnp">Take one</button><button type="button" class="btng">Send a cheer</button>
+    </div>
+    <div class="feeds">
+      <section class="box"><div class="boxh"><h2>Your week</h2><span class="muted" style="font-size:12.5px">58 points · 4 done</span></div><ul class="fe"><li><span class="fd">Thu</span><span class="fx">Finished Leapcast dashboard handover, on time</span><span class="plus">+15</span></li><li><span class="fd">Thu</span><span class="fx">Read · 1 hour</span><span class="plus">+2</span></li><li><span class="fd">Wed</span><span class="fx">Wrote the journal</span><span class="plus">+2</span></li><li><span class="fd">Tue</span><span class="fx">Finished Leapcast settings, modal to full page, on time</span><span class="plus">+15</span></li><li><span class="fd">Mon</span><span class="fx">Finished Branding website for trueleap</span><span class="plus">+10</span></li></ul><a href="#" style="display:inline-block;margin-top:8px;font-size:13px;font-weight:600">See all 9</a></section>
+      <section class="box"><div class="boxh"><h2>Partner's week</h2><span class="muted" style="font-size:12.5px">34 points · 2 done</span></div><ul class="fe"><li><span class="fd">Wed</span><span class="fx">Finished a subtask in Kimondo</span><span class="plus">+3</span></li><li><span class="fd">Wed</span><span class="fx">Wrote the journal</span><span class="plus">+2</span></li><li><span class="fd">Wed</span><span class="fx">Pratul Assignments was due</span><span class="pill over">missed</span></li><li><span class="fd">Wed</span><span class="fx">Saugata Assignments was due</span><span class="pill over">missed</span></li><li><span class="fd">Tue</span><span class="fx">Finished Brand moodboard, on time</span><span class="plus">+15</span></li></ul><a href="#" style="display:inline-block;margin-top:8px;font-size:13px;font-weight:600">See all 8</a></section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1120}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

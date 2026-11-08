@@ -2,7 +2,16 @@
 
 Sources: a hands-on run on local `wrangler dev` (desktop at 1366 and phone at 375) plus a read-only code audit.
 `H` = `public/index.html`, `W` = `src/worker.js`. **seen** = reproduced in the browser. **code** = read from the source.
-**Status (2026-11-05):** tier 1 (items 1–9) is done in the Trust pass (see `DESIGN-LOG.md`), plus the project Kind fix from item 17. Tiers 2–4 are still open.
+**Status (2026-11-08):** the details of every pass are in `DESIGN-LOG.md`.
+- **Done:**
+  - 1–9: the Trust pass
+  - 17: project Kind, Finish, the Finished list
+  - 21: Calendar Day view, with a list of times on the phone
+  - 22, in part: the phone bar now has 5 tabs (Today · Week · Calendar · Projects · More), and Home has a quick-add box
+  - 24: renamed "hate club"
+  - 25, in part: the code is in git (no backup/export yet; `deploy.sh` is still unsafe, don't use it)
+  - 26: your own sign-ins, the wrong-password lock, Sign out
+- **Still open:** 10–16, 18–20, 23, 27–28. 20 (the week strip clipping at 375 px) has been seen again on 8 Nov.
 
 ## Tier 1: breaks trust (data goes wrong or disappears)
 
