@@ -4,7 +4,7 @@
 
 ---
 
-## 2026-11-08: Motion pass, same identity (built, local-verified, not deployed)
+## 2026-11-08: Motion pass, same identity (LIVE 8 Nov: the live page matches `af592a6`)
 
 **Request:** "keep the identity same but work on animation, transitions etc". Brief: `BRIEF-motion.md`, approved with "Yes, build it". Same blue, Inter, sky ground. Only movement changed.
 
