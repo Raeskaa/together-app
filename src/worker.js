@@ -3,11 +3,11 @@ import { handleMcp, claudeApi } from './claude.js';
 // Two people, one shared space, protected by a shared passcode (signed cookie).
 
 const TABLES = {
-  tasks: ['id', 'title', 'project', 'owner', 'type', 'date', 'time', 'due', 'due_time', 'done', 'subtodos', 'parent_id', 'sort', 'created_at', 'space_id', 'done_at', 'done_by'],
+  tasks: ['id', 'title', 'project', 'owner', 'type', 'date', 'time', 'due', 'due_time', 'done', 'subtodos', 'parent_id', 'sort', 'created_at', 'space_id', 'done_at', 'done_by', 'personal'],
   projects: ['id', 'name', 'color', 'owner', 'kind', 'start_date', 'end_date', 'description', 'archived', 'sort', 'created_at', 'space_id'],
   project_materials: ['id', 'project_id', 'title', 'url', 'sort', 'created_at'],
   journal: ['id', 'date', 'owner', 'text', 'tag', 'updated_at', 'space_id'],
-  habits: ['id', 'name', 'kind', 'owner', 'unit', 'target', 'caption', 'color', 'sort', 'archived', 'created_at', 'space_id'],
+  habits: ['id', 'name', 'kind', 'owner', 'unit', 'target', 'caption', 'color', 'sort', 'archived', 'created_at', 'space_id', 'personal'],
   topics: ['id', 'week', 'title', 'owner', 'notes', 'sort', 'created_at', 'space_id'],
   topic_links: ['id', 'topic_id', 'title', 'url', 'sort', 'created_at'],
   notes: ['id', 'text', 'color', 'owner', 'date', 'created_at', 'space_id'],
@@ -112,6 +112,21 @@ const USERNAME_RE = /^[a-z0-9._-]{3,24}$/;
 const MIN_PASSWORD = 8;
 async function ensureInvites(env) {
   await env.DB.prepare('CREATE TABLE IF NOT EXISTS invites (code TEXT PRIMARY KEY, space_id TEXT, invited_by TEXT, status TEXT, created_at INTEGER, used_at INTEGER, used_by TEXT)').run();
+}
+// "personal" items (a habit/task you own) travel with you across every space you're in. Add the column once + migrate existing habits.
+async function ensurePersonal(env) {
+  const done = await env.DB.prepare("SELECT value FROM settings WHERE key='personal_ready'").first();
+  if (done) return;
+  for (const t of ['tasks', 'habits']) { try { await env.DB.prepare('ALTER TABLE ' + t + ' ADD COLUMN personal INTEGER DEFAULT 0').run(); } catch (e) {} }
+  try { await env.DB.prepare("UPDATE habits SET personal=1 WHERE owner IS NOT NULL AND owner!='' AND owner!='everyone'").run(); } catch (e) {}
+  await env.DB.prepare("INSERT INTO settings (key,value) VALUES ('personal_ready','1') ON CONFLICT(key) DO UPDATE SET value='1'").run();
+}
+// import copies a task into another space; copied_from points back to the original so a second import skips it
+async function ensureImport(env) {
+  const done = await env.DB.prepare("SELECT value FROM settings WHERE key='import_ready'").first();
+  if (done) return;
+  try { await env.DB.prepare('ALTER TABLE tasks ADD COLUMN copied_from TEXT').run(); } catch (e) {}
+  await env.DB.prepare("INSERT INTO settings (key,value) VALUES ('import_ready','1') ON CONFLICT(key) DO UPDATE SET value='1'").run();
 }
 
 // ---- too many wrong tries: 5, then a 1-minute wait ----
@@ -385,6 +400,37 @@ async function api(req, env, url) {
     await env.DB.prepare('DELETE FROM members WHERE space_id=?1 AND person_id=?2').bind(sid, me).run();
     return json({ ok: true });
   }
+  // import: copy your open tasks (+ their subtasks) from another space into this one, once (copied_from dedups)
+  if (p === '/api/space/import' && req.method === 'POST') {
+    await ensureImport(env);
+    const b = await req.json().catch(() => ({}));
+    const target = String(b.target || '');
+    const source = String(b.source || '');   // a space id, or 'all'
+    if (!(await env.DB.prepare('SELECT 1 FROM members WHERE space_id=?1 AND person_id=?2').bind(target, me).first())) return json({ ok: false, error: 'not_member' }, 403);
+    let where, binds;
+    if (source === 'all') { where = 'space_id IN (SELECT space_id FROM members WHERE person_id=?1) AND space_id!=?2'; binds = [me, target]; }
+    else {
+      if (!(await env.DB.prepare('SELECT 1 FROM members WHERE space_id=?1 AND person_id=?2').bind(source, me).first())) return json({ ok: false, error: 'bad_source' }, 400);
+      where = 'space_id=?2'; binds = [me, source];
+    }
+    const already = await env.DB.prepare('SELECT copied_from FROM tasks WHERE space_id=?1 AND copied_from IS NOT NULL').bind(target).all();
+    const skip = new Set((already.results || []).map((r) => r.copied_from));
+    const cand = await env.DB.prepare("SELECT * FROM tasks WHERE owner=?1 AND done=0 AND (parent_id IS NULL OR parent_id='') AND type!='event' AND (" + where + ') ORDER BY sort, created_at LIMIT 300').bind(...binds).all();
+    const parents = (cand.results || []).filter((t) => !skip.has(t.id));
+    if (!parents.length) return json({ ok: true, n: 0 });
+    const pids = parents.map((p2) => p2.id);
+    const ph = pids.map((_, i) => '?' + (i + 1)).join(',');
+    const kids = await env.DB.prepare('SELECT * FROM tasks WHERE done=0 AND parent_id IN (' + ph + ')').bind(...pids).all();
+    const now = Date.now();
+    const idMap = {};
+    const mk = (t, newId, parentId) => env.DB.prepare('INSERT INTO tasks (id,title,project,owner,type,date,time,due,due_time,done,subtodos,parent_id,sort,created_at,space_id,personal,copied_from) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,0,?10,?11,?12,?13,?14,0,?15)')
+      .bind(newId, t.title || '', '', me, t.type || 'task', t.date || '', t.time || '', t.due || '', t.due_time || '', '[]', parentId, t.sort || now, now, target, t.id);
+    const stmts = [];
+    parents.forEach((t) => { const nid = 'tk_' + crypto.randomUUID().replace(/-/g, '').slice(0, 16); idMap[t.id] = nid; stmts.push(mk(t, nid, null)); });
+    (kids.results || []).forEach((c) => { const np = idMap[c.parent_id]; if (!np) return; const nid = 'tk_' + crypto.randomUUID().replace(/-/g, '').slice(0, 16); stmts.push(mk(c, nid, np)); });
+    await env.DB.batch(stmts);
+    return json({ ok: true, n: parents.length });
+  }
   return json({ error: 'not found' }, 404);
 }
 
@@ -397,17 +443,21 @@ function parseJSON(v, fallback) {
 }
 
 async function loadState(env, me) {
+  await ensurePersonal(env);
+  await ensureImport(env);
   // only the spaces you're in; journal entries are yours, or shared into one of your spaces
   const MINE = 'SELECT space_id FROM members WHERE person_id=?1';
   const inMine = (t, order) => env.DB.prepare('SELECT * FROM ' + t + ' WHERE space_id IN (' + MINE + ') OR space_id IS NULL ORDER BY ' + order).bind(me).all();
+  // tasks + habits also pull your "personal" items (yours, flagged to travel) from every space — owner-scoped so they stay private to you
+  const inMineP = (t, order) => env.DB.prepare('SELECT * FROM ' + t + ' WHERE space_id IN (' + MINE + ') OR space_id IS NULL OR (personal=1 AND owner=?1) ORDER BY ' + order).bind(me).all();
   const [settings, projects, materials, routines, tasks, journal, habitDefs, habitLogs, topics, topicLinks, notes, focus, waves, people, spaces, members, focusLog, journalDays] = await Promise.all([
     env.DB.prepare('SELECT key,value FROM settings').all(),
     inMine('projects', 'sort, created_at'),
     env.DB.prepare('SELECT * FROM project_materials ORDER BY sort, created_at').all(),
     env.DB.prepare('SELECT id,title,"start" AS start,"end" AS end,owner,days,note,sort FROM routines ORDER BY sort, "start"').all(),
-    inMine('tasks', 'created_at'),
+    inMineP('tasks', 'created_at'),
     env.DB.prepare('SELECT * FROM journal WHERE owner=?1 OR space_id IN (' + MINE + ') ORDER BY date DESC').bind(me).all(),
-    inMine('habits', 'sort, created_at'),
+    inMineP('habits', 'sort, created_at'),
     env.DB.prepare('SELECT date,habit,value FROM habit_logs').all(),
     inMine('topics', 'week DESC, created_at DESC'),
     env.DB.prepare('SELECT * FROM topic_links ORDER BY sort, created_at').all(),

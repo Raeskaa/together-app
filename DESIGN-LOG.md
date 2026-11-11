@@ -5,7 +5,7 @@
 ## Where hate club stands (refreshed 2026-11-08 night, before an account switch)
 
 **Live:**
-- **Site:** https://shared-planner.mahesh-3dd.workers.dev. **Live build = Multi-space Phase 1** (Cloudflare Version `2df60c9b`, live sha `e68f3108`), on top of: "One for today" v2 (`0fbd4912`), theme-leak fix (`3dffd8a2`), Today greeting (`96366765`), UI refresh (`5e13d3a8`). (Repo working tree holds all of it — **not committed**; repo is `main`, no remote.)
+- **Site:** https://shared-planner.mahesh-3dd.workers.dev. **Live build = personal-items-travel + import-tasks** (Cloudflare Version `8f429a69`, live sha `71b27edd`), on top of: Multi-space Phase 1 (`2df60c9b`), "One for today" v2 (`0fbd4912`), theme-leak fix (`3dffd8a2`), Today greeting (`96366765`), UI refresh (`5e13d3a8`). (Everything since branch `ui-refresh-and-spaces` commit `2d45471` is **uncommitted**; repo is `main`, no remote.)
 - **Hosting:** Cloudflare account `3ddd20c68cd38c9b2dad37782db8a154` (mahesh@trueleap.io, subdomain mahesh-3dd). Mahesh approved this as an exception to the no-Trueleap-deploys rule.
 - **Repo:** `/Users/design/shared-planner` (git `main`, no remote). Stack: Cloudflare Worker + D1 + one-file Preact/htm `public/index.html`.
 
@@ -52,6 +52,40 @@
   - local dev = launch config `hate-club` (:8787); test sign-ins are in `.dev.vars` comments (git-ignored, never repeat them)
   - design gate: brief → Mahesh's yes → build → log here + `PARITY.md`
   - other files: `GAPS.md` (audit), `BRIEF-*.md` (one per pass)
+
+---
+
+## 2026-11-11 (later⁵): Import your tasks into a space — **DEPLOYED LIVE** (Version `8f429a69`, with later⁴)
+
+**Request:** on a new space, a button to pull in my existing tasks ("importing basically"). Confirmed: **copy** (one-time), **open tasks only**, source = a **picker with per-space counts + "All"**, **drop project links** for v1.
+
+**Built — backend (`src/worker.js`):** `copied_from` column on `tasks` (lazy `ensureImport()`, gated by `import_ready`). `POST /api/space/import {target, source}` (source = a space id or `'all'`): copies my open, top-level, non-event tasks (+ their open subtasks) from the source space(s) into target — new rows, `space_id`=target, owner=me, project dropped, `copied_from`=original id. Dedups against target rows whose `copied_from` is already set. Cap 300.
+
+**Built — frontend (`public/index.html`):** `nsImport(source)` → `/api/space/import` + refresh + toast; an **Import sheet** (reuses `.nsmodal`): lists your other spaces with per-space open-task counts + an "All my spaces" row (when >1 source). Entry points: a button on the **empty Today state** ("Import N tasks from your other spaces", via `importCount`/`onImport` props) and an **"Import your tasks here"** item in the space switcher — both shown only when you have open tasks elsewhere.
+
+**Verified** in local dev as Mahesh: added 3 open tasks to hate club → switched to the empty "Mahesh & Riya" → the empty-state button showed "Import 3 tasks" → sheet showed "hate club · 3 tasks" → imported → all 3 copied in (owned by me, "TODAY · 3 LEFT"); re-importing showed **"Nothing new to import"** (dedup works, no duplicates). Originals untouched. No feature console errors (transient 401s during logout→login only).
+
+**DEPLOYED LIVE 2026-11-11** (Version `8f429a69`, live sha `71b27edd`) once the Cloudflare Workers incident cleared — shipped together with later⁴. Verified live: `improw`/"Import your tasks here"/"Bring your tasks into" markup + `POST /api/space/import` → 401 (exists). `copied_from` self-applies via `ensureImport` on the next authed load.
+
+---
+
+## 2026-11-11 (later⁴): Personal items that travel across your spaces — **DEPLOYED LIVE** (Version `8f429a69`)
+
+**Request:** don't recreate my tasks/habits in every space — sync them, e.g. Mahesh↔A and Mahesh↔B should share his stuff. Cofounder reframe: **what travels is YOU** (personal habits/tasks), while shared/co-owned items stay per-space. He picked **Model A** (a "Just me — everywhere" flag, auto-travel), habits default ON + tasks default OFF, personal = private to you.
+
+**Grounded:** `space_id = NULL` already meant "show in every space" (loader + `inSpace`), and `habit_logs` is keyed by habit id alone (streaks already global). So small addition, not a rebuild.
+
+**Built — backend (`src/worker.js`):**
+- New `personal` column on `tasks` + `habits` (added lazily by `ensurePersonal()`, gated by a `personal_ready` settings flag so it runs once; also migrates existing person-owned habits → `personal=1`). Added `personal` to the TABLES whitelists.
+- Loader `inMineP` for tasks + habits: also pulls `(personal=1 AND owner=?me)` — **owner-scoped so personal items stay private** (a partner's client never receives them).
+
+**Built — frontend (`public/index.html`):**
+- `inSpace(r)` now returns true for `r.personal` → personal items show in every space.
+- A **"Where it lives: This space / Just me · everywhere"** toggle (reuses `.ownerseg`) in both the task editor (default This space) and habit editor (default Just me), with a privacy hint. `personal` threaded through `baseTask`, `TASK_FIELDS`, `saveTask`, `HABIT_FIELDS`, `saveHabit`, and both editors' form state.
+
+**Verified** in local dev as Mahesh: his 3 existing habits **auto-migrated to personal** and now appear in the "Mahesh & Riya" space (was "No habits yet") with full config + shared streak; the habit editor shows "Just me · everywhere" selected + the privacy hint; the task editor has the toggle defaulting to "This space"; "Whose" correctly lists Riya. No feature console errors (transient 401s during logout→login only). Privacy: personal items are owner-scoped, so Riya never loads Mahesh's.
+
+**DEPLOYED LIVE 2026-11-11** (Version `8f429a69`). The `personal` columns + the habit migration self-apply once on the remote via `ensurePersonal` on the next authed load. (The "Copy into a space" follow-up became later⁵, the import feature.)
 
 ---
 

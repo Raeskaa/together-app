@@ -63,6 +63,13 @@ button{font-family:inherit}
 .nsinvite{display:flex;gap:8px}
 .nscode{margin-top:12px;font-size:12.5px;color:var(--muted)}
 .nscode b{font-weight:700;color:var(--body);letter-spacing:.04em}
+.implist{display:flex;flex-direction:column;gap:6px;margin-top:2px}
+.improw{display:flex;align-items:center;gap:10px;width:100%;padding:10px 11px;border:1px solid var(--line);border-radius:12px;background:var(--card);cursor:pointer;font:inherit;text-align:left}
+.improw:hover:not(:disabled){background:var(--accent-wash);border-color:color-mix(in srgb,var(--accent) 28%,var(--line))}
+.improw:disabled{opacity:.6;cursor:default}
+.improw-nm{flex:1;font-weight:600;font-size:14px;color:var(--ink)}
+.improw-c{font-weight:500;font-size:12.5px;color:var(--muted)}
+.improw-all{border-style:dashed}
 .nav{display:flex;align-items:center;gap:11px;padding:7px 10px;border-radius:8px;font-weight:500;font-size:14px;color:#2F343B;cursor:pointer;border:none;background:none;width:100%;text-align:left}
 .nav:hover{background:#EDF2F8}
 .nav.sel{background:var(--card);color:var(--accent-deep);font-weight:600;box-shadow:0 1px 3px rgba(25,45,90,.12)}
@@ -429,6 +436,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 .ownerseg button{border:none;background:#fff;padding:9px 0;font-weight:500;font-size:12.5px;color:#5A616B;cursor:pointer;border-left:1px solid var(--field)}
 .ownerseg button:first-child{border-left:none}
 .ownerseg button.on{background:var(--ink);color:#fff}
+.travhint{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.4}
 .subedit{display:flex;align-items:center;gap:7px;margin:5px 0}
 .subedit input[type=text]{flex:1;border:1px solid var(--field);border-radius:8px;padding:7px 9px;font-size:13px;font-family:inherit;min-width:0}
 .subedit input[type=date]{border:1px solid var(--field);border-radius:8px;padding:7px 8px;font-size:12px;font-family:inherit;color:#5A616B;flex:none;width:122px}
@@ -1143,7 +1151,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
   function relName(o){ return o===VIEW.who?'You':nameOf(o); }
   function initialOf(o){ return ((nameOf(o)||'?').trim().charAt(0)||'?').toUpperCase(); }
   function personColor(o){ if(o===EVERYONE) return '#B4792B'; var p=personOf(o); if(p&&p.color) return p.color; var k=VIEW.members.indexOf(o); return PERSON_COLORS[k>=0?k%PERSON_COLORS.length:1]; }
-  function inSpace(r){ return !r.space_id || r.space_id===VIEW.space; }
+  function inSpace(r){ return !!r.personal || !r.space_id || r.space_id===VIEW.space; }
   var PROJ_COLORS=['#1F6FEB','#5B6B86','#2E9E6B','#B0529E','#C2704B','#B4792B','#4F5B76','#7A5BD8'];
   var TASK_TYPES=[
     {id:'task',label:'Task',color:'#1F6FEB',event:false},
@@ -1694,7 +1702,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
         ${openT.map(function(t){ return html`<${TaskRow} t=${t} tasks=${tasks} proj=${projMap[t.project]} parent=${t.parent_id?taskMap[t.parent_id]:null} onToggle=${props.onToggle} onEdit=${props.onEdit} key=${t.id} />`; })}
         ${doneT.length?html`<button type="button" class=${'hm-donel'+(showDone?' open':'')} aria-expanded=${showDone} onClick=${function(){setShowDone(!showDone);}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>${doneT.length} done${isToday?' today':''}${earned?html`<span class="hm-pts">+${earned}</span>`:null}</button>`:null}
         ${showDone?doneT.map(function(t){ return html`<${TaskRow} t=${t} tasks=${tasks} proj=${projMap[t.project]} parent=${t.parent_id?taskMap[t.parent_id]:null} onToggle=${props.onToggle} onEdit=${props.onEdit} key=${t.id} />`; }):null}
-        ${(dayTasks.length===0 && !(isToday&&dayRoutines.length))?(carried.length?html`<div class="carryempty">Nothing new today.</div>`:html`<div class="empty"><div class="big">A clear day ✨</div><div class="sub">Nothing planned. Enjoy the space, and add something above whenever you like.</div></div>`):null}
+        ${(dayTasks.length===0 && !(isToday&&dayRoutines.length))?(carried.length?html`<div class="carryempty">Nothing new today.</div>`:html`<div class="empty"><div class="big">A clear day ✨</div><div class="sub">Nothing planned. Enjoy the space, and add something above whenever you like.</div>${props.importCount>0?html`<button class="btn ghost" style=${{flex:'none',marginTop:'16px',padding:'9px 16px'}} onClick=${props.onImport}>Import ${props.importCount} task${props.importCount>1?'s':''} from your other spaces</button>`:null}</div>`):null}
       </section>
       <aside class="hm-rail" aria-label="Around today">
         ${other?html`<div class="hm-sec"><div class="hm-shd"><h2>${nameOf(other)}</h2><${Avatar} owner=${other} /></div>
@@ -2163,7 +2171,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var ed=props.editing||{};
     var st=useState({
       title:ed.title||'', project:ed.project||(props.defaultProject||''), owner:ed.owner||props.whoami||VIEW.who,
-      type:ed.type||props.defaultType||'task', date:ed.date||props.defaultDate||'', time:ed.time||props.defaultTime||'', due:ed.due||'', due_time:ed.due_time||''
+      type:ed.type||props.defaultType||'task', date:ed.date||props.defaultDate||'', time:ed.time||props.defaultTime||'', due:ed.due||'', due_time:ed.due_time||'', personal:ed.personal?1:0
     });
     var f=st[0], set=st[1];
     var subsInit=(props.children||[]).map(function(s){return {id:s.id,title:s.title,due:s.due||'',due_time:s.due_time||'',done:!!s.done,owner:s.owner,created_at:s.created_at,exists:true};});
@@ -2197,6 +2205,9 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
           </select>
           <label class="lbl">Whose</label>
           <${OwnerSeg} value=${f.owner} onChange=${function(v){upd('owner',v);}} />
+          ${!props.parent?html`<${Fragment}><label class="lbl">Where it lives</label>
+          <div class="ownerseg" style=${{gridTemplateColumns:'repeat(2,1fr)'}}><button type="button" class=${!f.personal?'on':''} onClick=${function(){upd('personal',0);}}>This space</button><button type="button" class=${f.personal?'on':''} onClick=${function(){upd('personal',1);}}>Just me · everywhere</button></div>
+          ${f.personal?html`<div class="travhint">Shows in every space you're in — and only you can see it.</div>`:null}<//>`:null}
           ${!isEventType(f.type)&&!props.parent?html`<${Fragment}>
             <label class="lbl">Subtasks (each can have a deadline)</label>
             ${subs.map(function(s,i){ return html`<div class="subedit" key=${s.id}>
@@ -2416,7 +2427,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 
   function HabitEditor(props){
     var ed=props.editing||{};
-    var st=useState({ name:ed.name||'', kind:ed.kind||'check', owner:ed.owner||props.whoami||VIEW.who, unit:ed.unit||'', target:(ed.target!=null?ed.target:''), caption:ed.caption||'', color:ed.color||PROJ_COLORS[0] });
+    var st=useState({ name:ed.name||'', kind:ed.kind||'check', owner:ed.owner||props.whoami||VIEW.who, unit:ed.unit||'', target:(ed.target!=null?ed.target:''), caption:ed.caption||'', color:ed.color||PROJ_COLORS[0], personal:(ed.id?(ed.personal?1:0):1) });
     var f=st[0], set=st[1];
     function upd(k,v){ var o=Object.assign({},f); o[k]=v; set(o); }
     return html`<div class=${'overlay'+(props.closing?' closing':'')} style=${{zIndex:80}} onClick=${function(e){if(e.target===e.currentTarget)props.onClose();}}>
@@ -2431,6 +2442,9 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
         <input class="fld" type="text" value=${f.caption} placeholder="e.g. 4 → 1 pack by 30 Nov" onInput=${function(e){upd('caption',e.target.value);}} />
         <label class="lbl">Whose</label>
         <${OwnerSeg} value=${f.owner} onChange=${function(v){upd('owner',v);}} />
+        <label class="lbl">Where it lives</label>
+        <div class="ownerseg" style=${{gridTemplateColumns:'repeat(2,1fr)'}}><button class=${!f.personal?'on':''} onClick=${function(){upd('personal',0);}}>This space</button><button class=${f.personal?'on':''} onClick=${function(){upd('personal',1);}}>Just me · everywhere</button></div>
+        ${f.personal?html`<div class="travhint">Shows in every space you're in — and only you can see it.</div>`:null}
         <label class="lbl">Colour</label>
         <div class="swatches">${PROJ_COLORS.map(function(c){ return html`<button class=${'sw'+(f.color===c?' on':'')} key=${c} style=${{background:c}} aria-label="colour" onClick=${function(){upd('color',c);}}></button>`; })}</div>
         <div class="mactions">${ed.id?html`<button class="btn del" onClick=${function(){props.onDelete(ed.id);}}>Delete</button>`:null}<button class="btn ghost" onClick=${props.onClose}>Cancel</button><button class="btn primary" onClick=${function(){ if(f.name.trim()) props.onSave(f,ed.id); }}>Save</button></div>
@@ -3083,6 +3097,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var smS=useState(false); var spaceMenu=smS[0], setSpaceMenu=smS[1];
     var nsS=useState(null); var newSpace=nsS[0], setNewSpace=nsS[1];        // null | {step:'name'|'invite', name, code, space_id, busy, err}
     var wsS=useState(false); var wantSignIn=wsS[0], setWantSignIn=wsS[1];   // on an invite link, "I already have an account"
+    var imS=useState(null); var importV=imS[0], setImport=imS[1];           // null | {} (sheet open) ; copy your tasks from another space into this one
     var inviteCode=(function(){ try{ return new URLSearchParams(location.search).get('invite')||''; }catch(e){ return ''; } })();
     function switchSpace(id){ try{lsSet('sp_space',id);}catch(e){} spS[1](id); setSpaceMenu(false); setView2('today'); }
     var fS=useState('all'); var filter=fS[0], setFilter=fS[1];
@@ -3236,6 +3251,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
         return apiPost('/api/space/invite',{space_id:sid}).then(function(r2){return r2.json();}).then(function(j2){ refresh(); switchSpace(sid); setNewSpace({step:'invite',name:nm,code:(j2&&j2.code)||'',space_id:sid}); });
       }).catch(function(){ setNewSpace(function(p){ return Object.assign({},p,{busy:false,err:'Couldn’t create it — try again.'}); }); }); }
     function nsInvite(sid,nm){ apiPost('/api/space/invite',{space_id:sid}).then(function(r){return r.json();}).then(function(j){ if(j&&j.ok) setNewSpace({step:'invite',name:nm,code:j.code,space_id:sid}); else showToast({text:'Couldn’t make an invite link.'}); }).catch(function(){ showToast({text:'Couldn’t make an invite link.'}); }); }
+    function nsImport(source){ setImport({busy:true}); apiPost('/api/space/import',{target:space,source:source}).then(function(r){return r.json();}).then(function(j){ setImport(null); if(j&&j.ok){ refresh(); showToast({emoji:'📥',text:j.n?('Imported '+j.n+' task'+(j.n>1?'s':'')):'Nothing new to import'}); } else showToast({text:'Couldn’t import.'}); }).catch(function(){ setImport(null); showToast({text:'Couldn’t import.'}); }); }
 
     // everything below is the current space's
     VIEW.space=space;
@@ -3308,11 +3324,11 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       var go=function(){ holdDelete([{op:'delete',table:'tasks',id:id,_label:t.title}],'Deleted “'+t.title+'”'+(kids?(' and its '+kids+' subtask'+(kids>1?'s':'')):'')); };
       exitThen(rowEl('d'+id)||rowEl('c'+id),go);
     }
-    function baseTask(o){ return Object.assign({ id:uid('tk'), title:'', project:'', owner:whoami, type:'task', date:'', time:'', due:'', due_time:'', done:false, subtodos:'[]', parent_id:null, sort:0, created_at:Date.now(), space_id:space }, o); }
-    var TASK_FIELDS=['title','project','owner','type','date','time','due','due_time'];
+    function baseTask(o){ return Object.assign({ id:uid('tk'), title:'', project:'', owner:whoami, type:'task', date:'', time:'', due:'', due_time:'', done:false, subtodos:'[]', parent_id:null, sort:0, created_at:Date.now(), space_id:space, personal:0 }, o); }
+    var TASK_FIELDS=['title','project','owner','type','date','time','due','due_time','personal'];
     function saveTask(f,id,subs,removed,origSubs){
       var ev=isEventType(f.type);
-      var vals={ title:f.title.trim(), project:f.project||'', owner:f.owner, type:f.type, date:f.date||'', time:f.time||'', due:ev?'':(f.due||''), due_time:ev?'':(f.due_time||'') };
+      var vals={ title:f.title.trim(), project:f.project||'', owner:f.owner, type:f.type, date:f.date||'', time:f.time||'', due:ev?'':(f.due||''), due_time:ev?'':(f.due_time||''), personal:f.personal?1:0 };
       var snap=(modal&&modal.editing)||{};   // the task as it was when the sheet opened
       var ops=[], rid=id;
       if(id){ var ch={}; TASK_FIELDS.forEach(function(k){ if((snap[k]||'')!==(vals[k]||'')) ch[k]=vals[k]; }); if(Object.keys(ch).length) ops.push({op:'patch',table:'tasks',id:id,fields:ch,_label:vals.title}); }
@@ -3359,9 +3375,9 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     // habit / journal / settings
     function checkHabit(hid,value){ commit([{op:'habit',date:TODAY,habit:hid,value:value}]); }
     function stepHabit(hid,delta){ commit([{op:'habit',date:TODAY,habit:hid,delta:delta}]); }   // +1/−1 adds up across both phones
-    var HABIT_FIELDS=['name','kind','owner','unit','target','caption','color'];
+    var HABIT_FIELDS=['name','kind','owner','unit','target','caption','color','personal'];
     function saveHabit(f,id){
-      var vals={ name:f.name.trim(), kind:f.kind, owner:f.owner, unit:f.unit||'', target:(f.target===''||f.target==null)?null:Number(f.target), caption:f.caption||'', color:f.color||'#1F6FEB' };
+      var vals={ name:f.name.trim(), kind:f.kind, owner:f.owner, unit:f.unit||'', target:(f.target===''||f.target==null)?null:Number(f.target), caption:f.caption||'', color:f.color||'#1F6FEB', personal:f.personal?1:0 };
       if(id){ var snap=habitEdit||{}, ch={}; HABIT_FIELDS.forEach(function(k){ var a=snap[k]==null?'':snap[k], b=vals[k]==null?'':vals[k]; if(a!==b) ch[k]=vals[k]; }); if(Object.keys(ch).length) commit([{op:'patch',table:'habits',id:id,fields:ch,_label:vals.name}]); setHabitEdit(null); return; }
       commit([{op:'upsert',table:'habits',row:Object.assign({id:uid('hb'),sort:Date.now(),archived:0,created_at:Date.now(),space_id:space},vals),_label:vals.name}]); setHabitEdit(null);
     }
@@ -3462,6 +3478,10 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var mySpaces=(store&&store.spaces)||[];
     var curSpaceName=(spaceRow&&spaceRow.name)||'hate club';
     function spaceMembers(id){ return ((store&&store.members)||[]).filter(function(m){return m.space_id===id;}).map(function(m){return m.person_id;}); }
+    var allTasksAll=(store&&store.tasks)||[];
+    function openCountIn(sid){ return allTasksAll.filter(function(t){ return t.owner===whoami && !t.done && !t.parent_id && !isEventType(t.type) && t.space_id===sid; }).length; }
+    var otherSpaces=mySpaces.filter(function(sp){ return sp.id!==space; });
+    var importable=otherSpaces.reduce(function(n,sp){ return n+openCountIn(sp.id); },0);
     var sidebar = html`<aside class="sidebar">
       <div class="spacesw">
         <button class="spacesw-btn" aria-haspopup="true" aria-expanded=${spaceMenu} onClick=${function(){setSpaceMenu(!spaceMenu);}}>
@@ -3475,6 +3495,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
             <span class="spacesw-opnm">${sp.name}</span>${sp.id===space?html`<span class="spacesw-ck">✓</span>`:null}
           </button>`; })}
           ${spaceMembers(space).length<2?html`<button class="spacesw-add" onClick=${function(){ setSpaceMenu(false); nsInvite(space,curSpaceName); }}>Invite someone to this space</button>`:null}
+          ${importable>0?html`<button class="spacesw-add" onClick=${function(){ setSpaceMenu(false); setImport({}); }}>Import your tasks here</button>`:null}
           <button class="spacesw-add" onClick=${function(){ setSpaceMenu(false); setNewSpace({step:'name',name:''}); }}>＋ New space</button>
         </div>`:null}
       </div>
@@ -3527,7 +3548,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     if(loading){ content=html`<div class="empty" style=${{marginTop:'60px',color:'var(--accent-muted)'}}><div class="big">${sync.st==='offline'?'Can’t reach the server':'Loading your planner…'}</div><div class="sub">${sync.st==='offline'?'Trying again in a few seconds.':'Syncing shared data.'}</div></div>`; }
     else if(openProj){ content=html`<${ProjectPage} key=${openProj.id} project=${openProj} tasks=${tasks} materials=${materials} onBack=${function(){setPanel(null);}} onToggle=${toggleTask} onEdit=${function(p){setPEdit(p);}} onEditTask=${function(t){setModal({editing:t});}} onAddItem=${addProjectItem} onAddSub=${addSubtask} onAddMaterial=${addMaterial} onDelMaterial=${delMaterial} onReopen=${reopenProject} onFinish=${finishProject} />`; }
     else if(v==='week'){ content=html`<${WeekPage} fresh=${!!leadFlash} data=${wkData} projects=${projects} onToggle=${toggleTask} onTakeOne=${takeOne} onCheer=${function(){ sendWave('💪'); }} />`; }
-    else if(v==='today'){ content=html`<${Fragment}>${showGS?html`<${GetStarted} steps=${gsSteps} done=${gsDone} onDismiss=${function(){setGsHide(true);lsSet('sp_gs_hide','1');}} />`:null}<div class="mobfocus"><${FocusWidget} focus=${focus} whoami=${whoami} onStart=${startFocus} onPause=${pauseFocus} onResume=${resumeFocus} onReset=${resetFocus} /></div><${Today} sel=${sel} filter=${filter} projects=${projects} tasks=${tasks} routines=${routines} upcoming=${upcoming} habits=${habitDefs} habitLogs=${habitLogs} topics=${topics} topicLinks=${topicLinks} settings=${settings} whoami=${whoami} onToggle=${toggleTask} onEdit=${function(t){setModal({editing:t});}} onAdd=${function(d){setModal({defaultDate:d});}} carry=${carry} onMoveAllToday=${moveAllToday} onSetHabit=${checkHabit} onStepHabit=${stepHabit} onEditHabit=${function(h){setHabitEdit(h);}} onAddHabit=${function(){setHabitEdit({});}} notes=${notes} onAddNote=${addNote} onSaveNote=${saveNoteText} onSetNoteColor=${setNoteColor} onDeleteNote=${deleteNote} onGoJournal=${function(){setView2('journal');}} onShowAll=${function(){setView2('tasks');}} score=${thisWeek} help=${helpFor} fresh=${!!leadFlash} onOpenWeek=${function(){setView2('week');}} onQuickAdd=${quickAdd} /><//>`; }
+    else if(v==='today'){ content=html`<${Fragment}>${showGS?html`<${GetStarted} steps=${gsSteps} done=${gsDone} onDismiss=${function(){setGsHide(true);lsSet('sp_gs_hide','1');}} />`:null}<div class="mobfocus"><${FocusWidget} focus=${focus} whoami=${whoami} onStart=${startFocus} onPause=${pauseFocus} onResume=${resumeFocus} onReset=${resetFocus} /></div><${Today} sel=${sel} filter=${filter} projects=${projects} tasks=${tasks} routines=${routines} upcoming=${upcoming} habits=${habitDefs} habitLogs=${habitLogs} topics=${topics} topicLinks=${topicLinks} settings=${settings} whoami=${whoami} onToggle=${toggleTask} onEdit=${function(t){setModal({editing:t});}} onAdd=${function(d){setModal({defaultDate:d});}} carry=${carry} onMoveAllToday=${moveAllToday} onSetHabit=${checkHabit} onStepHabit=${stepHabit} onEditHabit=${function(h){setHabitEdit(h);}} onAddHabit=${function(){setHabitEdit({});}} notes=${notes} onAddNote=${addNote} onSaveNote=${saveNoteText} onSetNoteColor=${setNoteColor} onDeleteNote=${deleteNote} onGoJournal=${function(){setView2('journal');}} onShowAll=${function(){setView2('tasks');}} onImport=${function(){setImport({});}} importCount=${importable} score=${thisWeek} help=${helpFor} fresh=${!!leadFlash} onOpenWeek=${function(){setView2('week');}} onQuickAdd=${quickAdd} /><//>`; }
     else if(v==='tasks'){ content=html`<${TasksTable} tasks=${tasks} projects=${projects} onEdit=${function(t){setModal({editing:t});}} onToggle=${toggleTask} />`; }
     else if(v==='calendar'){ content=html`<${Calendar} tasks=${tasks} projects=${projects} onAddDay=${function(ds){setModal({defaultDate:ds});}} onAddSlot=${function(ds,tm){setModal({defaultDate:ds,defaultTime:tm,defaultType:'event'});}} onEditTask=${function(t){setModal({editing:t});}} onOpenProject=${function(id){setPanel(id);}} onToggle=${toggleTask} onSchedule=${scheduleTask} onNewProject=${function(s,e){setPEdit({start_date:s,end_date:e});}} routines=${routines} />`; }
     else if(v==='projects'){ content=html`<${Projects} projects=${projects} tasks=${tasks} onOpen=${function(id){setPanel(id);}} onNew=${function(){setPEdit({});}} onEdit=${function(p){setPEdit(p);}} onToggle=${toggleTask} onPickDates=${function(){setView2('calendar');}} />`; }
@@ -3561,6 +3582,18 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       <nav class="mobnav">${navBtns.map(function(k){ var on=k==='more'?(navBtns.indexOf(v)<0&&!openProj):(k==='projects'?(v==='projects'||!!openProj):(v===k&&!openProj)); return html`<button key=${k} class=${on?'on':''} aria-current=${on?'page':null} onClick=${function(){ if(k==='more') setMoreOpen(true); else setView2(k); }}><${Icon} s=${20}>${icons[k]}<//>${NAVL[k]}</button>`; })}</nav>
       ${moreV?html`<${MoreSheet} closing=${moreClosing} onClose=${function(){setMoreOpen(false);}} onPick=${function(k){ setMoreOpen(false); if(k==='settings') setSettingsOpen(true); else if(k==='help') setShowIntro(true); else setView2(k); }} />`:null}
 
+      ${importV?html`<div class="nsov" onClick=${function(e){ if(e.target===e.currentTarget && !importV.busy) setImport(null); }}>
+        <div class="nsmodal">
+          <div class="meyebrow">Import</div>
+          <h3 class="nsh">Bring your tasks into ${curSpaceName}</h3>
+          <p class="nssub">Copies your open tasks (and their subtasks) here. The originals stay put, and it won't duplicate ones you've already imported.</p>
+          <div class="implist">
+            ${otherSpaces.filter(function(sp){return openCountIn(sp.id)>0;}).map(function(sp){ var c=openCountIn(sp.id); return html`<button key=${sp.id} class="improw" disabled=${importV.busy} onClick=${function(){nsImport(sp.id);}}><span class="spacesw-avs">${spaceMembers(sp.id).slice(0,3).map(function(m,k){return html`<span key=${m} class="av avm" style=${{background:personColor(m),marginLeft:k?'-7px':0,border:'2px solid var(--card)'}}>${initialOf(m)}</span>`;})}</span><span class="improw-nm">${sp.name}</span><span class="improw-c">${c} task${c>1?'s':''}</span></button>`; })}
+            ${otherSpaces.filter(function(sp){return openCountIn(sp.id)>0;}).length>1?html`<button class="improw improw-all" disabled=${importV.busy} onClick=${function(){nsImport('all');}}><span class="improw-nm">All my spaces</span><span class="improw-c">${importable} task${importable>1?'s':''}</span></button>`:null}
+          </div>
+          <div class="mactions" style=${{justifyContent:'flex-end',marginTop:'16px'}}><button class="btn ghost" style=${{flex:'none'}} disabled=${importV.busy} onClick=${function(){setImport(null);}}>${importV.busy?'Importing…':'Cancel'}</button></div>
+        </div>
+      </div>`:null}
       ${modalV?html`<${TaskModal} closing=${modalClosing} key=${editingTask?editingTask.id:'new'} parent=${editingParent} onOpenParent=${function(p){setModal({editing:p});}} editing=${modalV.editing} children=${modalChildren} defaultDate=${modalV.defaultDate} defaultTime=${modalV.defaultTime} defaultType=${modalV.defaultType} defaultProject=${modalV.defaultProject} whoami=${whoami} projects=${projects} onClose=${function(){setModal(null);}} onSave=${saveTask} onDelete=${deleteTask} />`:null}
       ${pEditV?html`<${ProjectEditor} closing=${pEditClosing} editing=${pEditV} whoami=${whoami} onClose=${function(){setPEdit(null);}} onSave=${saveProject} onDelete=${askDeleteProject} />`:null}
       ${introV?html`<${Intro} closing=${introClosing} onClose=${function(){setShowIntro(false);lsSet('sp_intro_v1','1');}} />`:null}
