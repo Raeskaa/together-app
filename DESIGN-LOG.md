@@ -5,7 +5,7 @@
 ## Where hate club stands (refreshed 2026-11-08 night, before an account switch)
 
 **Live:**
-- **Site:** https://shared-planner.mahesh-3dd.workers.dev, running app commit `0b402bc` (logs to `6248fe7`). Checked: the live page sha = build, `/mcp` answers.
+- **Site:** https://shared-planner.mahesh-3dd.workers.dev. **Live build = Multi-space Phase 1** (Cloudflare Version `2df60c9b`, live sha `e68f3108`), on top of: "One for today" v2 (`0fbd4912`), theme-leak fix (`3dffd8a2`), Today greeting (`96366765`), UI refresh (`5e13d3a8`). (Repo working tree holds all of it — **not committed**; repo is `main`, no remote.)
 - **Hosting:** Cloudflare account `3ddd20c68cd38c9b2dad37782db8a154` (mahesh@trueleap.io, subdomain mahesh-3dd). Mahesh approved this as an exception to the no-Trueleap-deploys rule.
 - **Repo:** `/Users/design/shared-planner` (git `main`, no remote). Stack: Cloudflare Worker + D1 + one-file Preact/htm `public/index.html`.
 
@@ -26,10 +26,10 @@
 **Canvas:** https://claude.ai/artifact/25zw9iYyovGXj73Yxah5di. It's private to the Claude account that made it. **A full copy is in `design/canvas/`**: every artboard, the index, a README mapping rows → picked / built, and the scripts that made the frames.
 
 **Locked:**
-- **Identity:** blue `#1F6FEB`, ink `#15171A`, Inter, sky gradient ground, a white sheet (radius 16). A rebrand was rejected: "keep the identity same".
+- **Identity:** blue `#1F6FEB` (default accent), ink `#15171A`, **General Sans** (allgreen font; Inter still a font option), sky gradient ground, a white sheet. A rebrand was rejected: "keep the identity same". As of the 9 Nov refresh the accent **travels with the theme** — the primary CTA is now `--accent-deep` (deep blue on Sky, deep orange on Peach, etc.), no longer hardwired ink.
 - **Points:** task 10 · subtask 3 · on time +5 · helping +5 · habit 2 · journal 2 · focus 3. The week runs Mon–Sun, the day turns at 4am (IST), and the race is to 100.
 - **Home and Calendar:** Home stays a list, because "we both don't have a schedule". The hour timeline lives in Calendar › Day.
-- **Two people only for now:** multiple partners and invites come later (Mahesh, 8 Nov).
+- **Multi-space Phase 1 is LIVE (Version `2df60c9b`):** be in multiple 2-person spaces + a sidebar switcher + invite links/codes + new-partner signup-and-join — see the 2026-11-11 (later³) entry. Each space is still 2-person; **teams (N>2) = Phase 2.**
 - **Claude connector:** acts as the person; ticking off is "kill", and there's no delete.
 
 **Open, not started (ask before starting any):**
@@ -41,6 +41,7 @@
   - no check on a real phone so far
 - **Claude:** no real connection to the deployed link tested yet.
 - **GAPS.md tier 2:** reminders, the background notifications, habits for past days, etc.
+- **UI language refresh** (Sky + moments): **LIVE as of 2026-11-10** (Version `5e13d3a8`). Themed accent travels to the CTA, glass side panel, jewel discs, dotted dividers, General Sans — on **Home + the side panel only**. Still to do: real-phone eyeball, then roll the language to Calendar / Projects / Tasks / Journal / Settings. See the 2026-11-09 build entry + `BRIEF-ui-refresh.md`.
 
 **Rules:**
 - **Deploying:**
@@ -51,6 +52,116 @@
   - local dev = launch config `hate-club` (:8787); test sign-ins are in `.dev.vars` comments (git-ignored, never repeat them)
   - design gate: brief → Mahesh's yes → build → log here + `PARITY.md`
   - other files: `GAPS.md` (audit), `BRIEF-*.md` (one per pass)
+
+---
+
+## 2026-11-11 (later³): Multi-space Phase 1 — multiple partnerships + switcher + invites — **DEPLOYED LIVE** (Version `2df60c9b`)
+
+**Context:** he wants to partner with multiple people (and later, teams). Cofounder analysis first (the DB was already schema v3 "spaces" — spaces+members many-to-many, content space-scoped, owners person-id based, `scoresOn()` already turns the race off for `kind:team`). Decision: **generalize the Space** — a partnership is a 2-member space, a team is an N-member space. **Phase 1 = multiple 2-person partnerships only** (no de-assume-2 / teams yet). His picks: invite by **link/code** (works for new people), switcher at **sidebar top**, **each space its own world**.
+
+**Built — backend (`src/worker.js`, `schema.sql`):**
+- `invites(code, space_id, invited_by, status, created_at, used_at, used_by)` — created lazily via `ensureInvites()` (no migration step; self-creates on remote).
+- Public endpoints (before the auth gate): `GET /api/invite/peek?code=` (inviter + space name), `POST /api/invite/signup` (brand-new person makes an account + joins + gets a session).
+- Authed endpoints: `POST /api/space/create`, `/api/space/invite` (reuses one open code per space), `/api/invite/accept` (signed-in join), `/api/space/leave`. (The generic commit still blocks spaces/members; these are dedicated.)
+
+**Built — frontend (`public/index.html`):**
+- The content was *already* space-scoped via `inSp()`/`inSpace`. Added `switchSpace()` (persists `sp_space`), the **sidebar space switcher** (`.spacesw*`: current space + member avatars + chevron → your spaces + "New space"; "Invite someone" shows only while a space has <2 members, keeping Phase 1 strictly 2-person).
+- **New-space + Invite modal** (`.nsmodal`): name it → create → auto-switch → shows the invite **link + code** with Copy.
+- **`JoinInvite`** screen: opening `?invite=CODE` while signed-out peeks the invite and offers name/username/password → signup+join (matches the real auth-card styling). Signed-in, a `useEffect` auto-accepts the code and hops into the space. "Already have an account? Sign in" bypass via `wantSignIn`.
+- `s_hateclub` stays the default; nothing migrates.
+
+**Verified** in local dev, full flow: switcher + menu, created "Mahesh & Riya" (auto-switched, **isolated/empty**, race hidden at 1 member), invite link/code shown, signed out, opened the link → JoinInvite → made a new account "Riya" → landed **in the space, 2 people, race live** ("Mahesh leads by 2"); Riya's switcher shows **only** her space (membership isolation). No feature console errors (transient 401s only during the sign-out→join moment).
+
+**DEPLOYED LIVE 2026-11-11** (Version `2df60c9b`, live sha `e68f3108`). Verified live: switcher/JoinInvite/nsmodal markup present, and `GET /api/invite/peek?code=zzz` → `{ok:false,error:"bad_code"}` (so the remote `invites` table self-created; existing hate club space/data untouched). **Phase 2 (teams, N>2)** is the de-assume-2 work (`otherOf`, scoring→leaderboard/off, rail/journal-share/waves for N, roles).
+
+---
+
+## 2026-11-11 (later²): "One for today" — random fact + line of the day — **DEPLOYED LIVE** (Version `0fbd4912`)
+
+> **Redesigned same day (his feedback: boxed card "too shitty", drop the header):** stripped to a borderless close — no card/tint/border, no "ONE FOR TODAY" header, no category tag. Just the fact, then the line in Fraunces italic + author, and a faint "Another". And **changed the pick to random on every page load** (`useState(pick)`) instead of the date-seeded daily — so it's no longer a shared daily pair (both people now see their own, fresh each refresh); "Another" reshuffles in place. Deployed Version `0fbd4912` (live sha `8cf2df0d`). (First build was the boxed/daily version, Version `496544ba`.)
+
+
+**Request:** a notebook-back-page random fact (nature/animals/space/art/world/movements…) + a "line of the day". Picks: curated local pack (massive, no repeats for ≥30–60 days), lines = poetry + witty + wisdom, placed at the bottom of Today, daily + a shuffle.
+
+**Built** in `public/index.html`:
+- `FACTS` (**86**, tagged by category) + `LINES` (**65**, poet/author/wit, each with attribution) — baked in, internet-sourced but hand-picked and fact-checked (speculative ones hedged).
+- `OneForToday` component: date-seeded daily pick (`fact = dayNum % 86`, `line = (dayNum*7+3) % 65`) so **both people see the same pair each day** (shared ritual), with **"Another →"** to shuffle (random, local-only) and **"today's pick"** to reset.
+- Card at the very bottom of Today, after "On your mind": soft `--accent-wash` tint (tracks theme), category tag, the fact, a dotted divider, then the line in **Fraunces italic** with its author. Borderless-soft, matches the new language.
+- No repeats for ~86 days (facts) / 65 (lines); trivial to grow the arrays.
+
+**Verified** in local dev on Mint (card renders, daily pick, shuffle + reset, theme-tinted, no console errors), then **DEPLOYED LIVE 2026-11-11** (Version `496544ba`, live sha `e71f86ff`; verified live: `OneForToday`, `.oft`, 86 facts, the lines).
+
+---
+
+## 2026-11-11 (later): Theme leak fix — all chrome accents now track the theme — **DEPLOYED LIVE** (Version `3dffd8a2`)
+
+**Request:** on Mint, the "Add task" plus icon (and other bits) were still blue — "make sure the themes are only that colors."
+
+**Cause:** stray hardcoded accent hexes that never went through the theme vars — plus-icon SVG `fill="#1F6FEB"`, selected nav icons `#195FD0`, `+ New project`, profile avatar gradient (`#3FA0FF`), and ~13 muted-blue labels (`#3C6FB0`: eyebrow, section headers, day letters, loading, calendar now-line, week-chart marks).
+
+**Fix (all in `public/index.html`):**
+- New token **`--accent-muted: color-mix(in srgb, var(--accent-deep) 60%, #8A93A0)`** — auto-tracks the theme; replaced every `#3C6FB0` label.
+- Routed to vars: plus icon + `.dv-now`/`.dv-linow`/donut/focus-ring/`.hk.k` → `var(--accent)`; selected nav icons + `+ New project` + week-chart selected day + `.dv-strip.on` → `var(--accent-deep)`; profile avatar → accent gradient; `.pc-glyph` shadow → `var(--glow)`.
+- **Kept as semantic/identity (by the "colors only as dots" rule):** project dots + timelines (`PROJ_COLORS`, `p.color`), person avatars (`personColor`), task-type colors (Task blue / Event purple), done-green `#2E9E6B`, overdue-red `#C64A3B`, note colors, confetti.
+
+**Verified** in local dev on **Peach and Mint** (plus icon, avatar, nav, labels, Save/CTA all retint; project dots keep their colors; `color-mix` resolves; no console errors), then **DEPLOYED LIVE 2026-11-11** (Version `3dffd8a2`, live sha `087cfb3e`; verified live: `--accent-muted` token, themed plus icon/nav/avatar, zero stray `#3C6FB0`).
+
+---
+
+## 2026-11-11: Today header → personalized greeting — **DEPLOYED LIVE** (Version `96366765`)
+
+**Request:** make the Today "Today" H1 functional + empathetic — "hey mahesh, let's finish 'X' first" / "Mahesh!!!! we have work to do". Picked **structure A** (short hook H1 + functional subline).
+
+**Built** in `public/index.html` (Today view only; other view titles unchanged):
+- Eyebrow → **the date** ("WED · 11 NOV"); H1 → a **time-of-day greeting with the first name**; new `.hgsub` subline → the functional line (next task + count).
+- `greet()` computed in the App shell from real data: `nameOf(whoami)` first name, `new Date().getHours()` (morning/afternoon/evening/night), `counts.today`, `carriedFrom()` (top rolled-over task), today's first non-event task title, `doneToday`.
+- **States:** has-work (greeting + *Let's finish "X" first — N to go* / carried variant) · all-done (*That's the lot, {name} ✨*) · clear-day (*A clear day, {name}* — nothing planned). Top task = carried first, else today's first.
+- **Daily-rotating** copy: `vary = parseInt(YYYYMMDD)%2` picks between two phrasings per state (stable within a day) — so the warm + cheeky registers he liked both show.
+- Renders on web + phone (shared topbar); task title bolded in the subline.
+
+**Verified** in local dev (all three states + date eyebrow, no console errors) and then **DEPLOYED LIVE 2026-11-11** (Version `96366765`, live sha `e54119a4`; verified live markers `.hgsub`, `greet()`, all three state strings). Copy is easily tuned in the `greet()` arrays if he wants a different tone.
+
+---
+
+## 2026-11-09 (later): UI refresh BUILT — Sky + moments → **DEPLOYED LIVE 2026-11-10** (Version `5e13d3a8`)
+
+> **Deployed 2026-11-10** on Mahesh's go-ahead via `npx wrangler deploy`. Verified on the live URL (cache-busted): Fontshare/General Sans, `--primary:var(--accent-deep)`, `--radius-sheet`, glass `blur(26px)`, the Peach accent trio — all present. Lab source copied to `design/ui-lab.html`.
+
+
+**Pick:** Mahesh chose **Sky + moments** from the lab. Built into `public/index.html` the same session.
+
+**What changed (Home + side panel first, plus the cross-cutting theme/font fix):**
+- **Accent travels with the theme.** The real bug behind "I change to orange and the CTA stays blue": the primary CTA was hardwired to `--primary:#15171A` (ink). Now `--primary:var(--accent-deep)`, and each ground preset carries an `ac:[accent, accent-deep, accent-wash, glow]` trio that the theme-apply `useEffect` sets on `<html>` (neutral presets reset to the Sky default). Verified end-to-end: Sky → CTA `#195FD0`; Peach → CTA `#C4471C` (deep orange) + orange glow; reverts clean.
+- **Primary CTA** (`.btn.primary`, `.savebtn`): gradient `accent → accent-deep` + `--glow` shadow + inner highlight, instead of flat ink.
+- **Font:** **General Sans** via Fontshare (`api.fontshare.com`), set as the default (`theme_font` default `inter → general`; Inter kept as an option). Confirmed loaded (`document.fonts.check` true), not a fallback.
+- **Glass side panel** (`.ppanel`, his chosen surface): `rgba(255,255,255,.60)` + `backdrop-filter:blur(26px) saturate(175%)` + glass border + glow + radius `var(--radius-sheet)=22`. Dark grounds get a dark-glass variant.
+- **Jewel discs** (`.check` / `.check.on`): frosted empty disc with inner highlight → fills `--accent` with `--glow` when done.
+- **Dotted dividers** on Home task rows (`.arow`: `1px dotted var(--dot)`), matching the "My Tasks" reference.
+- New `:root` tokens: `--glow`, `--glass`, `--glass-line`, `--dot`, `--radius-sheet`. 5 colored presets got `ac` trios (lavender, peach, mint, rose, slate); ink + midnight got light-on-dark trios; cream/ice/white stay on the Sky-blue accent.
+
+**Glass reach = moments only** (his pick): glass on the sheet, discs, CTA glow — the dense task list stays crisp. Dense-rows mode from the lab was *not* ported.
+
+**Verified in local dev** (`:8787`, test sign-in): sign-in, Home (jewel discs + dotted divider + gradient CTA), the glass add-task side panel, done-state jewel, and the Peach-accent CTA swap. No JS errors from the edits (only the expected pre-auth 401s).
+
+**Not done:** not deployed (needs his go-ahead); not checked on a real phone; other surfaces (Calendar, Projects, Tasks, Journal, Settings) still on the old borders — this pass was Home + side panel by his instruction. Lab source still in session scratchpad (copy into `design/` with deploy).
+
+---
+
+## 2026-11-09: UI language refresh — direction confirmed, lab built (design only, nothing in the app)
+
+**Request:** evolve the UI. Refs: glassmorphism (image 1 "My Tasks") + borderless softness & the font (image 8 "allgreen"); detailing cues from Todoist/Attio/Amie/Linear. "Design in a Claude artifact first", then update the web.
+
+**Confirmed (his words):**
+1. **Themes recolor ground AND CTA together** — not just the background; the primary action changes to a deep complement of the hue (orange→deep-orange, etc.), derived shadcn/tweakcn-style. Sky stays default. Evolution, not a rebrand.
+2. **Font** = the allgreen one (General Sans/Satoshi family); lab uses Hanken Grotesk (Google-Fonts match), General Sans self-hosts on the web build.
+3. **Glass** — show both moments-only and dense-rows; he decides after seeing them.
+4. **First surface** — Home + the add/edit side sheet.
+
+**The language:** borderless soft surfaces (shadow + tint, dotted dividers, radius 20–22); a glass recipe (blur + inner highlight + colored glow) on the moments; **status discs become "jewels" colored by task state** (done=accent, to-do=frosted, due-soon=amber, routine=green) — state, not project, so the no-random-project-colors rule holds.
+
+**Lab:** interactive artifact **https://claude.ai/artifact/EgVnNAipiz6NW3SKFMxnVT** — style tiles + Home + add sheet + phone, live theme switcher (Sky/Sunset/Grape/Meadow/Rose) + glass toggle, on real content. Full detail in `BRIEF-ui-refresh.md`. Source in session scratchpad (copy into `design/` once picks land).
+
+**Open:** his picks → theme set, glass reach, confirm font → then port tokens into `public/index.html` (THEMES table replaces bg-only presets; accent tracks theme; self-host General Sans) → PARITY → deploy on his go-ahead. **Not built into the app.**
 
 ---
 

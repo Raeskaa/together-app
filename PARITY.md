@@ -6,6 +6,18 @@
 
 Legend: ✅ done · 🟡 partial · ⬜ todo · 🚫 deliberately different
 
+## 9 Nov UI language refresh (Sky + moments) — built, not deployed
+
+| Piece | Desktop | Phone | Notes |
+|---|---|---|---|
+| Themed accent → CTA (`--primary`=`--accent-deep`) | ✅ | ✅ shared tokens | one responsive file; applies both widths automatically |
+| General Sans (Fontshare) default font | ✅ | ✅ | `--font` is global |
+| Gradient CTA + glow | ✅ verified | ✅ (same classes) | not yet eyeballed at phone width |
+| Glass side panel (`.ppanel`) | ✅ verified | 🟡 phone sheet is `width:100%;border-radius:0` — glass applies, re-check the frosted look full-bleed | |
+| Jewel discs + dotted dividers (Home) | ✅ verified | 🟡 not yet checked at ≤820px | |
+
+> Tokens are global so the phone inherits the refresh for free, but **nothing was eyeballed at phone width yet** — do a phone pass after deploy.
+
 ## Trust pass pieces
 
 | Piece | Desktop | Phone | Notes |

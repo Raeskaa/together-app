@@ -110,6 +110,9 @@ async function newPasswordFields(password) {
 }
 const USERNAME_RE = /^[a-z0-9._-]{3,24}$/;
 const MIN_PASSWORD = 8;
+async function ensureInvites(env) {
+  await env.DB.prepare('CREATE TABLE IF NOT EXISTS invites (code TEXT PRIMARY KEY, space_id TEXT, invited_by TEXT, status TEXT, created_at INTEGER, used_at INTEGER, used_by TEXT)').run();
+}
 
 // ---- too many wrong tries: 5, then a 1-minute wait ----
 const LOCK_AFTER = 5;
@@ -209,6 +212,40 @@ async function api(req, env, url) {
     return json({ ok: true }, 200, { 'set-cookie': `${COOKIE}=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0` });
   }
 
+  // --- invites are public: preview a code, or join via a code by making a brand-new account ---
+  if (p === '/api/invite/peek' && req.method === 'GET') {
+    await ensureInvites(env);
+    const code = String(url.searchParams.get('code') || '').trim();
+    if (!code) return json({ ok: false, error: 'missing' }, 400);
+    const inv = await env.DB.prepare('SELECT space_id, invited_by, status FROM invites WHERE code=?1').bind(code).first();
+    if (!inv || inv.status !== 'open') return json({ ok: false, error: 'bad_code' }, 404);
+    const sp = await env.DB.prepare('SELECT name FROM spaces WHERE id=?1').bind(inv.space_id).first();
+    const by = await env.DB.prepare('SELECT name FROM people WHERE id=?1').bind(inv.invited_by).first();
+    return json({ ok: true, space: (sp && sp.name) || 'a space', invitedBy: (by && by.name) || 'Someone' });
+  }
+  if (p === '/api/invite/signup' && req.method === 'POST') {
+    await ensureInvites(env);
+    const b = await req.json().catch(() => ({}));
+    const code = String(b.code || '').trim();
+    const username = String(b.username || '').trim().toLowerCase();
+    const password = String(b.password || '');
+    const name = String(b.name || '').trim();
+    if (!USERNAME_RE.test(username)) return json({ ok: false, error: 'bad_username' }, 400);
+    if (password.length < MIN_PASSWORD) return json({ ok: false, error: 'short_password' }, 400);
+    const inv = await env.DB.prepare('SELECT space_id, status FROM invites WHERE code=?1').bind(code).first();
+    if (!inv || inv.status !== 'open') return json({ ok: false, error: 'bad_code' }, 404);
+    if (await env.DB.prepare('SELECT id FROM people WHERE username=?1').bind(username).first()) return json({ ok: false, error: 'taken_username' }, 409);
+    const pid = 'p_' + crypto.randomUUID().replace(/-/g, '').slice(0, 12);
+    const f = await newPasswordFields(password);
+    const now = Date.now();
+    await env.DB.batch([
+      env.DB.prepare('INSERT INTO people (id,name,color,created_at,username,pass_hash,pass_salt,pass_iter) VALUES (?1,?2,?3,?4,?5,?6,?7,?8)').bind(pid, name || username, '', now, username, f.pass_hash, f.pass_salt, f.pass_iter),
+      env.DB.prepare('INSERT OR IGNORE INTO members (id,space_id,person_id,role,joined_at) VALUES (?1,?2,?3,?4,?5)').bind(inv.space_id + ':' + pid, inv.space_id, pid, 'member', now),
+      env.DB.prepare("UPDATE invites SET status='used', used_at=?1, used_by=?2 WHERE code=?3").bind(now, pid, code),
+    ]);
+    return json({ ok: true, space_id: inv.space_id }, 200, { 'set-cookie': sessionCookie(url, await makeToken(secret(env), pid)) });
+  }
+
   const tok = await readToken(secret(env), cookie(req, COOKIE));
   if (!tok) return json({ error: 'unauthorized' }, 401);
 
@@ -300,6 +337,52 @@ async function api(req, env, url) {
       env.DB.prepare('INSERT INTO settings (key,value) VALUES (?1,?2) ON CONFLICT(key) DO UPDATE SET value=excluded.value').bind(k, patch[k] == null ? '' : String(patch[k])),
     ).concat(legacyNameStatements(env, patch));
     if (stmts.length) await env.DB.batch(stmts);
+    return json({ ok: true });
+  }
+  // --- spaces (need a signed-in person): make one, invite to it, accept an invite, or leave ---
+  if (p === '/api/space/create' && req.method === 'POST') {
+    const b = await req.json().catch(() => ({}));
+    const name = String(b.name || '').trim().slice(0, 60) || 'New space';
+    const sid = 's_' + crypto.randomUUID().replace(/-/g, '').slice(0, 12);
+    const now = Date.now();
+    await env.DB.batch([
+      env.DB.prepare('INSERT INTO spaces (id,name,kind,created_at) VALUES (?1,?2,?3,?4)').bind(sid, name, 'partner', now),
+      env.DB.prepare('INSERT INTO members (id,space_id,person_id,role,joined_at) VALUES (?1,?2,?3,?4,?5)').bind(sid + ':' + me, sid, me, 'owner', now),
+    ]);
+    return json({ ok: true, space_id: sid });
+  }
+  if (p === '/api/space/invite' && req.method === 'POST') {
+    await ensureInvites(env);
+    const b = await req.json().catch(() => ({}));
+    const sid = String(b.space_id || '');
+    const mem = await env.DB.prepare('SELECT role FROM members WHERE space_id=?1 AND person_id=?2').bind(sid, me).first();
+    if (!mem) return json({ ok: false, error: 'not_member' }, 403);
+    let inv = await env.DB.prepare("SELECT code FROM invites WHERE space_id=?1 AND status='open' ORDER BY created_at DESC").bind(sid).first();
+    let code = inv && inv.code;
+    if (!code) {
+      code = crypto.randomUUID().replace(/-/g, '').slice(0, 10);
+      await env.DB.prepare('INSERT INTO invites (code,space_id,invited_by,status,created_at) VALUES (?1,?2,?3,?4,?5)').bind(code, sid, me, 'open', Date.now()).run();
+    }
+    return json({ ok: true, code });
+  }
+  if (p === '/api/invite/accept' && req.method === 'POST') {
+    await ensureInvites(env);
+    const b = await req.json().catch(() => ({}));
+    const code = String(b.code || '').trim();
+    const inv = await env.DB.prepare('SELECT space_id, status FROM invites WHERE code=?1').bind(code).first();
+    if (!inv || inv.status !== 'open') return json({ ok: false, error: 'bad_code' }, 404);
+    const now = Date.now();
+    await env.DB.batch([
+      env.DB.prepare('INSERT OR IGNORE INTO members (id,space_id,person_id,role,joined_at) VALUES (?1,?2,?3,?4,?5)').bind(inv.space_id + ':' + me, inv.space_id, me, 'member', now),
+      env.DB.prepare("UPDATE invites SET status='used', used_at=?1, used_by=?2 WHERE code=?3").bind(now, me, code),
+    ]);
+    return json({ ok: true, space_id: inv.space_id });
+  }
+  if (p === '/api/space/leave' && req.method === 'POST') {
+    const b = await req.json().catch(() => ({}));
+    const sid = String(b.space_id || '');
+    if (sid === DEFAULT_SPACE) return json({ ok: false, error: 'cant_leave_default' }, 400);
+    await env.DB.prepare('DELETE FROM members WHERE space_id=?1 AND person_id=?2').bind(sid, me).run();
     return json({ ok: true });
   }
   return json({ error: 'not found' }, 404);

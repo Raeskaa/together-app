@@ -1,0 +1,543 @@
+<title>hate club UI lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* LAYOUT: a neutral control bar on top; below it a themed "stage" (the app ground gradient)
+   holding floating mock screens. Two live controls: color theme + glass reach. */
+:root{
+  /* lab chrome (page) — follows the viewer's OS theme so the frame stays readable */
+  --page:#EBEEF4; --ink:#191C22; --panel:#FFFFFF; --chair:#E4E8F0; --cmut:#616C82; --csoft:#F4F6FA;
+  color-scheme: light;
+  /* type */
+  --sans:'Hanken Grotesk','Inter',system-ui,-apple-system,Segoe UI,sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --page:#121418; --ink:#ECEFF4; --panel:#1B1E25; --chair:#2A2F3A; --cmut:#9AA4B5; --csoft:#20242C; color-scheme: dark; } }
+:root[data-theme="dark"]{ --page:#121418; --ink:#ECEFF4; --panel:#1B1E25; --chair:#2A2F3A; --cmut:#9AA4B5; --csoft:#20242C; color-scheme: dark; }
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.5}
+h1,h2,h3,h4{margin:0;text-wrap:balance}
+button{font-family:inherit;cursor:pointer}
+
+/* ---------- control bar ---------- */
+.labtop{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:color-mix(in srgb,var(--panel) 86%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--chair)}
+.labtopin{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding-block:12px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px));max-width:1180px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800;letter-spacing:-.02em;font-size:15px}
+.brand .bdot{width:19px;height:19px;border-radius:7px;background:var(--accent);box-shadow:0 2px 8px -2px var(--glow)}
+.brand small{font-weight:600;color:var(--cmut);font-size:11.5px;letter-spacing:.01em}
+.ctl{display:flex;align-items:center;gap:8px}
+.ctl .clab{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--cmut)}
+.sw{display:flex;gap:7px}
+.sw button{width:26px;height:26px;border-radius:999px;border:2px solid transparent;padding:0;outline-offset:2px;transition:transform .15s}
+.sw button:hover{transform:scale(1.08)}
+.sw button[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 2px var(--panel) inset}
+.seg{display:inline-flex;background:var(--csoft);border:1px solid var(--chair);border-radius:11px;padding:3px}
+.seg button{border:none;background:none;font-size:12.5px;font-weight:600;color:var(--cmut);padding:6px 13px;border-radius:8px}
+.seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(20,40,80,.12)}
+.spacer{flex:1}
+.note{font-size:11.5px;color:var(--cmut)}
+.note b{color:var(--ink);font-weight:700}
+
+/* ---------- app scope: color themes live here ---------- */
+#app{
+  --ink:#15171A; --body:#2B2F36; --muted:#5A616B; --faint:#8A93A0;
+  --card:#FFFFFF; --field:#F6F8FC; --hair:rgba(120,134,158,.34); /* dotted divider */
+  --accent:#1F6FEB; --accent-deep:#195FD0; --accent-wash:#E8F1FF; --glow:rgba(31,111,235,.40);
+  --ground:
+    radial-gradient(1100px 760px at 80% 6%, rgba(255,255,255,.92), transparent 60%),
+    radial-gradient(820px 620px at 10% 88%, rgba(255,255,255,.5), transparent 55%),
+    linear-gradient(162deg,#3FA0FF 0%,#6FBAFF 20%,#A6D5FF 42%,#D9EDFF 64%,#F6FBFF 86%);
+}
+#app[data-app-theme="sunset"]{ --accent:#E35A2B; --accent-deep:#C4471C; --accent-wash:#FDEAE0; --glow:rgba(227,90,43,.38);
+  --ground:radial-gradient(1100px 760px at 80% 6%, rgba(255,255,255,.9), transparent 60%),radial-gradient(820px 620px at 10% 88%, rgba(255,255,255,.45), transparent 55%),linear-gradient(162deg,#FF9F6B 0%,#FFB88E 22%,#FFD1B2 44%,#FFE7D7 66%,#FFFAF6 88%); }
+#app[data-app-theme="grape"]{ --accent:#7A4FE0; --accent-deep:#6238C4; --accent-wash:#EFE8FF; --glow:rgba(122,79,224,.38);
+  --ground:radial-gradient(1100px 760px at 80% 6%, rgba(255,255,255,.9), transparent 60%),radial-gradient(820px 620px at 10% 88%, rgba(255,255,255,.45), transparent 55%),linear-gradient(162deg,#A487FF 0%,#BBA4FF 22%,#D4C6FF 44%,#E9E1FF 66%,#FBFAFF 88%); }
+#app[data-app-theme="meadow"]{ --accent:#1F9E5A; --accent-deep:#178049; --accent-wash:#E1F6EC; --glow:rgba(31,158,90,.34);
+  --ground:radial-gradient(1100px 760px at 80% 6%, rgba(255,255,255,.9), transparent 60%),radial-gradient(820px 620px at 10% 88%, rgba(255,255,255,.45), transparent 55%),linear-gradient(162deg,#5FD39F 0%,#8FE1BA 22%,#BCEFD6 44%,#DFF6EA 66%,#F7FFFB 88%); }
+#app[data-app-theme="rose"]{ --accent:#E24A77; --accent-deep:#C23763; --accent-wash:#FDE6EE; --glow:rgba(226,74,119,.34);
+  --ground:radial-gradient(1100px 760px at 80% 6%, rgba(255,255,255,.9), transparent 60%),radial-gradient(820px 620px at 10% 88%, rgba(255,255,255,.45), transparent 55%),linear-gradient(162deg,#FF8FB4 0%,#FFB0CB 22%,#FFCCDC 44%,#FFE6EE 66%,#FFF9FB 88%); }
+
+.stage{background:var(--ground);padding:30px 0 56px;transition:background .5s ease}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+
+.secttl{display:flex;align-items:center;gap:12px;margin:40px 2px 16px}
+.secttl:first-child{margin-top:4px}
+.secttl .k{font-size:11px;font-weight:800;letter-spacing:.10em;text-transform:uppercase;color:var(--accent-deep);background:color-mix(in srgb,var(--card) 70%,transparent);backdrop-filter:blur(6px);padding:5px 11px;border-radius:999px;box-shadow:0 2px 10px -6px rgba(20,40,80,.4)}
+.secttl .d{font-size:13px;color:#2E3A49;font-weight:500}
+
+/* ---------- glass + soft primitives ---------- */
+.glass{background:rgba(255,255,255,.52);backdrop-filter:blur(22px) saturate(165%);-webkit-backdrop-filter:blur(22px) saturate(165%);border:1px solid rgba(255,255,255,.7);box-shadow:inset 0 1px 0 rgba(255,255,255,.75),0 22px 54px -30px rgba(20,40,80,.5)}
+.soft{background:var(--card);border-radius:22px;box-shadow:0 1px 2px rgba(20,40,80,.05),0 20px 46px -28px rgba(20,40,80,.26)}
+
+/* buttons */
+.btn{border:none;border-radius:12px;font-weight:650;font-size:13.5px;padding:11px 17px;display:inline-flex;align-items:center;gap:8px;transition:transform .14s,box-shadow .2s}
+.btn:active{transform:scale(.97)}
+.btn.primary{color:#fff;background:linear-gradient(180deg,var(--accent),var(--accent-deep));box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 10px 22px -10px var(--glow)}
+.btn.primary:hover{box-shadow:0 1px 0 rgba(255,255,255,.3) inset,0 14px 26px -10px var(--glow)}
+.btn.ghost{background:var(--field);color:var(--body)}
+.btn.soft2{background:color-mix(in srgb,var(--accent-wash) 92%,transparent);color:var(--accent-deep)}
+.btn.glassb{background:rgba(255,255,255,.5);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:var(--accent-deep);border:1px solid rgba(255,255,255,.7)}
+.btn.del{background:none;color:#C23A3A;margin-right:auto;padding-left:4px}
+
+/* status discs — the signature "jewels" */
+.disc{width:28px;height:28px;border-radius:999px;flex:none;display:grid;place-items:center;position:relative;transition:transform .15s}
+.disc svg{width:15px;height:15px}
+.disc.open{background:rgba(255,255,255,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:2px solid rgba(120,134,158,.5);box-shadow:inset 0 1px 1px rgba(255,255,255,.8)}
+.disc.open:hover{border-color:var(--accent)}
+.disc.done{background:radial-gradient(120% 120% at 30% 20%,color-mix(in srgb,var(--accent) 78%,#fff),var(--accent));color:#fff;border:1px solid color-mix(in srgb,var(--accent) 60%,#fff);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 16%,transparent),0 6px 16px -6px var(--glow),inset 0 1px 1px rgba(255,255,255,.6)}
+.disc.soon{background:radial-gradient(120% 120% at 30% 20%,#FFD99A,#F0A83E);color:#6B4608;border:1px solid #E7A23A;box-shadow:0 0 0 4px rgba(240,168,62,.18),0 6px 16px -6px rgba(240,168,62,.5),inset 0 1px 1px rgba(255,255,255,.6)}
+.disc.routine{background:radial-gradient(120% 120% at 30% 20%,#A7ECC6,#44B87C);color:#0C5B33;border:1px dashed #2E9E64;box-shadow:0 0 0 4px rgba(68,184,124,.16),inset 0 1px 1px rgba(255,255,255,.6)}
+.disc.sm{width:20px;height:20px}.disc.sm svg{width:11px;height:11px}
+
+/* chips / pills / tags */
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:#55607A;background:rgba(120,134,158,.1);padding:3px 9px;border-radius:999px}
+.tag .pd{width:7px;height:7px;border-radius:999px}
+.pill{font-size:11px;font-weight:650;color:#51607A;background:rgba(120,134,158,.12);padding:3px 9px;border-radius:999px}
+.pill.due{color:var(--accent-deep);background:var(--accent-wash)}
+.pill.over{color:#B23A3A;background:#FBE7E7}
+.pill.amber{color:#8A5A12;background:#FCEFD6}
+.kind{font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+
+/* avatars */
+.av{width:24px;height:24px;border-radius:999px;flex:none;display:grid;place-items:center;color:#fff;font-size:11px;font-weight:700;box-shadow:0 2px 6px -2px rgba(20,40,80,.4)}
+.av.me{background:linear-gradient(160deg,#2B2F36,#15171A)}
+.av.pt{background:linear-gradient(160deg,#5E6B86,#3F4A62)}
+.av.sm{width:20px;height:20px;font-size:9.5px}
+
+/* ---------- STYLE TILES ---------- */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:16px}
+.tile{padding:20px}
+.tile h4{font-size:12.5px;font-weight:800;letter-spacing:.02em;color:var(--ink);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.tile h4 em{font-style:normal;font-weight:600;font-size:11px;color:var(--faint)}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.specimen .big{font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.specimen .mid{font-size:19px;font-weight:700;letter-spacing:-.01em;margin-top:8px}
+.specimen .sm{font-size:13px;color:var(--muted);margin-top:6px}
+.specimen .wt{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;font-size:14px}
+.specimen .wt span{color:var(--body)}
+.legend{display:flex;flex-direction:column;gap:12px}
+.legend .lr{display:flex;align-items:center;gap:11px;font-size:12.5px;color:var(--body)}
+.legend .lr b{font-weight:650}.legend .lr s{font-weight:500;color:var(--faint);text-decoration:none;margin-left:auto;font-size:11px}
+.notecolors{display:flex;gap:8px;flex-wrap:wrap}
+.nc{width:34px;height:34px;border-radius:10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 3px 8px -4px rgba(20,40,80,.3)}
+
+/* ---------- HOME (floating main) ---------- */
+.screen{margin-top:6px}
+.main{padding:24px 26px 28px}
+.hm-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
+.hm-hi{font-size:23px;font-weight:800;letter-spacing:-.02em}
+.hm-hi small{display:block;font-size:13px;font-weight:600;color:var(--muted);letter-spacing:0;margin-top:3px}
+.nav{display:flex;gap:4px;margin-top:12px}
+.nav button{border:none;background:none;font-size:13px;font-weight:650;color:var(--faint);padding:6px 12px;border-radius:9px}
+.nav button[aria-pressed="true"]{color:var(--accent-deep);background:var(--accent-wash)}
+
+/* score pill */
+.score{display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border-radius:999px}
+.score .crown{font-size:14px}
+.score .st{font-size:12.5px;font-weight:700;color:var(--ink)}
+.score .sc{font-size:12.5px;font-weight:800;color:var(--accent-deep);font-variant-numeric:tabular-nums}
+.score .vs{color:var(--faint);font-weight:600}
+
+.hm-grid{display:grid;grid-template-columns:1fr 268px;gap:22px}
+.qadd{display:flex;align-items:center;gap:11px;background:var(--field);border-radius:14px;padding:12px 14px;margin-bottom:6px}
+.qadd .qp{width:24px;height:24px;border-radius:8px;background:var(--card);display:grid;place-items:center;color:var(--accent);font-weight:800;box-shadow:0 1px 3px rgba(20,40,80,.12)}
+.qadd input{flex:1;border:none;background:none;font:inherit;font-size:14px;color:var(--body);outline:none}
+.qadd input::placeholder{color:var(--faint)}
+.qadd .kbd{font-size:10.5px;font-weight:700;color:var(--faint);background:var(--card);padding:3px 7px;border-radius:6px;box-shadow:0 1px 2px rgba(20,40,80,.1)}
+
+.ghd{display:flex;align-items:center;justify-content:space-between;margin:18px 2px 4px}
+.ghd .lbl{font-size:12.5px;font-weight:750;letter-spacing:.02em}
+.ghd .meta{font-size:11.5px;color:var(--faint);font-weight:600;display:flex;align-items:center;gap:9px}
+.addin{width:24px;height:24px;border-radius:7px;background:var(--card);border:1px solid var(--hair);color:var(--accent);font-weight:800;font-size:16px;line-height:1;display:grid;place-items:center}
+
+/* carry strip */
+.carry{background:color-mix(in srgb,var(--accent-wash) 60%,transparent);border-radius:16px;padding:10px 14px;margin-bottom:6px}
+.carry .chd{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.carry .ct{font-size:12px;font-weight:750;color:var(--accent-deep)}
+.linklike{border:none;background:none;font:inherit;font-size:11.5px;font-weight:650;color:var(--accent-deep);padding:2px}
+
+/* task rows */
+.list{border-radius:16px}
+#app[data-glass="moments"] .list{background:transparent}
+#app[data-glass="moments"] .trow{border-top:1.5px dotted var(--hair)}
+#app[data-glass="moments"] .trow:first-child{border-top:none}
+#app[data-glass="rows"] .list{display:flex;flex-direction:column;gap:9px}
+#app[data-glass="rows"] .trow{background:rgba(255,255,255,.5);backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);border:1px solid rgba(255,255,255,.7);border-radius:15px;padding:13px 14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 10px 26px -18px rgba(20,40,80,.4)}
+.trow{display:flex;align-items:flex-start;gap:13px;padding:13px 2px}
+.tbody{flex:1;min-width:0}
+.ttl{font-size:14.5px;font-weight:600;color:var(--ink);letter-spacing:-.005em}
+.ttl.done{color:var(--faint);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--accent) 60%,transparent)}
+.tmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px}
+
+.donefold{display:flex;align-items:center;gap:8px;border:none;background:none;font-size:12.5px;font-weight:700;color:var(--muted);padding:12px 2px 4px}
+.donefold .hm-pts{color:var(--accent-deep);background:var(--accent-wash);font-size:11px;padding:2px 8px;border-radius:999px}
+
+/* rail */
+.rail{display:flex;flex-direction:column;gap:14px}
+.rsec{padding:15px 16px}
+.rsec .rhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.rsec h3{font-size:13px;font-weight:750}
+.rsub{font-size:12.5px;color:#4B5866;line-height:1.5}
+.rsub .over{color:#B23A3A;font-weight:650}
+.crow{display:flex;align-items:center;gap:9px;padding:6px 0;font-size:12.5px}
+.crow .pd{width:8px;height:8px;border-radius:999px;flex:none}
+.crow .t{flex:1;min-width:0;font-weight:550;color:var(--body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cpill{font-size:10.5px;font-weight:650;color:#51607A;background:rgba(120,134,158,.12);padding:2px 8px;border-radius:999px}
+.cpill.soon{color:var(--accent-deep);background:var(--accent-wash)}
+.handbtn{width:100%;border:1px solid var(--hair);background:var(--card);border-radius:11px;padding:9px;font-size:12.5px;font-weight:650;color:var(--accent-deep)}
+.widebtn{width:100%;border:1px dashed var(--hair);background:color-mix(in srgb,var(--field) 70%,transparent);border-radius:11px;padding:11px;font-size:12.5px;font-weight:600;color:var(--muted)}
+
+/* habits + notes */
+.subhd{display:flex;align-items:baseline;justify-content:space-between;margin:26px 2px 12px}
+.subhd h3{font-size:15px;font-weight:800;letter-spacing:-.01em}
+.habs{display:flex;gap:14px;flex-wrap:wrap}
+.habcard{padding:17px 19px;flex:2 1 290px;min-width:260px}
+.habcard.s{flex:1 1 220px;min-width:210px}
+.hc-top{display:flex;justify-content:space-between;align-items:baseline}
+.hc-name{font-weight:700;font-size:14px}
+.hc-num{font-size:34px;font-weight:800;letter-spacing:-.02em}
+.hc-u{font-size:12px;color:var(--faint);font-weight:600;margin-left:6px}
+.step{width:34px;height:34px;border-radius:10px;border:1px solid var(--hair);background:var(--card);font-size:17px;font-weight:700;color:var(--body);display:grid;place-items:center}
+.bars{display:flex;align-items:flex-end;gap:5px;height:40px;margin-top:12px}
+.bars div{flex:1;background:rgba(120,134,158,.24);border-radius:4px 4px 2px 2px}
+.bars div.now{background:var(--accent)}
+.hday{display:flex;align-items:center;gap:11px;padding:8px 0}
+.hday .flame{color:#E8812B}
+.notesgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.ncard{border-radius:16px;padding:14px 15px;min-height:96px;font-size:13px;font-weight:550;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 8px 20px -14px rgba(20,40,80,.3)}
+.ncard small{display:block;font-size:10.5px;font-weight:700;opacity:.6;margin-top:10px}
+.addnote{border-radius:16px;min-height:96px;border:1.5px dashed var(--hair);background:color-mix(in srgb,var(--field) 60%,transparent);color:var(--muted);font-weight:600;font-size:13px;display:grid;place-items:center;gap:4px}
+
+/* ---------- SIDE SHEET ---------- */
+.sheetstage{position:relative;border-radius:24px;overflow:hidden;padding:26px;background:var(--ground);min-height:520px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+.scrim{position:absolute;inset:0;background:rgba(20,30,60,.14);backdrop-filter:blur(2px)}
+.sheet{position:absolute;top:18px;right:18px;bottom:18px;width:min(380px,calc(100% - 36px));border-radius:22px;display:flex;flex-direction:column;overflow:hidden}
+.sheet .shd{padding:20px 22px 14px}
+.eyebrow{font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-deep)}
+.sheet h3{font-size:19px;font-weight:800;letter-spacing:-.01em;margin-top:5px}
+.sbody{flex:1;overflow:auto;padding:4px 22px 10px;display:flex;flex-direction:column;gap:13px}
+.lbl{font-size:11px;font-weight:750;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:block}
+.fld{width:100%;border:1px solid rgba(255,255,255,.7);background:rgba(255,255,255,.6);backdrop-filter:blur(6px);border-radius:12px;padding:11px 13px;font:inherit;font-size:14px;color:var(--ink);outline:none}
+.fld:focus{border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 16%,transparent)}
+.ftwo{display:flex;gap:11px}.ftwo>div{flex:1;min-width:0}
+.oseg{display:inline-flex;background:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.7);border-radius:12px;padding:4px;gap:4px}
+.oseg button{border:none;background:none;border-radius:9px;padding:8px 12px;font-size:12.5px;font-weight:650;color:var(--muted);display:flex;align-items:center;gap:7px}
+.oseg button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(20,40,80,.14)}
+.subedit{display:flex;align-items:center;gap:8px}
+.subedit .fld{flex:1}
+.sfoot{display:flex;align-items:center;gap:10px;padding:14px 22px;border-top:1px solid rgba(255,255,255,.5)}
+.chipsel{display:flex;gap:7px;flex-wrap:wrap}
+.chipsel button{border:1px solid rgba(255,255,255,.7);background:rgba(255,255,255,.55);border-radius:999px;padding:7px 12px;font-size:12px;font-weight:650;color:var(--muted);display:flex;align-items:center;gap:6px}
+.chipsel button[aria-pressed="true"]{background:var(--accent-wash);color:var(--accent-deep);border-color:transparent}
+.chipsel .pd{width:8px;height:8px;border-radius:999px}
+.fab{position:absolute;bottom:20px;right:20px;width:52px;height:52px;border-radius:999px;border:none;color:#fff;font-size:26px;display:grid;place-items:center;background:linear-gradient(180deg,var(--accent),var(--accent-deep));box-shadow:0 10px 24px -8px var(--glow),inset 0 1px 0 rgba(255,255,255,.3)}
+
+/* ---------- PHONE ---------- */
+.phones{display:flex;gap:26px;flex-wrap:wrap;justify-content:center}
+.device{width:300px;max-width:100%;border-radius:40px;padding:11px;background:linear-gradient(160deg,#20242C,#0E1116);box-shadow:0 30px 60px -28px rgba(20,30,60,.6)}
+.dscreen{border-radius:30px;overflow:hidden;background:var(--ground);height:600px;position:relative;display:flex;flex-direction:column}
+.dnotch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:26px;background:#14161b;border-radius:0 0 16px 16px;z-index:5}
+.dstatus{display:flex;justify-content:space-between;padding:12px 20px 4px;font-size:12px;font-weight:700;color:#1b2430}
+.dbody{flex:1;overflow:auto;padding:6px 14px 70px}
+.dsheetpk{padding:8px 12px 14px;overflow:hidden}
+.mhead{display:flex;align-items:center;justify-content:space-between;padding:6px 2px 10px}
+.mhead .h{font-size:20px;font-weight:800;letter-spacing:-.02em}
+.mcard{padding:15px 16px;border-radius:19px}
+.tabbar{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-around;padding:10px 8px calc(12px + env(safe-area-inset-bottom,0px));background:rgba(255,255,255,.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid rgba(255,255,255,.6)}
+.tabbar b{font-size:10.5px;font-weight:700;color:var(--faint);display:flex;flex-direction:column;align-items:center;gap:3px}
+.tabbar b.on{color:var(--accent-deep)}
+.tabbar .ti{width:19px;height:19px;border-radius:7px;background:rgba(120,134,158,.2)}
+.tabbar b.on .ti{background:var(--accent)}
+
+.footnote{max-width:1180px;margin:34px auto 10px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px));font-size:12px;color:var(--cmut)}
+
+@media (max-width:760px){
+  .hm-grid{grid-template-columns:1fr}
+  .secttl{flex-wrap:wrap}
+  .sheetstage{padding:14px}
+  .sheet{position:relative;inset:auto;width:100%}
+  .scrim{display:none}
+  .main{padding:18px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="labtop"><div class="labtopin">
+  <div class="brand"><span class="bdot"></span>hate club <small>UI&nbsp;lab</small></div>
+  <div class="ctl"><span class="clab">Theme</span>
+    <div class="sw" role="group" aria-label="Color theme">
+      <button data-theme="sky"    aria-pressed="true"  title="Sky"    style="background:linear-gradient(135deg,#3FA0FF,#BFE0FF)"></button>
+      <button data-theme="sunset" aria-pressed="false" title="Sunset" style="background:linear-gradient(135deg,#FF9F6B,#FFD1B2)"></button>
+      <button data-theme="grape"  aria-pressed="false" title="Grape"  style="background:linear-gradient(135deg,#A487FF,#D4C6FF)"></button>
+      <button data-theme="meadow" aria-pressed="false" title="Meadow" style="background:linear-gradient(135deg,#5FD39F,#BCEFD6)"></button>
+      <button data-theme="rose"   aria-pressed="false" title="Rose"   style="background:linear-gradient(135deg,#FF8FB4,#FFCCDC)"></button>
+    </div>
+  </div>
+  <div class="ctl"><span class="clab">Glass</span>
+    <div class="seg" role="group" aria-label="Glass reach">
+      <button data-glass="moments" aria-pressed="true">Moments only</button>
+      <button data-glass="rows" aria-pressed="false">Dense rows</button>
+    </div>
+  </div>
+  <div class="spacer"></div>
+  <div class="note">Font <b>Hanken Grotesk</b> · allgreen match</div>
+</div></div>
+
+<div id="app" data-app-theme="sky" data-glass="moments">
+ <div class="stage"><div class="wrap">
+
+  <!-- STYLE TILES -->
+  <div class="secttl"><span class="k">Language</span><span class="d">The accent + ground change together with the theme. Glass lives on the moments.</span></div>
+  <div class="tiles">
+    <div class="tile soft specimen">
+      <h4>Type <em>Hanken Grotesk</em></h4>
+      <div class="big">A clear day</div>
+      <div class="mid">Draft the book intro</div>
+      <div class="sm">Soft, geometric, warm — the allgreen feel.</div>
+      <div class="wt"><span style="font-weight:500">Regular</span><span style="font-weight:650">Medium</span><span style="font-weight:800">Bold</span></div>
+    </div>
+    <div class="tile soft">
+      <h4>Buttons <em>CTA tracks the theme</em></h4>
+      <div class="row" style="margin-bottom:12px"><button class="btn primary">Save task</button><button class="btn ghost">Cancel</button></div>
+      <div class="row"><button class="btn soft2">Give a hand · +5</button><button class="btn glassb">＋ Quick add</button></div>
+    </div>
+    <div class="tile soft">
+      <h4>Status jewels <em>by state, not project</em></h4>
+      <div class="legend">
+        <div class="lr"><span class="disc done"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-10" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>Done</b> <s>theme accent</s></div>
+        <div class="lr"><span class="disc open"></span><b>To do</b> <s>frosted ring</s></div>
+        <div class="lr"><span class="disc soon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>Due soon</b> <s>amber</s></div>
+        <div class="lr"><span class="disc routine"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-10" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>Routine</b> <s>green</s></div>
+      </div>
+    </div>
+    <div class="tile soft">
+      <h4>Pills &amp; tags</h4>
+      <div class="row" style="margin-bottom:10px"><span class="tag"><span class="pd" style="background:#E8812B"></span>Overwhelmed</span><span class="tag"><span class="pd" style="background:#4F8DF5"></span>Portfolio</span></div>
+      <div class="row"><span class="pill due">Due Sun · 5pm</span><span class="pill over">Overdue</span><span class="pill">planned Tue</span></div>
+    </div>
+    <div class="tile soft">
+      <h4>Surfaces <em>no border · soft shadow · dotted rule</em></h4>
+      <div style="border-radius:14px;background:var(--field);padding:12px 14px;font-size:13px;color:var(--body)">Soft field</div>
+      <div style="height:1px;margin:14px 2px"></div>
+      <div class="row" style="border-top:1.5px dotted var(--hair);padding-top:12px;font-size:12.5px;color:var(--muted)">Rows part on a dotted hairline — no hard lines.</div>
+    </div>
+    <div class="tile soft">
+      <h4>Notes <em>on your mind</em></h4>
+      <div class="notecolors">
+        <span class="nc" style="background:#FFF3BE"></span><span class="nc" style="background:#FFE1EC"></span><span class="nc" style="background:#DCEBFF"></span>
+        <span class="nc" style="background:#DCF3E4"></span><span class="nc" style="background:#ECE4FF"></span><span class="nc" style="background:#FFE6D6"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div class="secttl"><span class="k">Home · Today</span><span class="d">Your real list — quick add, the day, the rail, habits &amp; notes.</span></div>
+  <div class="screen main soft">
+    <div class="hm-head">
+      <div>
+        <div class="hm-hi">Good evening<small>Tuesday, 11 November · a clear run ahead</small></div>
+        <div class="nav"><button aria-pressed="true">All</button><button aria-pressed="false">Mine</button></div>
+      </div>
+      <div class="score glass"><span class="crown">👑</span><span class="st">You lead by 3</span><span class="sc">21</span><span class="vs">–</span><span class="sc" style="color:var(--faint)">18</span></div>
+    </div>
+
+    <div class="hm-grid">
+      <div>
+        <div class="qadd"><span class="qp">＋</span><input placeholder="Add a task for today" aria-label="Add a task for today"><span class="kbd">Enter</span></div>
+
+        <div class="carry">
+          <div class="chd"><span class="ct">From earlier · 1</span><button class="linklike">Move all to today</button></div>
+          <div class="trow" style="border-top:none;padding-bottom:4px">
+            <span class="disc soon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <div class="tbody"><div class="ttl">Send portfolio to the studio</div>
+              <div class="tmeta"><span class="kind" style="color:#8A5A12">REMINDER</span><span class="tag"><span class="pd" style="background:#4F8DF5"></span>Portfolio</span><span class="pill over">Overdue · Mon</span></div></div>
+            <span class="av me">Y</span>
+          </div>
+        </div>
+
+        <div class="ghd"><span class="lbl">Today · 3 left</span><span class="meta">1 routine<button class="addin">＋</button></span></div>
+        <div class="list">
+          <div class="trow">
+            <span class="disc routine"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-10" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <div class="tbody"><div class="ttl">Read for an hour</div>
+              <div class="tmeta"><span class="kind" style="color:#2E9E64">ROUTINE</span><span class="pill">8–9pm</span></div></div>
+            <span class="av me">Y</span>
+          </div>
+          <div class="trow">
+            <span class="disc open" role="checkbox" aria-checked="false" aria-label="Draft the book intro"></span>
+            <div class="tbody"><div class="ttl">Draft the book intro</div>
+              <div class="tmeta"><span class="kind" style="color:var(--accent-deep)">TASK</span><span class="tag"><span class="pd" style="background:#E8812B"></span>Overwhelmed</span><span class="pill due">Due today · 5pm</span><button class="linklike">2/3 subtasks ▾</button></div></div>
+            <span class="av me">Y</span>
+          </div>
+          <div class="trow">
+            <span class="disc open" role="checkbox" aria-checked="false" aria-label="Call about the STP submission"></span>
+            <div class="tbody"><div class="ttl">Call about the STP submission</div>
+              <div class="tmeta"><span class="kind" style="color:var(--accent-deep)">TASK</span><span class="pill due">Due Fri</span></div></div>
+            <span class="av pt">R</span>
+          </div>
+          <div class="trow">
+            <span class="disc open" role="checkbox" aria-checked="false" aria-label="Review the design mockups"></span>
+            <div class="tbody"><div class="ttl">Review the design mockups</div>
+              <div class="tmeta"><span class="kind" style="color:#7A5BD8">MEETING</span><span class="pill">4:00pm</span></div></div>
+            <span class="av pt">R</span>
+          </div>
+        </div>
+        <button class="donefold"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>2 done today<span class="hm-pts">+23</span></button>
+      </div>
+
+      <aside class="rail">
+        <div class="rsec soft">
+          <div class="rhd"><h3>Rhea</h3><span class="av pt">R</span></div>
+          <div class="rsub">3 of 5 done today · <span class="over">1 overdue</span></div>
+          <div style="margin-top:10px"><button class="handbtn">Give a hand · +5</button></div>
+        </div>
+        <div class="rsec soft">
+          <div class="rhd"><h3>Coming up</h3><button class="linklike">All tasks</button></div>
+          <div class="crow"><span class="pd" style="background:var(--accent)"></span><span class="t">STP submission</span><span class="cpill soon">Fri</span></div>
+          <div class="crow"><span class="pd" style="background:#4F8DF5"></span><span class="t">Portfolios due</span><span class="cpill">in 3 wks</span></div>
+          <div class="crow"><span class="pd" style="background:#E8812B"></span><span class="t">Book draft</span><span class="cpill">30 Nov</span></div>
+        </div>
+        <div class="rsec soft">
+          <div class="rhd"><h3>Tonight</h3></div>
+          <button class="widebtn">Write tonight’s journal</button>
+        </div>
+      </aside>
+    </div>
+
+    <div class="subhd"><h3>Habits &amp; focus</h3><button class="linklike">＋ Add habit</button></div>
+    <div class="habs">
+      <div class="habcard soft">
+        <div class="hc-top"><span class="hc-name">Cigarettes</span><button class="linklike">Edit</button></div>
+        <div style="font-size:11.5px;color:var(--faint);font-weight:600;margin-top:2px">gliding 4 → 1 by 30 Nov</div>
+        <div style="display:flex;align-items:flex-end;margin-top:10px"><div><span class="hc-num">2</span><span class="hc-u">today · aim ≤ 3</span></div>
+          <div style="margin-left:auto;display:flex;gap:8px"><button class="step">−</button><button class="step">＋</button></div></div>
+        <div class="bars"><div style="height:70%"></div><div style="height:85%"></div><div style="height:60%"></div><div style="height:75%"></div><div style="height:50%"></div><div style="height:55%"></div><div class="now" style="height:40%"></div></div>
+        <div style="font-size:11.5px;color:var(--faint);margin-top:7px">last 7 days</div>
+      </div>
+      <div class="habcard s soft">
+        <span class="hc-name">Daily</span>
+        <div class="hday">
+          <span class="disc sm done"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-10" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span style="flex:1"><span style="font-weight:600;font-size:13.5px">Read 30 min</span><span style="display:block;font-size:11.5px;color:var(--faint)"><span class="flame">▲</span> 6-day streak</span></span>
+        </div>
+        <div class="hday">
+          <span class="disc sm open"></span>
+          <span style="flex:1"><span style="font-weight:600;font-size:13.5px">Morning pages</span></span>
+        </div>
+      </div>
+      <div class="habcard s soft">
+        <div class="hc-top"><span class="hc-name">This week’s topic</span><button class="linklike">Edit</button></div>
+        <div style="font-size:17px;font-weight:700;letter-spacing:-.01em;margin-top:8px">Type systems</div>
+        <div style="font-size:12px;color:var(--faint);margin-top:4px">3 links saved</div>
+      </div>
+    </div>
+
+    <div class="subhd"><h3>On your mind</h3><button class="linklike">＋ Add note</button></div>
+    <div class="notesgrid">
+      <div class="ncard" style="background:#FFF3BE;color:#6E5810">Book cover ideas — paper layers, no clean cuts<small>YOU</small></div>
+      <div class="ncard" style="background:#DCEBFF;color:#1C4E8A">Ask Sandip about the calendar day view<small>YOU</small></div>
+      <div class="ncard" style="background:#ECE4FF;color:#4E3A8A">Reading list for the week ↗<small>YOU</small></div>
+      <button class="addnote"><span style="font-size:18px;line-height:1">＋</span>Add a note</button>
+    </div>
+  </div>
+
+  <!-- SIDE SHEET -->
+  <div class="secttl"><span class="k">Side panel</span><span class="d">The add / edit sheet — glass, floating over the dimmed day.</span></div>
+  <div class="sheetstage">
+    <div class="scrim"></div>
+    <div class="sheet glass">
+      <div class="shd"><div class="eyebrow">Create</div><h3>New task</h3></div>
+      <div class="sbody">
+        <div><label class="lbl">Title</label><input class="fld" value="Draft the book intro" aria-label="Title"></div>
+        <div class="ftwo">
+          <div><label class="lbl">Type</label><div class="chipsel"><button aria-pressed="true"><span class="pd" style="background:var(--accent)"></span>Task</button><button aria-pressed="false"><span class="pd" style="background:#E8812B"></span>Milestone</button></div></div>
+        </div>
+        <div class="ftwo">
+          <div><label class="lbl">Date</label><input class="fld" value="Tue, 11 Nov" aria-label="Date"></div>
+          <div><label class="lbl">Deadline</label><input class="fld" value="Today · 5:00pm" aria-label="Deadline"></div>
+        </div>
+        <div><label class="lbl">Project</label><div class="chipsel"><button aria-pressed="true"><span class="pd" style="background:#E8812B"></span>Overwhelmed</button><button aria-pressed="false"><span class="pd" style="background:#4F8DF5"></span>Portfolio</button><button aria-pressed="false">No project</button></div></div>
+        <div><label class="lbl">Whose</label><div class="oseg"><button aria-pressed="true"><span class="av sm me">Y</span>You</button><button aria-pressed="false"><span class="av sm pt">R</span>Rhea</button><button aria-pressed="false">Both</button></div></div>
+        <div><label class="lbl">Subtasks</label>
+          <div class="subedit" style="margin-bottom:8px"><input class="fld" value="Outline the three threads"><span class="disc sm open"></span></div>
+          <div class="subedit"><input class="fld" value="Write the opening line"><span class="disc sm open"></span></div>
+          <button class="linklike" style="margin-top:9px">＋ add subtask</button>
+        </div>
+      </div>
+      <div class="sfoot"><button class="btn del">Delete</button><button class="btn ghost">Cancel</button><button class="btn primary">Save task</button></div>
+    </div>
+    <button class="fab" aria-label="New">＋</button>
+  </div>
+
+  <!-- PHONE -->
+  <div class="secttl"><span class="k">Phone</span><span class="d">The same language at 390px — tab bar, glass sheet from the bottom.</span></div>
+  <div class="phones">
+    <div class="device"><div class="dscreen"><div class="dnotch"></div>
+      <div class="dstatus"><span>9:41</span><span>● ⋯ ▮</span></div>
+      <div class="dbody">
+        <div class="mhead"><div class="h">Today</div><div class="score glass" style="padding:6px 11px"><span>👑</span><span class="sc">+3</span></div></div>
+        <div class="qadd" style="margin-bottom:14px"><span class="qp">＋</span><input placeholder="Add a task" aria-label="Add a task"></div>
+        <div style="font-size:12px;font-weight:750;margin:0 2px 8px">Today · 3 left</div>
+        <div class="list">
+          <div class="trow"><span class="disc routine"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-10" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <div class="tbody"><div class="ttl" style="font-size:13.5px">Read for an hour</div><div class="tmeta"><span class="pill">8–9pm</span></div></div></div>
+          <div class="trow"><span class="disc open"></span>
+            <div class="tbody"><div class="ttl" style="font-size:13.5px">Draft the book intro</div><div class="tmeta"><span class="pill due">Due 5pm</span></div></div></div>
+          <div class="trow"><span class="disc open"></span>
+            <div class="tbody"><div class="ttl" style="font-size:13.5px">Call about STP</div><div class="tmeta"><span class="pill">Fri</span></div></div></div>
+        </div>
+        <div class="mcard soft" style="margin-top:14px"><div class="hc-top"><span class="hc-name" style="font-size:13px">Cigarettes</span></div>
+          <div style="display:flex;align-items:flex-end;margin-top:6px"><div><span class="hc-num" style="font-size:28px">2</span><span class="hc-u">≤ 3</span></div><div style="margin-left:auto;display:flex;gap:7px"><button class="step" style="width:30px;height:30px">−</button><button class="step" style="width:30px;height:30px">＋</button></div></div>
+        </div>
+      </div>
+      <div class="tabbar"><b class="on"><span class="ti"></span>Today</b><b><span class="ti"></span>Week</b><b><span class="ti"></span>Cal</b><b><span class="ti"></span>More</b></div>
+    </div></div>
+
+    <div class="device"><div class="dscreen"><div class="dnotch"></div>
+      <div class="scrim" style="border-radius:30px"></div>
+      <div class="sheet glass" style="position:absolute;top:70px;left:10px;right:10px;bottom:10px;width:auto">
+        <div class="shd"><div class="eyebrow">Create</div><h3>New task</h3></div>
+        <div class="sbody">
+          <div><label class="lbl">Title</label><input class="fld" value="Draft the book intro"></div>
+          <div><label class="lbl">Whose</label><div class="oseg" style="width:100%"><button aria-pressed="true"><span class="av sm me">Y</span>You</button><button aria-pressed="false">Rhea</button><button aria-pressed="false">Both</button></div></div>
+          <div><label class="lbl">Project</label><div class="chipsel"><button aria-pressed="true"><span class="pd" style="background:#E8812B"></span>Overwhelmed</button><button aria-pressed="false">None</button></div></div>
+        </div>
+        <div class="sfoot"><button class="btn ghost" style="flex:1">Cancel</button><button class="btn primary" style="flex:1;justify-content:center">Save</button></div>
+      </div>
+    </div></div>
+  </div>
+
+ </div></div>
+
+ <div class="footnote">Mockups on your real hate club content. Color themes recolour the ground <b>and</b> the CTA together. Glass toggle flips between moments-only and every row as glass — pick what reads best. The exact allgreen font (General Sans) goes on the web build; here it’s Hanken Grotesk via Google Fonts.</div>
+</div>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap">
+<script>
+(function(){
+  var app=document.getElementById('app');
+  function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+  function lsGet(k,d){try{var v=localStorage.getItem(k);return v==null?d:v;}catch(e){return d;}}
+  // restore
+  app.setAttribute('data-app-theme', lsGet('hc_lab_theme','sky'));
+  app.setAttribute('data-glass', lsGet('hc_lab_glass','moments'));
+  function syncPressed(sel,attr,val){
+    document.querySelectorAll(sel).forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute(attr)===val ? 'true':'false'); });
+  }
+  syncPressed('.sw button','data-theme', app.getAttribute('data-app-theme'));
+  syncPressed('.seg button','data-glass', app.getAttribute('data-glass'));
+
+  document.querySelectorAll('.sw button').forEach(function(b){ b.addEventListener('click',function(){
+    var t=b.getAttribute('data-theme'); app.setAttribute('data-app-theme',t); lsSet('hc_lab_theme',t); syncPressed('.sw button','data-theme',t);
+  });});
+  document.querySelectorAll('.seg button').forEach(function(b){ b.addEventListener('click',function(){
+    var g=b.getAttribute('data-glass'); app.setAttribute('data-glass',g); lsSet('hc_lab_glass',g); syncPressed('.seg button','data-glass',g);
+  });});
+  // mock-only: tapping an open disc fills it (so glass "done" state can be felt)
+  document.querySelectorAll('.disc.open').forEach(function(d){ d.addEventListener('click',function(){
+    d.classList.remove('open'); d.classList.add('done');
+    d.innerHTML='<svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-10" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    var t=d.parentElement.querySelector('.ttl'); if(t) t.classList.add('done');
+  });});
+})();
+</script>

@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS login_attempts (key TEXT PRIMARY KEY, fails INTEGER, 
 CREATE TABLE IF NOT EXISTS focus_log (id TEXT PRIMARY KEY, space_id TEXT, person_id TEXT, minutes INTEGER, label TEXT, ended_at INTEGER);
 CREATE TABLE IF NOT EXISTS spaces (id TEXT PRIMARY KEY, name TEXT, kind TEXT, created_at INTEGER);  -- kind: partner | friends | team | solo
 CREATE TABLE IF NOT EXISTS members (id TEXT PRIMARY KEY, space_id TEXT, person_id TEXT, role TEXT, joined_at INTEGER);  -- id = <space_id>:<person_id>
+CREATE TABLE IF NOT EXISTS invites (code TEXT PRIMARY KEY, space_id TEXT, invited_by TEXT, status TEXT, created_at INTEGER, used_at INTEGER, used_by TEXT);  -- open | used; a code you share to join a space
 
 CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT);
 

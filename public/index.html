@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#DCEBFF">
 <title>hate club</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap">
 <style>
 /* Calm sky system: soft blue->white gradient pane + ink/blue accents, Todoist-style shell. Single light theme by choice. */
 :root{
@@ -14,13 +15,15 @@
   --line:#E7ECF2; --line-soft:#EEF2F7; --field:#D7DEE7;
   --sidebar:#F7FAFE; --card:#FFFFFF; --wash:#EFF4FA;
   --accent:#1F6FEB; --accent-deep:#195FD0; --accent-wash:#E8F1FF;
-  --primary:#15171A;
+  --glow:rgba(31,111,235,.22); --glass:rgba(255,255,255,.60); --glass-line:rgba(255,255,255,.72); --dot:#CBD5E3; --radius-sheet:22px;
+  --accent-muted:color-mix(in srgb, var(--accent-deep) 60%, #8A93A0);
+  --primary:var(--accent-deep);
   --me:#15171A; --partner:#5B6B86; --shared:#B4792B;
   --grad:
     radial-gradient(1100px 760px at 78% 12%, rgba(255,255,255,.9), transparent 60%),
     radial-gradient(900px 680px at 12% 82%, rgba(255,255,255,.5), transparent 55%),
     linear-gradient(162deg,#3FA0FF 0%,#6FBAFF 20%,#A6D5FF 40%,#D6ECFF 62%,#F5FAFF 85%);
-  --font:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  --font:'General Sans','Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
   color-scheme:light;
 }
 html,body{height:100%}
@@ -33,10 +36,33 @@ button{font-family:inherit}
 /* sidebar */
 .sidebar{width:242px;flex:none;background:transparent;border-right:none;padding:16px 12px;overflow-y:auto;display:flex;flex-direction:column;gap:1px}
 .prof{display:flex;align-items:center;gap:9px;padding:4px 6px 12px}
-.pav{width:30px;height:30px;border-radius:999px;background:linear-gradient(135deg,#3FA0FF,#8EC5FF);color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none}
+.pav{width:30px;height:30px;border-radius:999px;background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 45%,#fff));color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none}
 .pname{font-weight:600;font-size:14.5px}
 .addbtn{display:flex;align-items:center;gap:10px;background:none;border:none;padding:8px;font-weight:600;font-size:14px;color:var(--accent-deep);cursor:pointer;border-radius:8px;width:100%;text-align:left}
 .addbtn:hover{background:var(--accent-wash)}
+/* space switcher (sidebar top) */
+.spacesw{position:relative;margin-bottom:12px}
+.spacesw-btn{display:flex;align-items:center;gap:9px;width:100%;padding:7px 8px;border:none;background:none;border-radius:10px;cursor:pointer;text-align:left}
+.spacesw-btn:hover{background:var(--accent-wash)}
+.spacesw-nm{display:flex;flex-direction:column;line-height:1.15;min-width:0;flex:1}
+.spacesw-nm b{font-weight:700;font-size:14px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spacesw-nm i{font-style:normal;font-weight:500;font-size:11px;color:var(--muted)}
+.spacesw-cv{color:var(--faint);font-size:11px;flex:none}
+.spacesw-menu{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:40;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 40px -12px rgba(20,40,80,.28);padding:6px}
+.spacesw-op{display:flex;align-items:center;gap:9px;width:100%;padding:8px 9px;border:none;background:none;border-radius:8px;cursor:pointer;text-align:left;font:inherit}
+.spacesw-op:hover,.spacesw-op.on{background:var(--accent-wash)}
+.spacesw-avs{display:flex;flex:none}
+.spacesw-opnm{flex:1;font-weight:500;font-size:13.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spacesw-ck{color:var(--accent-deep);font-weight:700;flex:none}
+.spacesw-add{display:block;width:100%;text-align:left;padding:8px 9px;margin-top:4px;border:none;border-top:1px solid var(--line-soft);background:none;color:var(--accent-deep);font-weight:600;font-size:13px;cursor:pointer;border-radius:0 0 8px 8px}
+.spacesw-add:hover{background:var(--accent-wash)}
+.nsov{position:fixed;inset:0;background:rgba(16,38,77,.22);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);z-index:80;display:flex;align-items:center;justify-content:center;padding:18px;animation:fadein .2s var(--ease-out)}
+.nsmodal{width:440px;max-width:100%;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-sheet);box-shadow:0 28px 80px rgba(16,40,82,.3);padding:22px 24px 20px;animation:slidein .2s var(--ease-out)}
+.nsh{margin:2px 0 0;font-weight:700;font-size:20px;letter-spacing:-.01em;color:var(--ink)}
+.nssub{margin:7px 0 16px;font-size:13.5px;line-height:1.5;color:var(--muted)}
+.nsinvite{display:flex;gap:8px}
+.nscode{margin-top:12px;font-size:12.5px;color:var(--muted)}
+.nscode b{font-weight:700;color:var(--body);letter-spacing:.04em}
 .nav{display:flex;align-items:center;gap:11px;padding:7px 10px;border-radius:8px;font-weight:500;font-size:14px;color:#2F343B;cursor:pointer;border:none;background:none;width:100%;text-align:left}
 .nav:hover{background:#EDF2F8}
 .nav.sel{background:var(--card);color:var(--accent-deep);font-weight:600;box-shadow:0 1px 3px rgba(25,45,90,.12)}
@@ -68,8 +94,10 @@ button{font-family:inherit}
 .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
 .brandrow{display:flex;align-items:center;gap:13px}
 .brand{width:42px;height:42px;border-radius:12px;background:#15171A;color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}
-.eyebrow{font-weight:500;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#3C6FB0}
+.eyebrow{font-weight:500;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-muted)}
 h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;color:#15171A}
+.hgsub{margin-top:5px;font-weight:500;font-size:13.5px;line-height:1.4;color:var(--muted);max-width:44ch}
+.hgsub b{font-weight:600;color:var(--body)}
 .ctrls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .seg{display:inline-flex;align-items:center;gap:2px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);border-radius:999px;padding:3px;box-shadow:0 1px 2px rgba(30,70,140,.06)}
 .seg button{border:none;background:none;border-radius:999px;padding:6px 13px;font-weight:500;font-size:12.5px;color:#3A4350;cursor:pointer}
@@ -81,7 +109,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 .navcirc{width:38px;height:38px;border-radius:999px;border:1px solid rgba(255,255,255,.7);background:rgba(255,255,255,.55);cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none}
 .days{flex:1;display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .daycell{text-align:center;background:none;border:none;cursor:pointer;padding:0}
-.dletter{font-weight:500;font-size:12px;color:#3C6FB0;margin-bottom:8px}
+.dletter{font-weight:500;font-size:12px;color:var(--accent-muted);margin-bottom:8px}
 .ddisc{margin:0 auto;width:44px;height:44px;border-radius:999px;border:1px solid rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:16px;color:#2B3440}
 .ddisc.today{color:var(--accent-deep);font-weight:700}
 .ddisc.sel{background:#fff;box-shadow:0 2px 8px rgba(40,90,160,.18);border-color:transparent}
@@ -126,7 +154,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 .hdttl{display:flex;align-items:center;gap:9px}
 .addinline{width:25px;height:25px;border-radius:7px;border:1px solid var(--line);background:#fff;color:var(--accent);font-weight:700;font-size:17px;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none}
 .addinline:hover{background:var(--accent-wash);border-color:#B9D4F6}
-.arow{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-top:1px solid var(--line-soft)}
+.arow{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-top:1px dotted var(--dot)}
 .arow:first-child{border-top:none}
 .atime{width:74px;flex:none}
 .atime .t{font-weight:600;font-size:14px;color:#15171A}
@@ -146,8 +174,8 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 .pill{font-weight:500;font-size:11.5px;color:#5A616B;background:#EEF2F7;border-radius:999px;padding:3px 10px}
 .pill.now{font-weight:600;color:var(--accent-deep);background:var(--accent-wash)}
 .pill.due{font-weight:600;color:#B4792B;background:#FBF1E6}
-.check{width:20px;height:20px;border-radius:999px;border:1.5px solid #C2CAD6;background:#fff;cursor:pointer;flex:none;margin-top:1px;display:flex;align-items:center;justify-content:center;padding:0}
-.check.on{background:var(--accent);border-color:var(--accent)}
+.check{width:20px;height:20px;border-radius:999px;border:1.5px solid #C2CAD6;background:rgba(255,255,255,.72);cursor:pointer;flex:none;margin-top:1px;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 1px 2px rgba(20,40,80,.07),inset 0 1px 0 rgba(255,255,255,.9)}
+.check.on{background:var(--accent);border-color:var(--accent);box-shadow:0 2px 9px var(--glow),inset 0 1px 0 rgba(255,255,255,.35)}
 .check.sm{width:16px;height:16px}
 .subs{margin-top:9px;border-left:1px solid #E7ECF2;padding-left:14px;display:flex;flex-direction:column;gap:5px}
 .subrow{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted)}
@@ -288,7 +316,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 .projcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:0;overflow:hidden;cursor:pointer;box-shadow:0 1px 2px rgba(30,70,140,.04);text-align:left;transition:transform .13s cubic-bezier(.16,1,.3,1),box-shadow .13s,border-color .13s}
 .projcard:hover{border-color:#C7D3E4;box-shadow:0 10px 26px rgba(30,70,140,.11);transform:translateY(-2px)}
 .pc-band{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 15px;background:var(--accent-wash)}
-.pc-glyph{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:17px;background:var(--accent);box-shadow:0 2px 7px rgba(31,111,235,.28)}
+.pc-glyph{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:17px;background:var(--accent);box-shadow:0 2px 7px var(--glow)}
 .pc-ring{position:relative;width:44px;height:44px}
 .pc-ring .arc{stroke:var(--accent)}
 .pc-ring .pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10.5px;color:#15171A;font-variant-numeric:tabular-nums}
@@ -312,7 +340,8 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 
 /* project side panel */
 .pov{position:fixed;inset:0;background:rgba(16,38,77,.22);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);z-index:60;display:flex;justify-content:flex-end;padding:18px;align-items:stretch}
-.ppanel{width:452px;max-width:100%;height:100%;background:#fff;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 28px 80px rgba(16,40,82,.34);animation:slidein .22s cubic-bezier(.16,1,.3,1)}
+.ppanel{width:452px;max-width:100%;height:100%;background:var(--glass);backdrop-filter:blur(26px) saturate(175%);-webkit-backdrop-filter:blur(26px) saturate(175%);border:1px solid var(--glass-line);border-radius:var(--radius-sheet);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 28px 80px rgba(16,40,82,.26),0 30px 90px -42px var(--glow),inset 0 1px 0 rgba(255,255,255,.5);animation:slidein .22s cubic-bezier(.16,1,.3,1)}
+#root[data-ground="dark"] .ppanel{background:rgba(30,38,56,.62);border-color:rgba(255,255,255,.12);box-shadow:0 28px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08)}
 .pmeta{display:flex;align-items:center;gap:10px;margin-top:10px}
 .pmeta-t{font-weight:500;font-size:12.5px;color:#5A616B}
 .pprog{font-weight:500;font-size:11.5px;color:#8A93A0;margin-top:6px}
@@ -379,7 +408,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 .tags{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px}
 .tagchip{font-weight:500;font-size:11.5px;color:#49505A;border:1px solid var(--field);border-radius:999px;padding:5px 12px;cursor:pointer;background:#fff}
 .tagchip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
-.savebtn{margin-left:auto;background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-weight:600;font-size:13px;cursor:pointer}
+.savebtn{margin-left:auto;background:linear-gradient(180deg,var(--accent),var(--accent-deep));color:#fff;border:none;border-radius:10px;padding:10px 18px;font-weight:600;font-size:13px;cursor:pointer;box-shadow:0 4px 14px var(--glow),inset 0 1px 0 rgba(255,255,255,.22)}
 .jentry{padding:16px 20px;margin-bottom:12px}
 .jentry .jh{display:flex;justify-content:space-between;align-items:baseline}
 .jentry p{margin:7px 0 0;font-size:14px;line-height:1.55;color:#39414C}
@@ -410,8 +439,8 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 .btn:active{transform:scale(.97)}
 .btn.ghost{background:#fff;border:1px solid var(--field);color:#15171A}
 .btn.ghost:hover{background:#F6F9FC}
-.btn.primary{background:var(--primary);border:none;color:#fff;box-shadow:0 3px 12px rgba(18,30,55,.22)}
-.btn.primary:hover{box-shadow:0 6px 18px rgba(18,30,55,.3)}
+.btn.primary{background:linear-gradient(180deg,var(--accent),var(--accent-deep));border:none;color:#fff;box-shadow:0 4px 14px var(--glow),inset 0 1px 0 rgba(255,255,255,.22)}
+.btn.primary:hover{box-shadow:0 7px 22px var(--glow),inset 0 1px 0 rgba(255,255,255,.22);filter:brightness(1.03)}
 .btn.del{flex:none;background:none;border:none;color:#C64A3B;font-weight:600;font-size:12.5px;padding:10px 4px;cursor:pointer}
 
 /* gate */
@@ -441,6 +470,14 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 .noterm{border:none;background:none;font-size:18px;cursor:pointer;line-height:1;opacity:.55}
 .noterm:hover{opacity:1}
 .addnote{border:1.5px dashed #CBD6E6;background:rgba(255,255,255,.5);border-radius:16px;min-height:148px;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:14px;color:var(--accent-deep);cursor:pointer}
+/* One for today — a quiet close to the day: no card, no header, just the fact + the line */
+.oft{margin:32px 2px 0;padding-top:22px;border-top:1px solid var(--line-soft)}
+.oft-fact{margin:0;font-size:15px;line-height:1.55;color:var(--body)}
+.oft-line{margin:18px 0 0;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-style:italic;font-size:18px;line-height:1.5;color:var(--ink)}
+.oft-line cite{display:block;margin-top:8px;font-family:var(--font);font-style:normal;font-weight:500;font-size:12.5px;color:var(--muted)}
+.oft-foot{display:flex;gap:16px;margin-top:16px}
+.oft-more{border:none;background:none;font:inherit;font-weight:500;font-size:12px;color:var(--faint);cursor:pointer;padding:2px 0;letter-spacing:.01em}
+.oft-more:hover{color:var(--accent-deep)}
 .addnote:hover{background:rgba(255,255,255,.75);border-color:#B9CBE4}
 /* shared focus / pomodoro */
 .focuscard{background:#fff;border:1px solid var(--line,#E7EBF0);border-radius:18px;padding:18px 20px;margin:0 0 18px;box-shadow:0 4px 18px rgba(20,40,80,.05)}
@@ -698,8 +735,8 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 .runner .av{box-shadow:0 0 0 3px #fff,0 2px 6px rgba(0,0,0,.15)}
 .rv{position:absolute;top:-19px;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
 .goal{position:absolute;right:-6px;top:-28px;display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700}
-.pace{position:absolute;top:-10px;bottom:-10px;width:0;border-left:2px dashed #3C6FB0;z-index:1}
-.pacel{position:absolute;bottom:-22px;left:0;transform:translateX(-50%);font-size:11px;font-weight:700;color:#3C6FB0;white-space:nowrap;background:#fff;padding:0 4px}
+.pace{position:absolute;top:-10px;bottom:-10px;width:0;border-left:2px dashed var(--accent-muted);z-index:1}
+.pacel{position:absolute;bottom:-22px;left:0;transform:translateX(-50%);font-size:11px;font-weight:700;color:var(--accent-muted);white-space:nowrap;background:#fff;padding:0 4px}
 .ticks{position:relative;height:18px;margin:26px 10px 0 116px}
 .ticks span{position:absolute;transform:translateX(-50%);font-size:11px;font-weight:600;color:#4B5866;font-variant-numeric:tabular-nums}
 .helpcard,.freshcard{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px;border:1px solid #E5EAF1;background:#F7F9FC;border-radius:14px;padding:13px 16px}
@@ -713,7 +750,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 .dash{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:14px}
 .w{border:1px solid #E5EAF1;border-radius:14px;background:#fff;padding:14px 18px 16px;min-width:0}
 .span2{grid-column:span 2}
-.wt{font-size:12.5px;font-weight:600;color:#3C6FB0}
+.wt{font-size:12.5px;font-weight:600;color:var(--accent-muted)}
 .lboard{list-style:none;margin:10px 0 0;padding:0}
 .lboard li{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid #EEF2F7;font-size:14px}
 .lboard li:first-child{border-top:0}
@@ -735,7 +772,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 .hkn{width:58px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hkd{display:flex;gap:4px}
 .hk{width:13px;height:13px;border-radius:4px;background:#E3E9F1}
-.hk.k{background:#1F6FEB}
+.hk.k{background:var(--accent)}
 .hk.s{background:#A9C8F7}
 .hk.f{background:transparent;border:1px dashed #DCE3EC;box-sizing:border-box}
 .donutrow{display:flex;align-items:center;gap:18px;margin-top:12px;flex-wrap:wrap}
@@ -771,7 +808,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 .ptr:hover{background:#F6F9FE}
 .ptr.pth{min-height:38px;background:#F8FAFD;border-top:0;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#4B5866;cursor:default}
 .ptr.pth:hover{background:#F8FAFD}
-.ptgrp{padding:8px 14px;background:#FBFCFE;border-top:1px solid #EEF2F7;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3C6FB0;min-width:960px}
+.ptgrp{padding:8px 14px;background:#FBFCFE;border-top:1px solid #EEF2F7;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-muted);min-width:960px}
 .ptn{display:flex;align-items:center;gap:10px;min-width:0}
 .ptn>span:last-child{min-width:0;display:flex;flex-direction:column}
 .pname2{border:0;background:none;padding:0;font-family:inherit;font-weight:600;font-size:14.5px;color:#15171A;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -943,7 +980,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 .hm-qplus{font-size:18px;line-height:1;color:#4B5866;width:16px;text-align:center}
 .hm-kbd{font-size:11px;font-weight:500;color:#4B5866;border:1px solid #DCE3EC;border-radius:5px;padding:1px 6px}
 .hm-ghd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 2px 4px}
-.hm-glbl{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3C6FB0}
+.hm-glbl{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-muted)}
 .hm-gmeta{display:flex;align-items:center;gap:10px;font-size:12.5px;color:#4B5866}
 .hm-donel{display:flex;align-items:center;gap:8px;width:100%;padding:11px 2px;border:0;border-top:1px solid var(--line-soft);background:none;font:inherit;font-size:13px;color:#4B5866;cursor:pointer;text-align:left}
 .hm-donel svg{transition:transform .15s var(--ease-out)}
@@ -974,7 +1011,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 .dv-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(260px,1fr);gap:22px;align-items:start}
 .dv-grid>*,.hm-grid>*{min-width:0}
 .dv-allday{display:flex;align-items:center;gap:8px;flex-wrap:wrap;border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin-bottom:10px;font-size:12.5px;min-height:22px}
-.dv-allday .k{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3C6FB0;width:52px;flex:none}
+.dv-allday .k{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-muted);width:52px;flex:none}
 .dv-chip{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:99px;padding:3px 10px;font:inherit;font-size:12px;font-weight:600;color:#85560F;background:#FBF1E6;cursor:pointer}
 .dv-chip.proj{color:#2F343B;background:#EEF2F7}
 .dv-chip.ev{color:#4E3A8A;background:#ECE4FF}
@@ -997,10 +1034,10 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 .dv-b.pt{background:#F1F3F7;border-color:#D9DFE8;box-shadow:none}
 .dv-b.dn{background:#F7F9FC;border-color:#EEF2F7;box-shadow:none}
 .dv-b.dn .bt{color:#6B7480;text-decoration:line-through;text-decoration-color:#AEB8C5;font-weight:500}
-.dv-ic{display:inline-flex;color:#3C6FB0;flex:none;margin-top:1px}
-.dv-now{position:absolute;left:56px;right:0;height:0;border-top:2px solid #1F6FEB;pointer-events:none;z-index:2}
-.dv-now i{position:absolute;left:-5px;top:-6px;width:10px;height:10px;border-radius:99px;background:#1F6FEB}
-.dv-now b{position:absolute;right:8px;top:-21px;background:#1F6FEB;color:#fff;font-size:11px;font-weight:600;border-radius:99px;padding:2px 7px;font-variant-numeric:tabular-nums}
+.dv-ic{display:inline-flex;color:var(--accent-muted);flex:none;margin-top:1px}
+.dv-now{position:absolute;left:56px;right:0;height:0;border-top:2px solid var(--accent);pointer-events:none;z-index:2}
+.dv-now i{position:absolute;left:-5px;top:-6px;width:10px;height:10px;border-radius:99px;background:var(--accent)}
+.dv-now b{position:absolute;right:8px;top:-21px;background:var(--accent);color:#fff;font-size:11px;font-weight:600;border-radius:99px;padding:2px 7px;font-variant-numeric:tabular-nums}
 .dv-empty{border:1px dashed #C9D5E5;border-radius:14px;padding:48px 24px;text-align:center;background:#FBFCFE}
 .dv-empty h3{margin:0;font-size:16px;font-weight:700;color:#15171A}
 .dv-empty p{margin:6px auto 0;max-width:440px;font-size:13.5px;line-height:1.5;color:#4B5866}
@@ -1023,16 +1060,16 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
   .dv-tl{display:none}
   .dv-list{display:block}
   .dv-strip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;margin:0 0 10px}
-  .dv-strip button{border:0;background:none;border-radius:10px;padding:6px 0;display:flex;flex-direction:column;align-items:center;gap:2px;font:inherit;font-size:11px;font-weight:600;color:#3C6FB0;cursor:pointer}
+  .dv-strip button{border:0;background:none;border-radius:10px;padding:6px 0;display:flex;flex-direction:column;align-items:center;gap:2px;font:inherit;font-size:11px;font-weight:600;color:var(--accent-muted);cursor:pointer}
   .dv-strip button b{font-size:15px;color:#2F343B}
-  .dv-strip button.on{background:#EEF4FF}.dv-strip button.on b{color:#195FD0}
+  .dv-strip button.on{background:var(--accent-wash)}.dv-strip button.on b{color:var(--accent-deep)}
   .dv-li{display:flex;gap:12px;align-items:stretch;padding:4px 0}
   .dv-li .tm{width:44px;flex:none;text-align:right;font-size:12px;color:#4B5866;padding-top:9px;font-variant-numeric:tabular-nums}
   .dv-li .dv-b{position:static;flex:1;min-width:0}
   .dv-linow{display:flex;align-items:center;gap:8px;margin:6px 0}
-  .dv-linow b{width:44px;text-align:right;font-size:11px;font-weight:700;color:#195FD0;font-variant-numeric:tabular-nums}
-  .dv-linow span{flex:1;border-top:2px solid #1F6FEB;position:relative}
-  .dv-linow i{position:absolute;left:-5px;top:-6px;width:10px;height:10px;border-radius:99px;background:#1F6FEB}
+  .dv-linow b{width:44px;text-align:right;font-size:11px;font-weight:700;color:var(--accent-deep);font-variant-numeric:tabular-nums}
+  .dv-linow span{flex:1;border-top:2px solid var(--accent);position:relative}
+  .dv-linow i{position:absolute;left:-5px;top:-6px;width:10px;height:10px;border-radius:99px;background:var(--accent)}
 }
 
 /* ---- Settings › Claude (8 Nov) ---- */
@@ -1121,18 +1158,20 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
   var DEFAULT_FONT="'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif";
   var BG_PRESETS=[
     {id:'sky',label:'Sky',css:DEFAULT_GRAD,sw:'linear-gradient(135deg,#3FA0FF,#BFE0FF)'},
-    {id:'lavender',label:'Lavender',css:"radial-gradient(900px 680px at 80% 10%, rgba(255,255,255,.85), transparent 60%),linear-gradient(160deg,#B49BFF 0%,#D7C9FF 30%,#ECE4FF 55%,#FBFAFF 85%)",sw:'linear-gradient(135deg,#B49BFF,#E6DCFF)'},
-    {id:'peach',label:'Peach',css:"radial-gradient(900px 680px at 80% 10%, rgba(255,255,255,.85), transparent 60%),linear-gradient(160deg,#FFB38A 0%,#FFD0B0 30%,#FFE8DC 55%,#FFFBF8 85%)",sw:'linear-gradient(135deg,#FFB38A,#FFE0CE)'},
-    {id:'mint',label:'Mint',css:"radial-gradient(900px 680px at 80% 10%, rgba(255,255,255,.85), transparent 60%),linear-gradient(160deg,#6FD6A8 0%,#A9E6CB 30%,#D7F3E6 55%,#F7FFFB 85%)",sw:'linear-gradient(135deg,#6FD6A8,#CFF0E2)'},
-    {id:'rose',label:'Rose',css:"radial-gradient(900px 680px at 80% 10%, rgba(255,255,255,.85), transparent 60%),linear-gradient(160deg,#FF9DBE 0%,#FFC4D7 30%,#FFE2EC 55%,#FFF9FB 85%)",sw:'linear-gradient(135deg,#FF9DBE,#FFD6E2)'},
-    {id:'slate',label:'Slate',css:"linear-gradient(160deg,#AEBDD4 0%,#CAD6E6 30%,#E4ECF5 55%,#F7FAFE 85%)",sw:'linear-gradient(135deg,#AEBDD4,#DCE6F2)'},
+    {id:'lavender',label:'Lavender',css:"radial-gradient(900px 680px at 80% 10%, rgba(255,255,255,.85), transparent 60%),linear-gradient(160deg,#B49BFF 0%,#D7C9FF 30%,#ECE4FF 55%,#FBFAFF 85%)",sw:'linear-gradient(135deg,#B49BFF,#E6DCFF)',ac:['#7A4FE0','#6238C4','#EFEAFC','rgba(122,79,224,.24)']},
+    {id:'peach',label:'Peach',css:"radial-gradient(900px 680px at 80% 10%, rgba(255,255,255,.85), transparent 60%),linear-gradient(160deg,#FFB38A 0%,#FFD0B0 30%,#FFE8DC 55%,#FFFBF8 85%)",sw:'linear-gradient(135deg,#FFB38A,#FFE0CE)',ac:['#E8632E','#C4471C','#FDEADF','rgba(232,99,46,.24)']},
+    {id:'mint',label:'Mint',css:"radial-gradient(900px 680px at 80% 10%, rgba(255,255,255,.85), transparent 60%),linear-gradient(160deg,#6FD6A8 0%,#A9E6CB 30%,#D7F3E6 55%,#F7FFFB 85%)",sw:'linear-gradient(135deg,#6FD6A8,#CFF0E2)',ac:['#1F9E5A','#178049','#E4F5EC','rgba(31,158,90,.22)']},
+    {id:'rose',label:'Rose',css:"radial-gradient(900px 680px at 80% 10%, rgba(255,255,255,.85), transparent 60%),linear-gradient(160deg,#FF9DBE 0%,#FFC4D7 30%,#FFE2EC 55%,#FFF9FB 85%)",sw:'linear-gradient(135deg,#FF9DBE,#FFD6E2)',ac:['#E24A77','#C23763','#FCE7EE','rgba(226,74,119,.24)']},
+    {id:'slate',label:'Slate',css:"linear-gradient(160deg,#AEBDD4 0%,#CAD6E6 30%,#E4ECF5 55%,#F7FAFE 85%)",sw:'linear-gradient(135deg,#AEBDD4,#DCE6F2)',ac:['#4C64A8','#3C5090','#E9EEF7','rgba(76,100,168,.20)']},
     {id:'cream',label:'Cream',css:"#FBF7EF",sw:'#FBF7EF'},
     {id:'ice',label:'Ice',css:"#EDF3FB",sw:'#EDF3FB'},
     {id:'white',label:'White',css:"#FFFFFF",sw:'#FFFFFF'},
-    {id:'ink',label:'Ink',css:"#14161c",sw:'#14161c',dark:true},
-    {id:'midnight',label:'Midnight',css:"radial-gradient(900px 680px at 80% 8%, rgba(60,90,160,.35), transparent 60%),linear-gradient(160deg,#0E1322 0%,#141B2D 60%,#0F1420 100%)",sw:'linear-gradient(135deg,#1c2440,#0e1322)',dark:true}
+    {id:'ink',label:'Ink',css:"#14161c",sw:'#14161c',dark:true,ac:['#5B8CFF','#3E72F0','rgba(91,140,255,.16)','rgba(91,140,255,.32)']},
+    {id:'midnight',label:'Midnight',css:"radial-gradient(900px 680px at 80% 8%, rgba(60,90,160,.35), transparent 60%),linear-gradient(160deg,#0E1322 0%,#141B2D 60%,#0F1420 100%)",sw:'linear-gradient(135deg,#1c2440,#0e1322)',dark:true,ac:['#6E9BFF','#4E7BF0','rgba(110,155,255,.14)','rgba(110,155,255,.34)']}
   ];
+  var GENERAL_STACK="'General Sans','Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif";
   var FONTS=[
+    {id:'general',label:'General Sans',stack:GENERAL_STACK},
     {id:'inter',label:'Inter',stack:DEFAULT_FONT},
     {id:'fraunces',label:'Fraunces',stack:"'Fraunces',Georgia,'Times New Roman',serif"},
     {id:'jakarta',label:'Jakarta',stack:"'Plus Jakarta Sans','Inter',system-ui,sans-serif"},
@@ -1147,6 +1186,173 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     {id:'peach',bg:'#FFE6D6',bd:'#F6CDB4',fg:'#8A4A22'}
   ];
   function noteColor(id){ for(var i=0;i<NOTE_COLORS.length;i++){if(NOTE_COLORS[i].id===id)return NOTE_COLORS[i];} return NOTE_COLORS[0]; }
+
+  // ---- "One for today": a random fact + a line of the day, baked in, one shared pair per day (date-seeded, no repeat for months) ----
+  var FACTS=[
+    {c:"NATURE",t:"Owls can't move their eyeballs, so they turn their whole head instead — up to about 270 degrees."},
+    {c:"NATURE",t:"Honey never spoils. Archaeologists have found 3,000-year-old honey in Egyptian tombs that was still edible."},
+    {c:"NATURE",t:"Bananas are berries, botanically — but strawberries aren't."},
+    {c:"NATURE",t:"A bolt of lightning is about five times hotter than the surface of the Sun."},
+    {c:"NATURE",t:"Antarctica is the largest desert on Earth."},
+    {c:"NATURE",t:"There's a word for the smell of rain after dry weather: petrichor."},
+    {c:"NATURE",t:"Lightning strikes the Earth around 8 million times a day."},
+    {c:"ANIMALS",t:"Octopuses have three hearts and blue blood."},
+    {c:"ANIMALS",t:"A group of flamingos is called a flamboyance."},
+    {c:"ANIMALS",t:"Wombats produce cube-shaped poop."},
+    {c:"ANIMALS",t:"Sea otters hold hands while they sleep so they don't drift apart."},
+    {c:"ANIMALS",t:"Sloths can hold their breath longer than dolphins can."},
+    {c:"ANIMALS",t:"A snail can sleep for up to three years."},
+    {c:"ANIMALS",t:"Cows have best friends and get stressed when they're separated."},
+    {c:"ANIMALS",t:"Butterflies taste with their feet."},
+    {c:"ANIMALS",t:"Crows can recognize individual human faces — and hold a grudge."},
+    {c:"ANIMALS",t:"The immortal jellyfish can revert to its juvenile form, and may never die of old age."},
+    {c:"ANIMALS",t:"Tardigrades can survive the vacuum of space."},
+    {c:"ANIMALS",t:"Axolotls can regrow their limbs, spinal cord, and even parts of their heart and brain."},
+    {c:"ANIMALS",t:"Penguins often propose to their mates with a pebble."},
+    {c:"ANIMALS",t:"The mantis shrimp has up to 16 color receptors in its eyes. Humans have just three."},
+    {c:"ANIMALS",t:"A pistol shrimp snaps its claw so fast it makes a bubble that is, for an instant, hotter than the surface of the Sun."},
+    {c:"ANIMALS",t:"Sharks are older than trees — they've been around for over 400 million years."},
+    {c:"ANIMALS",t:"A blue whale's heart is so large a small child could crawl through its largest artery."},
+    {c:"ANIMALS",t:"Cats can't taste sweetness — they lack the receptor for it."},
+    {c:"ANIMALS",t:"A group of pandas is called an embarrassment."},
+    {c:"ANIMALS",t:"Horses physically cannot vomit."},
+    {c:"ANIMALS",t:"A shrimp's heart is located in its head."},
+    {c:"SPACE",t:"A day on Venus is longer than a year on Venus."},
+    {c:"SPACE",t:"There are more stars in the universe than grains of sand on all the beaches on Earth."},
+    {c:"SPACE",t:"A teaspoon of neutron star would weigh about a billion tons."},
+    {c:"SPACE",t:"Saturn is less dense than water — in a big enough bathtub, it would float."},
+    {c:"SPACE",t:"Space is silent. There's no air to carry sound."},
+    {c:"SPACE",t:"The footprints on the Moon will likely last millions of years — there's no wind to erase them."},
+    {c:"SPACE",t:"The Sun makes up about 99.8 percent of the mass of the entire solar system."},
+    {c:"SPACE",t:"Light from the Sun takes about eight minutes to reach your face."},
+    {c:"SPACE",t:"Scientists think it may rain diamonds on Jupiter and Saturn."},
+    {c:"SPACE",t:"Olympus Mons on Mars is the tallest known volcano in the solar system — about three times the height of Everest."},
+    {c:"SPACE",t:"We have mapped more of the surface of Mars than the floor of our own oceans."},
+    {c:"THE BODY",t:"The acid in your stomach is strong enough to dissolve metal."},
+    {c:"THE BODY",t:"You are about a centimetre taller in the morning than at night."},
+    {c:"THE BODY",t:"The human nose can distinguish around a trillion different smells."},
+    {c:"THE BODY",t:"Your heart beats roughly 100,000 times a day."},
+    {c:"THE BODY",t:"You carry more bacterial cells than human cells."},
+    {c:"THE BODY",t:"Your brain uses about 20 percent of your body's energy."},
+    {c:"THE BODY",t:"Humans glow faintly in the dark — it's just about a thousand times too dim for our eyes to see."},
+    {c:"THE BODY",t:"Bone, gram for gram, is stronger than steel."},
+    {c:"ART",t:"Van Gogh sold only one painting during his lifetime."},
+    {c:"ART",t:"The Mona Lisa has no eyebrows — shaving them was the fashion in Renaissance Florence."},
+    {c:"ART",t:"Impressionism got its name mockingly, from a Monet painting called Impression, Sunrise."},
+    {c:"ART",t:"The pigment ultramarine was once more expensive than gold — it was ground from lapis lazuli."},
+    {c:"ART",t:"Frida Kahlo painted 55 self-portraits, saying she was the subject she knew best."},
+    {c:"ART",t:"Yves Klein patented his own shade of blue: International Klein Blue."},
+    {c:"ART",t:"A paint called mummy brown was once literally made from ground-up Egyptian mummies."},
+    {c:"ART",t:"Leonardo da Vinci could reportedly draw with one hand and write with the other at the same time."},
+    {c:"ART",t:"Physicists have found fractal patterns hidden inside Jackson Pollock's drip paintings."},
+    {c:"MOVEMENTS",t:"The Dada art movement was born out of disgust with the First World War."},
+    {c:"MOVEMENTS",t:"The Bauhaus school lasted only 14 years, but it reshaped modern design for a century."},
+    {c:"MUSIC",t:"The oldest known musical instrument is a bone flute more than 40,000 years old."},
+    {c:"MUSIC",t:"A single piano has around 230 strings under roughly 20 tons of total tension."},
+    {c:"HISTORY",t:"Oxford University is older than the Aztec Empire."},
+    {c:"HISTORY",t:"Cleopatra lived closer in time to the Moon landing than to the building of the Great Pyramid."},
+    {c:"HISTORY",t:"The shortest war in history lasted about 38 minutes."},
+    {c:"HISTORY",t:"Nintendo was founded in 1889 — it started out making playing cards."},
+    {c:"HISTORY",t:"Sliced bread was briefly banned in the United States in 1943."},
+    {c:"HISTORY",t:"In the 1830s, ketchup was sold as medicine."},
+    {c:"HISTORY",t:"The first webcam was pointed at a coffee pot, so people wouldn't walk to an empty one."},
+    {c:"WORLD",t:"The Eiffel Tower grows about 15 centimetres taller in summer, as the iron expands in the heat."},
+    {c:"WORLD",t:"The Great Wall of China is not actually visible from space with the naked eye."},
+    {c:"WORLD",t:"Finland has more saunas than cars."},
+    {c:"WORLD",t:"Scotland's national animal is the unicorn."},
+    {c:"WORLD",t:"The Hawaiian alphabet has only 13 letters."},
+    {c:"WORLD",t:"The longest place name in the world — a hill in New Zealand — has 85 letters."},
+    {c:"WORLD",t:"There are more possible games of chess than there are atoms in the observable universe."},
+    {c:"WORLD",t:"More than 80 percent of the ocean has never been explored."},
+    {c:"WORLD",t:"Measured from its base on the sea floor, Mauna Kea is taller than Mount Everest."},
+    {c:"LANGUAGE",t:"The word nerd was first coined by Dr. Seuss."},
+    {c:"LANGUAGE",t:"The dot over a lowercase i or j has a name: a tittle."},
+    {c:"LANGUAGE",t:"In Japanese, tsundoku means buying books and letting them pile up unread."},
+    {c:"LANGUAGE",t:"The German word Kummerspeck, literally grief bacon, is the weight gained from emotional eating."},
+    {c:"LANGUAGE",t:"The English word set has more distinct definitions than almost any other."},
+    {c:"NUMBERS",t:"A jiffy is a real unit of time — in physics, about a hundredth of a second or less."},
+    {c:"NUMBERS",t:"If you fold a piece of paper 42 times, it would be thick enough to reach the Moon."},
+    {c:"SCIENCE",t:"Glass is not a slow-moving liquid — old window panes are thicker at the bottom because of how they were made."},
+    {c:"SCIENCE",t:"Hot water can freeze faster than cold water under the right conditions — it's called the Mpemba effect."},
+    {c:"SCIENCE",t:"A single cloud can weigh more than a million pounds."}
+  ];
+  var LINES=[
+    {t:"Tell me, what is it you plan to do with your one wild and precious life?",w:"Mary Oliver"},
+    {t:"The wound is the place where the Light enters you.",w:"Rumi"},
+    {t:"What you seek is seeking you.",w:"Rumi"},
+    {t:"I dwell in Possibility.",w:"Emily Dickinson"},
+    {t:"Hope is the thing with feathers that perches in the soul.",w:"Emily Dickinson"},
+    {t:"And still, after all this time, the sun never says to the earth, you owe me.",w:"Hafiz"},
+    {t:"You must change your life.",w:"Rainer Maria Rilke"},
+    {t:"Be patient toward all that is unsolved in your heart.",w:"Rainer Maria Rilke"},
+    {t:"In the depth of winter, I finally learned that within me there lay an invincible summer.",w:"Albert Camus"},
+    {t:"I love you as certain dark things are to be loved, in secret, between the shadow and the soul.",w:"Pablo Neruda"},
+    {t:"I am large, I contain multitudes.",w:"Walt Whitman"},
+    {t:"A thing of beauty is a joy forever.",w:"John Keats"},
+    {t:"Tread softly, because you tread on my dreams.",w:"W. B. Yeats"},
+    {t:"Where the mind is without fear and the head is held high.",w:"Rabindranath Tagore"},
+    {t:"Let life be beautiful like summer flowers, and death like autumn leaves.",w:"Rabindranath Tagore"},
+    {t:"Still I rise.",w:"Maya Angelou"},
+    {t:"There is no greater agony than bearing an untold story inside you.",w:"Maya Angelou"},
+    {t:"Two roads diverged in a wood, and I took the one less travelled by.",w:"Robert Frost"},
+    {t:"The woods are lovely, dark and deep.",w:"Robert Frost"},
+    {t:"Do not go gentle into that good night.",w:"Dylan Thomas"},
+    {t:"What happens to a dream deferred?",w:"Langston Hughes"},
+    {t:"I carry your heart with me. I carry it in my heart.",w:"E. E. Cummings"},
+    {t:"We are all in the gutter, but some of us are looking at the stars.",w:"Oscar Wilde"},
+    {t:"There is a crack in everything. That's how the light gets in.",w:"Leonard Cohen"},
+    {t:"Ring the bells that still can ring. Forget your perfect offering.",w:"Leonard Cohen"},
+    {t:"Not all those who wander are lost.",w:"J. R. R. Tolkien"},
+    {t:"Little by little, one travels far.",w:"J. R. R. Tolkien"},
+    {t:"And now that you don't have to be perfect, you can be good.",w:"John Steinbeck"},
+    {t:"The world breaks everyone, and afterward many are strong at the broken places.",w:"Ernest Hemingway"},
+    {t:"You have power over your mind, not outside events. Realize this, and you will find strength.",w:"Marcus Aurelius"},
+    {t:"Very little is needed to make a happy life.",w:"Marcus Aurelius"},
+    {t:"We suffer more in imagination than in reality.",w:"Seneca"},
+    {t:"It is not that we have a short time to live, but that we waste a lot of it.",w:"Seneca"},
+    {t:"A journey of a thousand miles begins with a single step.",w:"Lao Tzu"},
+    {t:"Nature does not hurry, yet everything is accomplished.",w:"Lao Tzu"},
+    {t:"The only true wisdom is in knowing you know nothing.",w:"Socrates"},
+    {t:"Knowing yourself is the beginning of all wisdom.",w:"Aristotle"},
+    {t:"We are what we repeatedly do. Excellence, then, is not an act, but a habit.",w:"Will Durant"},
+    {t:"The best time to plant a tree was twenty years ago. The second best time is now.",w:"Chinese proverb"},
+    {t:"Fall seven times, stand up eight.",w:"Japanese proverb"},
+    {t:"He who has a why to live can bear almost any how.",w:"Friedrich Nietzsche"},
+    {t:"The cave you fear to enter holds the treasure you seek.",w:"Joseph Campbell"},
+    {t:"Between stimulus and response there is a space. In that space is our power to choose.",w:"Viktor Frankl"},
+    {t:"The future belongs to those who believe in the beauty of their dreams.",w:"Eleanor Roosevelt"},
+    {t:"You must do the things you think you cannot do.",w:"Eleanor Roosevelt"},
+    {t:"Turn your wounds into wisdom.",w:"Oprah Winfrey"},
+    {t:"The quieter you become, the more you can hear.",w:"Ram Dass"},
+    {t:"Everything you can imagine is real.",w:"Pablo Picasso"},
+    {t:"Art washes away from the soul the dust of everyday life.",w:"Pablo Picasso"},
+    {t:"Creativity takes courage.",w:"Henri Matisse"},
+    {t:"Tears are words that need to be written.",w:"Paulo Coelho"},
+    {t:"I can resist everything except temptation.",w:"Oscar Wilde"},
+    {t:"Be yourself; everyone else is already taken.",w:"Oscar Wilde"},
+    {t:"To love oneself is the beginning of a lifelong romance.",w:"Oscar Wilde"},
+    {t:"The reports of my death are greatly exaggerated.",w:"Mark Twain"},
+    {t:"Whenever you find yourself on the side of the majority, it is time to pause and reflect.",w:"Mark Twain"},
+    {t:"The trouble with having an open mind is that people keep coming along and putting things in it.",w:"Terry Pratchett"},
+    {t:"I have not failed. I've just found 10,000 ways that won't work.",w:"Thomas Edison"},
+    {t:"If you think you are too small to make a difference, try sleeping with a mosquito.",w:"Dalai Lama"},
+    {t:"Outside of a dog, a book is a man's best friend. Inside of a dog it's too dark to read.",w:"Groucho Marx"},
+    {t:"I always wanted to be somebody, but now I realize I should have been more specific.",w:"Lily Tomlin"},
+    {t:"A day without laughter is a day wasted.",w:"Charlie Chaplin"},
+    {t:"Wit is educated insolence.",w:"Aristotle"},
+    {t:"Everything will be okay in the end. If it's not okay, it's not the end.",w:"John Lennon"},
+    {t:"Stars can't shine without darkness.",w:"Anonymous"}
+  ];
+  function OneForToday(){
+    function pick(){ return {f:Math.floor(Math.random()*FACTS.length), l:Math.floor(Math.random()*LINES.length)}; }
+    var sS=useState(pick); var cur=sS[0], setCur=sS[1];   // fresh pair on every load; "Another" reshuffles in place
+    var fact=FACTS[cur.f], line=LINES[cur.l];
+    return html`<section class="oft">
+      <p class="oft-fact">${fact.t}</p>
+      <blockquote class="oft-line">“${line.t}”<cite>— ${line.w}</cite></blockquote>
+      <div class="oft-foot"><button class="oft-more" onClick=${function(){setCur(pick());}}>Another</button></div>
+    </section>`;
+  }
 
   function lsGet(k,d){ try{ var v=localStorage.getItem(k); return v==null?d:v; }catch(e){ return d; } }
   function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
@@ -1347,7 +1553,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var ring = html`<div class="fcring">
       <svg viewBox="0 0 128 128" width="128" height="128">
         <circle cx="64" cy="64" r="54" fill="none" stroke="#E7EDF5" stroke-width="9" />
-        <circle cx="64" cy="64" r="54" fill="none" stroke=${done?'#2E9E6B':'#1F6FEB'} stroke-width="9" stroke-linecap="round" stroke-dasharray=${C} stroke-dashoffset=${off} style=${{transition:'stroke-dashoffset .5s linear'}} />
+        <circle cx="64" cy="64" r="54" fill="none" stroke=${done?'#2E9E6B':'var(--accent)'} stroke-width="9" stroke-linecap="round" stroke-dasharray=${C} stroke-dashoffset=${off} style=${{transition:'stroke-dashoffset .5s linear'}} />
       </svg>
       <div class="fcclock">${fmtClock(remMs)}</div>
     </div>`;
@@ -1390,7 +1596,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var done = running && remMs<=0;
     var prog = done?1:(total>0?Math.min(1,Math.max(0,1-remMs/total)):0);
     var who = f.started_by?relName(f.started_by):'';
-    var dotc = done?'#2E9E6B':running?'#1F6FEB':paused?'#C2873B':'#9AA3AF';
+    var dotc = done?'#2E9E6B':running?'var(--accent)':paused?'#C2873B':'#9AA3AF';
     var clockSvg=html`<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
     return html`<div class=${'focusw'+(active?' active':'')+(done?' done':'')}>
       <button class="fw-head" onClick=${function(){setOpen(!open);}}>
@@ -1548,6 +1754,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
         ${myNotes.map(function(n){ return html`<${NoteCard} key=${n.id} note=${n} onSave=${props.onSaveNote} onColor=${props.onSetNoteColor} onDelete=${props.onDeleteNote} />`; })}
         <button class="addnote" onClick=${function(){props.onAddNote();}}><span style=${{fontSize:'18px',lineHeight:1}}>+</span> ${myNotes.length?'Add a note':'Jot your first note'}</button>
       </div>
+      <${OneForToday} />
     <//>`;
   }
 
@@ -1793,7 +2000,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
         </span>
       </div>`:null}
       <div class="calsplit">${rail}<div class="calmain">${main}</div></div>
-      <p style=${{fontWeight:400,fontSize:'12px',color:'#3C6FB0',margin:'12px 2px 0'}}>${selTask?'Now pick a day or time for it.':'Pick a task on the left to give it a day, or tap any day to add something. Select two days to start a project across them.'}</p>
+      <p style=${{fontWeight:400,fontSize:'12px',color:'var(--accent-muted)',margin:'12px 2px 0'}}>${selTask?'Now pick a day or time for it.':'Pick a task on the left to give it a day, or tap any day to add something. Select two days to start a project across them.'}</p>
     <//>`;
   }
 
@@ -2048,7 +2255,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
           ${!share?html`<div class="jstatus" style=${{marginTop:'4px'}}>Only you can see it. Writing it still earns +${PTS.journal} on the board.</div>`:null}
           ${jstatus?html`<div class="jstatus" aria-live="polite">${jstatus}</div>`:null}
         </section>
-        <h3 style=${{fontWeight:600,fontSize:'11px',letterSpacing:'.07em',textTransform:'uppercase',color:'#3C6FB0',margin:'24px 2px 10px'}}>Earlier</h3>
+        <h3 style=${{fontWeight:600,fontSize:'11px',letterSpacing:'.07em',textTransform:'uppercase',color:'var(--accent-muted)',margin:'24px 2px 10px'}}>Earlier</h3>
         ${earlier.map(function(e){ var tl=({good:'Good day',hard:'Hard day',shipped:'Shipped something',rest:'Rest'})[e.tag]||''; var tc=e.tag==='hard'?'#C64A3B':(e.tag==='shipped'?'#2E9E6B':'#8A93A0');
           return html`<section class="card jentry" key=${e.id}><div class="jh"><span style=${{fontWeight:600,fontSize:'13px'}}>${shortDate(e.date)}${e.owner!==whoami?(' · '+nameOf(e.owner)):''}${e.owner===whoami&&!e.space_id?html`<span class="jpriv">Only you</span>`:null}</span>${tl?html`<span style=${{fontWeight:500,fontSize:'11px',color:tc}}>${tl}</span>`:null}</div><p>${e.text}</p></section>`;
         })}
@@ -2425,9 +2632,9 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
           <div class="wboxh"><span class="wt">Points so far</span><span class="muted small">${members.map(function(m){ return relName(m)+' '+P[m].points; }).join(' · ')}</span></div>
           <svg viewBox=${'0 0 '+W+' '+H} width="100%" style=${{height:'auto',display:'block'}} role="img" aria-label=${'Points so far: '+members.map(function(m){return relName(m)+' '+P[m].points;}).join(', ')}>
             ${[0,top/2,top].map(function(v){ return html`<g key=${v}><line x1=${L} x2=${W-R} y1=${y(v)} y2=${y(v)} stroke="#E5EAF1" stroke-dasharray="3 4"></line><text x=${L-8} y=${y(v)+4} text-anchor="end" font-size="10.5" fill="#4B5866">${Math.round(v)}</text></g>`; })}
-            ${which==='this'?html`<line x1=${x(0)} y1=${y(WEEK_GOAL/7)} x2=${x(6)} y2=${y(WEEK_GOAL)} stroke="#3C6FB0" stroke-width="1.5" stroke-dasharray="5 5"></line>`:null}
+            ${which==='this'?html`<line x1=${x(0)} y1=${y(WEEK_GOAL/7)} x2=${x(6)} y2=${y(WEEK_GOAL)} stroke="var(--accent-muted)" stroke-width="1.5" stroke-dasharray="5 5"></line>`:null}
             ${lines.map(function(l){ return html`<g key=${l.id}><polyline points=${l.pts} fill="none" stroke=${personColor(l.id)} stroke-width="3" stroke-linejoin="round" stroke-linecap="round"></polyline><circle cx=${x(dayIdx)} cy=${y(l.end)} r="5" fill=${personColor(l.id)} stroke="#fff" stroke-width="2"></circle><text x=${x(dayIdx)+((dayIdx<5||narrow)?10:-10)} y=${l.ly+4} text-anchor=${(dayIdx<5||narrow)?'start':'end'} font-size="12" font-weight="700" fill="#15171A">${relName(l.id)} ${l.end}</text></g>`; })}
-            ${dayNames.map(function(n,i){ return html`<text key=${n} x=${x(i)} y=${H-6} text-anchor="middle" font-size="11" font-weight="600" fill=${i===dayIdx&&which==='this'?'#195FD0':'#4B5866'}>${n}</text>`; })}
+            ${dayNames.map(function(n,i){ return html`<text key=${n} x=${x(i)} y=${H-6} text-anchor="middle" font-size="11" font-weight="600" fill=${i===dayIdx&&which==='this'?'var(--accent-deep)':'#4B5866'}>${n}</text>`; })}
           </svg>
         </section>
         <section class="w" aria-label="Leaderboard">
@@ -2452,8 +2659,8 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
         </section>
         <section class="w" aria-label="Tasks this week">
           <span class="wt">Tasks this week</span>
-          <div class="donutrow"><div class="donut" style=${{background:'conic-gradient(#1F6FEB 0 '+pct+'%,#E3E9F1 '+pct+'% 100%)'}} role="img" aria-label=${doneN+' of '+planned.length+' done'}><span><b>${planned.length}</b><small>tasks</small></span></div>
-            <div class="dleg"><span><i style=${{background:'#1F6FEB'}}></i>Done <b>${doneN}</b></span><span><i style=${{background:'#E3E9F1'}}></i>Not done <b>${planned.length-doneN}</b></span>${overdueOpen?html`<span class="muted small">${overdueOpen} overdue</span>`:null}</div></div>
+          <div class="donutrow"><div class="donut" style=${{background:'conic-gradient(var(--accent) 0 '+pct+'%,#E3E9F1 '+pct+'% 100%)'}} role="img" aria-label=${doneN+' of '+planned.length+' done'}><span><b>${planned.length}</b><small>tasks</small></span></div>
+            <div class="dleg"><span><i style=${{background:'var(--accent)'}}></i>Done <b>${doneN}</b></span><span><i style=${{background:'#E3E9F1'}}></i>Not done <b>${planned.length-doneN}</b></span>${overdueOpen?html`<span class="muted small">${overdueOpen} overdue</span>`:null}</div></div>
         </section>
         <section class="w span2" aria-label="Still open">
           <div class="wboxh"><span class="wt">Still open · ${open.length}</span></div>
@@ -2830,6 +3037,38 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
   }
 
   // ---- App ----
+  // Someone opened an invite link without an account yet — make one and join in a single step.
+  function JoinInvite(props){
+    var pkS=useState(null); var peek=pkS[0], setPeek=pkS[1];
+    var nS=useState(''); var name=nS[0], setName=nS[1];
+    var uS=useState(''); var user=uS[0], setUser=uS[1];
+    var pS=useState(''); var pass=pS[0], setPass=pS[1];
+    var eS=useState(''); var err=eS[0], setErr=eS[1];
+    var bS=useState(false); var busy=bS[0], setBusy=bS[1];
+    useEffect(function(){ fetch('/api/invite/peek?code='+encodeURIComponent(props.code)).then(function(r){return r.json();}).then(setPeek).catch(function(){ setPeek({ok:false}); }); },[props.code]);
+    function submit(e){ if(e)e.preventDefault(); if(busy) return; setErr(''); setBusy(true);
+      apiPost('/api/invite/signup',{code:props.code,name:name,username:user.trim().toLowerCase(),password:pass}).then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});}).then(function(res){
+        if(res.ok&&res.j.ok){ try{ var u=new URL(location.href); u.searchParams.delete('invite'); history.replaceState({},'',u); }catch(e2){} props.onIn(); }
+        else { setBusy(false); setErr(({taken_username:'That username is taken.',bad_username:'Username: 3–24 letters, numbers, . _ -',short_password:'Use at least 8 characters.',bad_code:'This invite link is no longer valid.'})[res.j.error]||'Something went wrong. Try again.'); }
+      }).catch(function(){ setBusy(false); setErr('Can’t reach the server. Try again.'); });
+    }
+    if(peek&&peek.ok===false) return html`<div class="authpage"><div class="authcard">${BRANDMARK}<h1 class="authh">Invite expired</h1><p class="authsub">This invite link is no longer valid — ask for a fresh one.</p><button class="btn primary authgo" onClick=${props.onSignIn}>Go to sign in</button></div></div>`;
+    return html`<div class="authpage"><form class="authcard" onSubmit=${submit} noValidate>
+      ${BRANDMARK}
+      <h1 class="authh">${peek?(peek.invitedBy+' invited you'):'You’re invited'}</h1>
+      <p class="authsub">Join ${peek?html`<b>${peek.space}</b>`:'the space'} on hate club — make your sign-in to hop in.</p>
+      <label class="lbl" for="ji-name">Your name</label>
+      <input class="fld" id="ji-name" type="text" value=${name} onInput=${function(e){setName(e.target.value);}} placeholder="e.g. Riya" />
+      <label class="lbl" for="ji-user">Username</label>
+      <input class="fld" id="ji-user" type="text" autocapitalize="none" spellcheck="false" value=${user} onInput=${function(e){setUser(e.target.value);}} />
+      <label class="lbl" for="ji-pass">Password</label>
+      <${PasswordField} id="ji-pass" value=${pass} bad=${!!err&&!busy} onInput=${setPass} />
+      <${AuthError} text=${err} />
+      <button class="btn primary authgo" type="submit" disabled=${busy}>${busy?'Joining…':'Join'}</button>
+      <div class="authfoot">Already have an account? <button type="button" class="linkbtn" onClick=${props.onSignIn}>Sign in</button></div>
+    </form></div>`;
+  }
+
   function App(){
     var authS=useState('checking'); var auth=authS[0], setAuth=authS[1];
     var authRef=useRef(auth); authRef.current=auth;
@@ -2840,7 +3079,12 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var whoami=me?me.id:'p_mahesh';
     var clS=useState(null); var claimable=clS[0], setClaimable=clS[1];   // people still without a sign-in, during setup
     var moreS=useState(false); var moreOpen=moreS[0], setMoreOpen=moreS[1];
-    var spS=useState(lsGet('sp_space',DEFAULT_SPACE)); var space=spS[0];   // one space for now; a switcher comes with the second
+    var spS=useState(lsGet('sp_space',DEFAULT_SPACE)); var space=spS[0];   // the space you're viewing; switch it from the sidebar
+    var smS=useState(false); var spaceMenu=smS[0], setSpaceMenu=smS[1];
+    var nsS=useState(null); var newSpace=nsS[0], setNewSpace=nsS[1];        // null | {step:'name'|'invite', name, code, space_id, busy, err}
+    var wsS=useState(false); var wantSignIn=wsS[0], setWantSignIn=wsS[1];   // on an invite link, "I already have an account"
+    var inviteCode=(function(){ try{ return new URLSearchParams(location.search).get('invite')||''; }catch(e){ return ''; } })();
+    function switchSpace(id){ try{lsSet('sp_space',id);}catch(e){} spS[1](id); setSpaceMenu(false); setView2('today'); }
     var fS=useState('all'); var filter=fS[0], setFilter=fS[1];
     var dayS=useState(TODAY); var today=dayS[0], setToday=dayS[1];
     var selS=useState(TODAY); var sel=selS[0], setSel=selS[1];
@@ -2976,7 +3220,22 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       return function(){ window.removeEventListener('focus',onVis); document.removeEventListener('visibilitychange',onVis); window.removeEventListener('online',onOnline); window.removeEventListener('pagehide',onHide); clearInterval(iv); clearInterval(dv); };
     },[]);
     useEffect(function(){ try{ if(localStorage.getItem('sp_intro_v1')!=='1') setShowIntro(true); }catch(e){} },[]);
+    // opened an invite link (?invite=CODE) while already signed in → accept it and hop into the space
+    var invDoneRef=useRef(false);
+    useEffect(function(){ if(!inviteCode||auth!=='in'||invDoneRef.current) return; invDoneRef.current=true;
+      apiPost('/api/invite/accept',{code:inviteCode}).then(function(r){return r.json();}).then(function(j){
+        try{ var u=new URL(location.href); u.searchParams.delete('invite'); history.replaceState({},'',u); }catch(e){}
+        if(j&&j.ok&&j.space_id){ refresh(); switchSpace(j.space_id); showToast({emoji:'🤝',text:'You joined the space'}); }
+      }).catch(function(){});
+    },[auth,inviteCode]);
     function setView2(v){ setView(v); lsSet('sp_view',v); setPanel(null); }
+    // create a space, then hand back an invite code; and make an invite for a space you're already in
+    function nsCreate(){ if(!newSpace||newSpace.busy) return; var nm=(newSpace.name||'').trim(); if(!nm){ setNewSpace(Object.assign({},newSpace,{err:'Give it a name.'})); return; }
+      setNewSpace(Object.assign({},newSpace,{busy:true,err:''}));
+      apiPost('/api/space/create',{name:nm}).then(function(r){return r.json();}).then(function(j){ if(!j||!j.ok) throw 0; var sid=j.space_id;
+        return apiPost('/api/space/invite',{space_id:sid}).then(function(r2){return r2.json();}).then(function(j2){ refresh(); switchSpace(sid); setNewSpace({step:'invite',name:nm,code:(j2&&j2.code)||'',space_id:sid}); });
+      }).catch(function(){ setNewSpace(function(p){ return Object.assign({},p,{busy:false,err:'Couldn’t create it — try again.'}); }); }); }
+    function nsInvite(sid,nm){ apiPost('/api/space/invite',{space_id:sid}).then(function(r){return r.json();}).then(function(j){ if(j&&j.ok) setNewSpace({step:'invite',name:nm,code:j.code,space_id:sid}); else showToast({text:'Couldn’t make an invite link.'}); }).catch(function(){ showToast({text:'Couldn’t make an invite link.'}); }); }
 
     // everything below is the current space's
     VIEW.space=space;
@@ -3001,11 +3260,16 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     VIEW.who=whoami; VIEW.people=pmap; VIEW.members=mids.length?mids:['p_mahesh','p_partner'];
     var other=otherOf(whoami);
     useEffect(function(){ try{
-      var bg=(settings&&settings.theme_bg)||'sky', ft=(settings&&settings.theme_font)||'inter', rd=(settings&&settings.theme_radius)||'default';
+      var bg=(settings&&settings.theme_bg)||'sky', ft=(settings&&settings.theme_font)||'general', rd=(settings&&settings.theme_radius)||'default';
       var bgp=BG_PRESETS.filter(function(p){return p.id===bg;})[0];
-      document.documentElement.style.setProperty('--grad', bgp?bgp.css:DEFAULT_GRAD);
+      var S=document.documentElement.style;
+      S.setProperty('--grad', bgp?bgp.css:DEFAULT_GRAD);
+      // accent travels with the ground: the primary CTA, discs and glow all retint to the theme hue
+      var ac=bgp&&bgp.ac;
+      if(ac){ S.setProperty('--accent',ac[0]); S.setProperty('--accent-deep',ac[1]); S.setProperty('--accent-wash',ac[2]); S.setProperty('--glow',ac[3]); }
+      else { S.removeProperty('--accent'); S.removeProperty('--accent-deep'); S.removeProperty('--accent-wash'); S.removeProperty('--glow'); }
       var fo=FONTS.filter(function(f){return f.id===ft;})[0];
-      document.documentElement.style.setProperty('--font', fo?fo.stack:DEFAULT_FONT);
+      S.setProperty('--font', fo?fo.stack:GENERAL_STACK);
       var r=document.getElementById('root'); if(r){ r.setAttribute('data-radius', rd); if(bgp&&bgp.dark) r.setAttribute('data-ground','dark'); else r.removeAttribute('data-ground'); }
     }catch(e){} },[settings]);
     // while a focus session runs, sync faster so both people see start/pause/reset within a few seconds
@@ -3173,6 +3437,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     useEffect(function(){ if(store&&!APP_READY.v){ var tm=setTimeout(function(){ APP_READY.v=true; },400); return function(){ clearTimeout(tm); }; } },[!!store]);
     var helpFor=null; if(thisWeek){ var tIdx=Math.max(0,weekDates(mondayOf(TODAY)).indexOf(TODAY)); VIEW.members.forEach(function(m){ if(!helpFor&&m!==whoami&&needsHand(tasks,mondayOf(TODAY),m,tIdx)) helpFor=m; }); }
 
+    if(inviteCode && !wantSignIn && (auth==='signin'||auth==='setup')){ return html`<${JoinInvite} code=${inviteCode} onIn=${loadMe} onSignIn=${function(){ setWantSignIn(true); authRef.current='signin'; setAuth('signin'); }} />`; }
     if(auth==='signin'){ return html`<${SignIn} onIn=${loadMe} onSetup=${function(){ setClaimable(null); authRef.current='setup'; setAuth('setup'); }} />`; }
     if(auth==='setup'){ return html`<${Setup} claimable=${claimable} onIn=${loadMe} onSignIn=${function(){ authRef.current='signin'; setAuth('signin'); }} />`; }
     var loading=!store;
@@ -3194,19 +3459,36 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       : sync.st==='saving'?'Saving…' : '';
     var editingParent=(editingTask&&editingTask.parent_id)?findTask(editingTask.parent_id):null;
     var jPending=outboxRef.current.some(function(o){ return o.table==='journal' && o.row && o.row.id===TODAY+'_'+whoami; });
+    var mySpaces=(store&&store.spaces)||[];
+    var curSpaceName=(spaceRow&&spaceRow.name)||'hate club';
+    function spaceMembers(id){ return ((store&&store.members)||[]).filter(function(m){return m.space_id===id;}).map(function(m){return m.person_id;}); }
     var sidebar = html`<aside class="sidebar">
-      <div class="prof"><span class="pav">${initialOf(whoami)}</span><span class="pname">${nameOf(whoami)}</span></div>
+      <div class="spacesw">
+        <button class="spacesw-btn" aria-haspopup="true" aria-expanded=${spaceMenu} onClick=${function(){setSpaceMenu(!spaceMenu);}}>
+          <span class="pav">${initialOf(whoami)}</span>
+          <span class="spacesw-nm"><b>${curSpaceName}</b><i>${nameOf(whoami)}</i></span>
+          <span class="spacesw-cv">${spaceMenu?'▴':'▾'}</span>
+        </button>
+        ${spaceMenu?html`<div class="spacesw-menu">
+          ${(mySpaces.length?mySpaces:[{id:space,name:curSpaceName}]).map(function(sp){ var mem=spaceMembers(sp.id); return html`<button key=${sp.id} class=${'spacesw-op'+(sp.id===space?' on':'')} onClick=${function(){switchSpace(sp.id);}}>
+            <span class="spacesw-avs">${(mem.length?mem:[whoami]).slice(0,3).map(function(m,k){ return html`<span key=${m} class="av avm" style=${{background:personColor(m),marginLeft:k?'-7px':0,border:'2px solid var(--sidebar)'}}>${initialOf(m)}</span>`; })}</span>
+            <span class="spacesw-opnm">${sp.name}</span>${sp.id===space?html`<span class="spacesw-ck">✓</span>`:null}
+          </button>`; })}
+          ${spaceMembers(space).length<2?html`<button class="spacesw-add" onClick=${function(){ setSpaceMenu(false); nsInvite(space,curSpaceName); }}>Invite someone to this space</button>`:null}
+          <button class="spacesw-add" onClick=${function(){ setSpaceMenu(false); setNewSpace({step:'name',name:''}); }}>＋ New space</button>
+        </div>`:null}
+      </div>
       <button class="addbtn" onClick=${function(){setModal({defaultDate:TODAY});}}>
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#1F6FEB"/><path d="M12 8v8M8 12h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>Add task</button>
-      <button class=${'nav'+(v==='today'&&!openProj?' sel':'')} onClick=${function(){setView2('today');}}><span style=${{display:'flex',color:v==='today'&&!openProj?'#195FD0':'#54606E'}}><${Icon}>${icons.today}<//></span>Today<span class="cnt">${counts.today||''}</span></button>
-      ${showScores?html`<button class=${'nav'+(v==='week'&&!openProj?' sel':'')} onClick=${function(){setView2('week');}}><span style=${{display:'flex',color:v==='week'&&!openProj?'#195FD0':'#54606E'}}><${Icon}>${icons.week}<//></span>This week<span class="cnt">${thisWeek&&thisWeek.people[whoami]&&thisWeek.people[other]?html`<${Num} v=${thisWeek.people[whoami].points} /> · <${Num} v=${thisWeek.people[other].points} />`:''}</span></button>`:null}
-      <button class=${'nav'+(v==='tasks'&&!openProj?' sel':'')} onClick=${function(){setView2('tasks');}}><span style=${{display:'flex',color:v==='tasks'&&!openProj?'#195FD0':'#54606E'}}><${Icon}>${icons.tasks}<//></span>Tasks<span class="cnt">${(tasks||[]).filter(function(t){return !t.done;}).length||''}</span></button>
-      <button class=${'nav'+(v==='calendar'&&!openProj?' sel':'')} onClick=${function(){setView2('calendar');}}><span style=${{display:'flex',color:v==='calendar'&&!openProj?'#195FD0':'#54606E'}}><${Icon}>${icons.calendar}<//></span>Calendar</button>
-      <button class=${'nav'+(v==='projects'||openProj?' sel':'')} onClick=${function(){setView2('projects');}}><span style=${{display:'flex',color:v==='projects'||openProj?'#195FD0':'#54606E'}}><${Icon}>${icons.projects}<//></span>Projects</button>
-      <button class=${'nav'+(v==='journal'&&!openProj?' sel':'')} onClick=${function(){setView2('journal');}}><span style=${{display:'flex',color:v==='journal'&&!openProj?'#195FD0':'#54606E'}}><${Icon}>${icons.journal}<//></span>Journal</button>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="var(--accent)"/><path d="M12 8v8M8 12h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>Add task</button>
+      <button class=${'nav'+(v==='today'&&!openProj?' sel':'')} onClick=${function(){setView2('today');}}><span style=${{display:'flex',color:v==='today'&&!openProj?'var(--accent-deep)':'#54606E'}}><${Icon}>${icons.today}<//></span>Today<span class="cnt">${counts.today||''}</span></button>
+      ${showScores?html`<button class=${'nav'+(v==='week'&&!openProj?' sel':'')} onClick=${function(){setView2('week');}}><span style=${{display:'flex',color:v==='week'&&!openProj?'var(--accent-deep)':'#54606E'}}><${Icon}>${icons.week}<//></span>This week<span class="cnt">${thisWeek&&thisWeek.people[whoami]&&thisWeek.people[other]?html`<${Num} v=${thisWeek.people[whoami].points} /> · <${Num} v=${thisWeek.people[other].points} />`:''}</span></button>`:null}
+      <button class=${'nav'+(v==='tasks'&&!openProj?' sel':'')} onClick=${function(){setView2('tasks');}}><span style=${{display:'flex',color:v==='tasks'&&!openProj?'var(--accent-deep)':'#54606E'}}><${Icon}>${icons.tasks}<//></span>Tasks<span class="cnt">${(tasks||[]).filter(function(t){return !t.done;}).length||''}</span></button>
+      <button class=${'nav'+(v==='calendar'&&!openProj?' sel':'')} onClick=${function(){setView2('calendar');}}><span style=${{display:'flex',color:v==='calendar'&&!openProj?'var(--accent-deep)':'#54606E'}}><${Icon}>${icons.calendar}<//></span>Calendar</button>
+      <button class=${'nav'+(v==='projects'||openProj?' sel':'')} onClick=${function(){setView2('projects');}}><span style=${{display:'flex',color:v==='projects'||openProj?'var(--accent-deep)':'#54606E'}}><${Icon}>${icons.projects}<//></span>Projects</button>
+      <button class=${'nav'+(v==='journal'&&!openProj?' sel':'')} onClick=${function(){setView2('journal');}}><span style=${{display:'flex',color:v==='journal'&&!openProj?'var(--accent-deep)':'#54606E'}}><${Icon}>${icons.journal}<//></span>Journal</button>
       <div class="sec">Projects</div>
       ${(projects||[]).filter(function(p){return !p.archived;}).map(function(p){ return html`<button class="nav" key=${p.id} onClick=${function(){setPanel(p.id);}}><span class="dot" style=${{background:p.color}}></span>${p.name}<span class="cnt">${projCounts[p.id]||''}</span></button>`; })}
-      <button class="nav" style=${{color:'#195FD0',fontWeight:600}} onClick=${function(){setPEdit({});}}>+ New project</button>
+      <button class="nav" style=${{color:'var(--accent-deep)',fontWeight:600}} onClick=${function(){setPEdit({});}}>+ New project</button>
       <${FocusWidget} focus=${focus} whoami=${whoami} onStart=${startFocus} onPause=${pauseFocus} onResume=${resumeFocus} onReset=${resetFocus} />
       <button class="helpbtn" onClick=${function(){setShowIntro(true);}}><span style=${{display:'flex',color:'#54606E'}}><${Icon}>${icons.help}<//></span>How it works</button>
       <button class="nav" onClick=${function(){setSettingsOpen(true);}}><span style=${{display:'flex',color:'#54606E'}}><${Icon}>${icons.settings}<//></span>Settings</button>
@@ -3214,8 +3496,35 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     </aside>`;
 
     var titleTxt = openProj?'Projects':(({today:'Today',week:'This week',tasks:'Tasks',calendar:'Calendar',projects:'Projects',journal:'Journal'})[v]||'Today');
+    // Today header: a functional + empathetic greeting (name · time of day · what's next), daily-rotating so it stays fresh
+    var greet=(function(){
+      var name=((nameOf(whoami)||'').trim().split(/\s+/)[0])||'you';
+      var h=new Date().getHours();
+      var tod=h<5?'night':h<12?'morning':h<17?'afternoon':h<22?'evening':'night';
+      var n=counts.today;
+      var carried=carriedFrom(tasks,function(){return true;});
+      var todayList=(tasks||[]).filter(function(t){return !t.parent_id&&t.date===TODAY&&!t.done&&!isEventType(t.type);});
+      var top=carried[0]||todayList[0];
+      var topT=top?((top.title||'').trim()):'';
+      var doneToday=(tasks||[]).filter(function(t){return !t.parent_id&&t.date===TODAY&&t.done;}).length;
+      var d=parseYmd(TODAY), eb=DOW[d.getDay()]+' · '+d.getDate()+' '+MON[d.getMonth()].slice(0,3);
+      var vary=parseInt(TODAY.replace(/-/g,''),10)%2, hook, sub;
+      if(n===0&&doneToday===0){ hook=vary?('A clear day, '+name):('Nothing on today, '+name); sub='Add something when you like — or enjoy the quiet.'; }
+      else if(n===0){ hook=vary?('That’s the lot, '+name+' ✨'):('Done for the day, '+name+' 🎉'); sub='Everything for today is ticked off.'; }
+      else {
+        var g={morning:['Morning, '+name, name+', let’s get into it'],
+               afternoon:['Afternoon, '+name, name+', keep it rolling'],
+               evening:['Evening, '+name, name+', let’s close the day'],
+               night:['Still up, '+name+'?', name+', one more push?']};
+        hook=g[tod][vary];
+        if(carried.length){ sub=vary?html`${carried.length} rolled over — start with “<b>${topT}</b>”`:html`${carried.length} from earlier still open · first “<b>${topT}</b>”`; }
+        else if(topT){ sub=vary?html`Let’s finish “<b>${topT}</b>” first — ${n} to go`:html`${n} on the list · kick off with “<b>${topT}</b>”`; }
+        else sub=n+' to go today';
+      }
+      return {eb:eb, hook:hook, sub:sub};
+    })();
     var content;
-    if(loading){ content=html`<div class="empty" style=${{marginTop:'60px',color:'#3C6FB0'}}><div class="big">${sync.st==='offline'?'Can’t reach the server':'Loading your planner…'}</div><div class="sub">${sync.st==='offline'?'Trying again in a few seconds.':'Syncing shared data.'}</div></div>`; }
+    if(loading){ content=html`<div class="empty" style=${{marginTop:'60px',color:'var(--accent-muted)'}}><div class="big">${sync.st==='offline'?'Can’t reach the server':'Loading your planner…'}</div><div class="sub">${sync.st==='offline'?'Trying again in a few seconds.':'Syncing shared data.'}</div></div>`; }
     else if(openProj){ content=html`<${ProjectPage} key=${openProj.id} project=${openProj} tasks=${tasks} materials=${materials} onBack=${function(){setPanel(null);}} onToggle=${toggleTask} onEdit=${function(p){setPEdit(p);}} onEditTask=${function(t){setModal({editing:t});}} onAddItem=${addProjectItem} onAddSub=${addSubtask} onAddMaterial=${addMaterial} onDelMaterial=${delMaterial} onReopen=${reopenProject} onFinish=${finishProject} />`; }
     else if(v==='week'){ content=html`<${WeekPage} fresh=${!!leadFlash} data=${wkData} projects=${projects} onToggle=${toggleTask} onTakeOne=${takeOne} onCheer=${function(){ sendWave('💪'); }} />`; }
     else if(v==='today'){ content=html`<${Fragment}>${showGS?html`<${GetStarted} steps=${gsSteps} done=${gsDone} onDismiss=${function(){setGsHide(true);lsSet('sp_gs_hide','1');}} />`:null}<div class="mobfocus"><${FocusWidget} focus=${focus} whoami=${whoami} onStart=${startFocus} onPause=${pauseFocus} onResume=${resumeFocus} onReset=${resetFocus} /></div><${Today} sel=${sel} filter=${filter} projects=${projects} tasks=${tasks} routines=${routines} upcoming=${upcoming} habits=${habitDefs} habitLogs=${habitLogs} topics=${topics} topicLinks=${topicLinks} settings=${settings} whoami=${whoami} onToggle=${toggleTask} onEdit=${function(t){setModal({editing:t});}} onAdd=${function(d){setModal({defaultDate:d});}} carry=${carry} onMoveAllToday=${moveAllToday} onSetHabit=${checkHabit} onStepHabit=${stepHabit} onEditHabit=${function(h){setHabitEdit(h);}} onAddHabit=${function(){setHabitEdit({});}} notes=${notes} onAddNote=${addNote} onSaveNote=${saveNoteText} onSetNoteColor=${setNoteColor} onDeleteNote=${deleteNote} onGoJournal=${function(){setView2('journal');}} onShowAll=${function(){setView2('tasks');}} score=${thisWeek} help=${helpFor} fresh=${!!leadFlash} onOpenWeek=${function(){setView2('week');}} onQuickAdd=${quickAdd} /><//>`; }
@@ -3231,7 +3540,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       ${sidebar}
       <main class="main"><div class="wrap">
         <div class="topbar">
-          <div class="brandrow"><span class="brand">hc</span><div><div class="eyebrow">hate club</div><h1 class="title">${titleTxt}</h1></div></div>
+          <div class="brandrow"><span class="brand">hc</span>${v==='today'&&!openProj&&!loading?html`<div class="hgreet"><div class="eyebrow">${greet.eb}</div><h1 class="title">${greet.hook}</h1><div class="hgsub">${greet.sub}</div></div>`:html`<div><div class="eyebrow">hate club</div><h1 class="title">${titleTxt}</h1></div>`}</div>
           <div class="ctrls">
             <button class="navcirc mobonly" style=${{width:'36px',height:'36px'}} aria-label="How it works" onClick=${function(){setShowIntro(true);}}><${Icon} s=${16}>${icons.help}<//></button>
             ${syncTxt?html`<button class=${'syncbtn mobonly '+sync.st} aria-label=${syncTxt} onClick=${function(){ showToast({text:syncTxt,action:sync.st==='error'?{label:'Retry',fn:retryNow}:null,ms:5000}); }}><i class="syncdot"></i><span class="syncw">${sync.st==='offline'?('Offline'+(sync.n?(' · '+sync.n):'')):sync.st==='error'?'Not saved':'Saving'}</span></button>`:null}
@@ -3255,8 +3564,27 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       ${modalV?html`<${TaskModal} closing=${modalClosing} key=${editingTask?editingTask.id:'new'} parent=${editingParent} onOpenParent=${function(p){setModal({editing:p});}} editing=${modalV.editing} children=${modalChildren} defaultDate=${modalV.defaultDate} defaultTime=${modalV.defaultTime} defaultType=${modalV.defaultType} defaultProject=${modalV.defaultProject} whoami=${whoami} projects=${projects} onClose=${function(){setModal(null);}} onSave=${saveTask} onDelete=${deleteTask} />`:null}
       ${pEditV?html`<${ProjectEditor} closing=${pEditClosing} editing=${pEditV} whoami=${whoami} onClose=${function(){setPEdit(null);}} onSave=${saveProject} onDelete=${askDeleteProject} />`:null}
       ${introV?html`<${Intro} closing=${introClosing} onClose=${function(){setShowIntro(false);lsSet('sp_intro_v1','1');}} />`:null}
-      ${setV?html`<${SettingsModal} closing=${setClosing} settings=${settings} habits=${habitDefs} whoami=${whoami} themeBg=${(settings&&settings.theme_bg)||'sky'} themeFont=${(settings&&settings.theme_font)||'inter'} themeRad=${(settings&&settings.theme_radius)||'default'} onSetTheme=${setTheme} me=${me} members=${VIEW.members} onSaveName=${saveMyName} onChangePassword=${changePassword} onSignOut=${signOut} onAddHabit=${function(){setHabitEdit({});}} onEditHabit=${function(h){setHabitEdit(h);}} onHowItWorks=${function(){setSettingsOpen(false);setShowIntro(true);}} onClose=${function(){setSettingsOpen(false);}} />`:null}
+      ${setV?html`<${SettingsModal} closing=${setClosing} settings=${settings} habits=${habitDefs} whoami=${whoami} themeBg=${(settings&&settings.theme_bg)||'sky'} themeFont=${(settings&&settings.theme_font)||'general'} themeRad=${(settings&&settings.theme_radius)||'default'} onSetTheme=${setTheme} me=${me} members=${VIEW.members} onSaveName=${saveMyName} onChangePassword=${changePassword} onSignOut=${signOut} onAddHabit=${function(){setHabitEdit({});}} onEditHabit=${function(h){setHabitEdit(h);}} onHowItWorks=${function(){setSettingsOpen(false);setShowIntro(true);}} onClose=${function(){setSettingsOpen(false);}} />`:null}
       ${habitV?html`<${HabitEditor} closing=${habitClosing} editing=${habitV.id?habitV:null} whoami=${whoami} onClose=${function(){setHabitEdit(null);}} onSave=${saveHabit} onDelete=${deleteHabit} />`:null}
+      ${newSpace?html`<div class="nsov" onClick=${function(e){ if(e.target===e.currentTarget) setNewSpace(null); }}>
+        <div class="nsmodal">
+          ${newSpace.step==='invite'?html`<${Fragment}>
+            <div class="meyebrow">Space</div>
+            <h3 class="nsh">Invite your partner</h3>
+            <p class="nssub">Send them this link. They open it, make a sign-in, and land straight in <b>${newSpace.name}</b>.</p>
+            <div class="nsinvite"><input class="fld" readOnly value=${location.origin+'/?invite='+newSpace.code} onFocus=${function(e){e.target.select();}} /><button class="btn primary" style=${{flex:'none'}} onClick=${function(e){ var u=location.origin+'/?invite='+newSpace.code, b=e.currentTarget; try{navigator.clipboard.writeText(u);}catch(x){} b.textContent='Copied'; setTimeout(function(){ try{b.textContent='Copy';}catch(y){} },1400); }}>Copy</button></div>
+            <div class="nscode">or share the code <b>${newSpace.code}</b></div>
+            <div class="mactions" style=${{justifyContent:'flex-end',marginTop:'18px'}}><button class="btn primary" style=${{flex:'none'}} onClick=${function(){ setNewSpace(null); }}>Done</button></div>
+          <//>`:html`<${Fragment}>
+            <div class="meyebrow">New space</div>
+            <h3 class="nsh">Start a space</h3>
+            <p class="nssub">A fresh shared world — its own tasks, habits and race. Name it, then invite one person.</p>
+            <input class="fld" autoFocus value=${newSpace.name} placeholder="e.g. Mahesh & Riya" onInput=${function(e){ setNewSpace(Object.assign({},newSpace,{name:e.target.value,err:''})); }} onKeyDown=${function(e){ if(e.key==='Enter') nsCreate(); }} />
+            ${newSpace.err?html`<${AuthError} text=${newSpace.err} />`:null}
+            <div class="mactions" style=${{justifyContent:'flex-end',marginTop:'16px'}}><button class="btn ghost" style=${{flex:'none'}} onClick=${function(){ setNewSpace(null); }}>Cancel</button><button class="btn primary" style=${{flex:'none'}} disabled=${newSpace.busy} onClick=${nsCreate}>${newSpace.busy?'Creating…':'Create'}</button></div>
+          <//>`}
+        </div>
+      </div>`:null}
       ${!loading?html`<div class="wavewrap">
         ${waveOpen?html`<div class="wavepick">${WAVE_EMOJIS.map(function(e){ return html`<button class="waveopt" key=${e} onClick=${function(){sendWave(e);}}>${e}</button>`; })}</div>`:null}
         <button class="wavefab" aria-label=${'Send a wave to '+nameOf(other)} title=${'Wave to '+nameOf(other)} onClick=${function(){setWaveOpen(!waveOpen);}}>🫶</button>
