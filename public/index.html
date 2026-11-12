@@ -1028,6 +1028,22 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 .hm-pdot{width:8px;height:8px;border-radius:50%;background:var(--accent-deep);flex:none;animation:ppulse 1.9s ease-out infinite}
 @keyframes ppulse{0%{box-shadow:0 0 0 0 var(--glow)}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
 .hm-pact{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.hm-mood{font-size:12.5px;color:var(--muted);margin-bottom:5px}
+.hm-moode{font-size:14px;vertical-align:-1px;filter:none}
+/* slice 4: mood row + honest habit check-in */
+.moodrow{display:flex;align-items:center;gap:12px;margin:0 2px 16px;flex-wrap:wrap}
+.moodq{font-size:13px;font-weight:600;color:var(--ink)}
+.moodopts{display:inline-flex;gap:3px}
+.moodbtn{width:38px;height:38px;border:1px solid transparent;border-radius:50%;background:none;font-size:20px;line-height:1;cursor:pointer;filter:grayscale(.55);opacity:.6;transition:transform .12s var(--ease-out),opacity .12s,filter .12s}
+.moodbtn:hover{opacity:1;filter:none;transform:scale(1.12)}
+.moodbtn.on{opacity:1;filter:none;border-color:var(--accent);background:var(--accent-wash);transform:scale(1.05)}
+.habchk{display:flex;align-items:center;gap:11px;padding:8px 0}
+.habname{font-weight:500;font-size:13.5px}
+.habchk.skipped .habname{color:#9AA6B4;text-decoration:line-through;text-decoration-color:#C7D0DA}
+.habsub{display:block;font-weight:400;font-size:11.5px;color:#8A93A0}
+.habskip{border:none;background:none;font:inherit;font-weight:500;font-size:12px;color:#8A93A0;cursor:pointer;padding:4px 7px;border-radius:6px}
+.habskip:hover{color:var(--accent-deep);background:var(--accent-wash)}
+.view.drop:hover{color:#C64A3B}
 .hm-wide{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;border:1px solid #DCE3EC;border-radius:10px;background:#fff;color:#15171A;font:inherit;font-weight:600;font-size:13px;padding:8px 12px;cursor:pointer}
 .hm-over{color:#A3392C;font-weight:600}
 .scpill{display:inline-flex;align-items:center;gap:8px;border:1px solid #E5EAF1;background:#F7F9FC;border-radius:99px;padding:6px 12px;font:inherit;font-size:13px;font-weight:600;color:#15171A;cursor:pointer;white-space:nowrap}
@@ -1461,6 +1477,9 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     "What is one word for today?",
     "What is something you want to start, even badly?"
   ];
+  // a one-tap daily mood
+  var MOODS=[{e:'😣',k:'rough'},{e:'😕',k:'low'},{e:'😐',k:'okay'},{e:'🙂',k:'good'},{e:'😄',k:'great'}];
+  function moodOf(k){ return MOODS.filter(function(m){return m.k===k;})[0]; }
   // the daily question card: you only see the other's answer once you've written yours (the reveal is server-enforced too)
   function DailyQuestion(props){
     var me=props.whoami, other=props.other, ans=props.answers||[];
@@ -1656,6 +1675,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
             <button class="view" onClick=${function(){carry.onToday(t);}}>Today</button>
             <${DayPick} title=${t.title} onPick=${function(ds){carry.onPick(t,ds);}} />
             ${t.date?html`<button class="view" onClick=${function(){carry.onUnplan(t);}}>Unplan</button>`:null}
+            ${carry.onDrop?html`<button class="view drop" onClick=${function(){carry.onDrop(t);}}>Drop</button>`:null}
           <//>`:null}
           <button class="view" onClick=${function(){props.onEdit(t);}}>Edit</button>
         </div>
@@ -1819,6 +1839,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var dayLbl=isToday?'Today':longDay(parseYmd(sel));
     return html`<${Fragment}>
       ${isToday&&props.streak?html`<${UsStreak} streak=${props.streak} repair=${props.repair} onCover=${props.onCover} onRepair=${props.onRepair} />`:null}
+      ${isToday&&props.onMood?html`<div class="moodrow"><span class="moodq">How’s today?</span><div class="moodopts">${MOODS.map(function(m){ return html`<button type="button" class=${'moodbtn'+(props.mood===m.k?' on':'')} key=${m.k} title=${m.k} aria-label=${'Mood: '+m.k} aria-pressed=${props.mood===m.k} onClick=${function(){ buzz(); props.onMood(props.mood===m.k?'':m.k); }}>${m.e}</button>`; })}</div></div>`:null}
       <div class="hm-grid">
       <section class="hm-list" aria-label=${dayLbl}>
         <form class="hm-qadd" onSubmit=${function(e){ e.preventDefault(); var v=qa.trim(); if(!v) return; props.onQuickAdd(v,sel); setQa(''); }}>
@@ -1841,6 +1862,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       </section>
       <aside class="hm-rail" aria-label="Around today">
         ${other?html`<div class="hm-sec"><div class="hm-shd"><h2>${nameOf(other)}</h2><${Avatar} owner=${other} /></div>
+          ${(props.partner&&props.partner.mood)?html`<div class="hm-mood"><span class="hm-moode">${(moodOf(props.partner.mood)||{}).e||''}</span> Feeling ${props.partner.mood}</div>`:null}
           ${(function(){ var p=props.partner;
             if(p&&p.focusing) return html`<div class="hm-pres"><span class="hm-pdot" aria-hidden="true"></span>Focusing now${p.focusLabel?(' · '+p.focusLabel):''}</div>`;
             if(p){ var bits=[]; if(p.done>0)bits.push(p.done+' done'); if(p.kept>0)bits.push(p.kept+' habit'+(p.kept>1?'s':'')); if(p.journaled)bits.push('journaled');
@@ -1886,10 +1908,11 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
         })}
         ${checkH.length?html`<section class="habcard" style=${{flex:'1 1 240px',minWidth:'220px'}}>
           <span style=${{fontWeight:600,fontSize:'14px'}}>Daily</span>
-          ${checkH.map(function(h){ var done=(logVal(h.id,TODAY)||0)>0; var st=streak(h.id);
-            return html`<div style=${{display:'flex',alignItems:'center',gap:'11px',padding:'8px 0'}} key=${h.id}>
-              <${Check} done=${done} label=${h.name} onClick=${function(){props.onSetHabit(h.id,done?0:1);}} />
-              <span style=${{flex:1,minWidth:0}}><span style=${{fontWeight:500,fontSize:'13.5px'}}>${h.name}</span>${st>0?html`<span style=${{display:'block',fontWeight:400,fontSize:'11.5px',color:'#8A93A0'}}><span key=${h.id+'-'+st} class=${'flame'+(grewStreak(h.id,st)?' bump':'')}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">${svgFlame}</svg></span>${st}-day streak</span>`:null}</span>
+          ${checkH.map(function(h){ var v=logVal(h.id,TODAY); var done=(v||0)>0; var skipped=v===-1; var st=streak(h.id);
+            return html`<div class=${'habchk'+(skipped?' skipped':'')} key=${h.id}>
+              <${Check} done=${done} label=${h.name} onClick=${function(){ buzz(); props.onSetHabit(h.id,done?0:1); }} />
+              <span style=${{flex:1,minWidth:0}}><span class="habname">${h.name}</span>${skipped?html`<span class="habsub">Skipped today</span>`:(st>0?html`<span class="habsub"><span key=${h.id+'-'+st} class=${'flame'+(grewStreak(h.id,st)?' bump':'')}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">${svgFlame}</svg></span>${st}-day streak</span>`:null)}</span>
+              ${done?null:html`<button class="habskip" onClick=${function(){ props.onSetHabit(h.id,skipped?0:-1); }}>${skipped?'Undo':'Skip'}</button>`}
               <button class="view" onClick=${function(){props.onEditHabit(h);}}>Edit</button>
             </div>`; })}
         </section>`:null}
@@ -3568,7 +3591,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     function takeOne(t){ if(!t) return; var was=t.owner; commit([{op:'patch',table:'tasks',id:t.id,fields:{owner:EVERYONE},_label:t.title}]); showToast({text:'“'+t.title+'” is now for both of you',action:{label:'Undo',fn:function(){ commit([{op:'patch',table:'tasks',id:t.id,fields:{owner:was}}]); }},ms:6500}); }
     function scheduleTask(t,ds,time){ patchTask(t,{date:ds,time:(time!=null?time:(t.time||''))}); }
     function rowEl(k){ return document.querySelector('[data-row="'+k+'"]'); }
-    var carry={ onToday:function(t){ exitThen(rowEl('c'+t.id),function(){ patchTask(t,{date:TODAY}); }); }, onPick:function(t,ds){ exitThen(rowEl('c'+t.id),function(){ patchTask(t,{date:ds}); }); }, onUnplan:function(t){ exitThen(rowEl('c'+t.id),function(){ patchTask(t,{date:'',time:''}); }); } };
+    var carry={ onToday:function(t){ exitThen(rowEl('c'+t.id),function(){ patchTask(t,{date:TODAY}); }); }, onPick:function(t,ds){ exitThen(rowEl('c'+t.id),function(){ patchTask(t,{date:ds}); }); }, onUnplan:function(t){ exitThen(rowEl('c'+t.id),function(){ patchTask(t,{date:'',time:''}); }); }, onDrop:function(t){ exitThen(rowEl('c'+t.id),function(){ holdDelete([{op:'delete',table:'tasks',id:t.id,_label:t.title}],'Dropped “'+t.title+'”'); }); } };
     function moveAllToday(list){
       var prev=list.map(function(t){ return {id:t.id,date:t.date||''}; });
       commit(list.map(function(t){ return {op:'patch',table:'tasks',id:t.id,fields:{date:TODAY},_label:t.title}; }));
@@ -3725,9 +3748,13 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       var kept=0; (habitLogs||[]).forEach(function(l){ var h=hb[l.habit]; if(!h||l.date!==TODAY) return; var ok=h.kind==='count'?(h.target==null?l.value>0:l.value<=h.target):l.value>0; if(ok) kept++; });
       var jrnl=homeJournal.some(function(j){ return j.date===TODAY&&j.owner===other; });
       var foc=!!(focus&&focus.status==='running'&&focus.started_by===other&&Date.now()<(focus.ends_at||0));
-      return {id:other,done:dn,kept:kept,journaled:jrnl,focusing:foc,focusLabel:(focus&&focus.label)||'',late:overdueOf(homeTasks,other).length,anything:(dn>0||kept>0||jrnl||foc)};
+      var pm=(((store&&store.moods)||[]).filter(function(m){return m.person_id===other&&m.date===TODAY;})[0]||{}).mood||'';
+      return {id:other,done:dn,kept:kept,journaled:jrnl,focusing:foc,focusLabel:(focus&&focus.label)||'',mood:pm,late:overdueOf(homeTasks,other).length,anything:(dn>0||kept>0||jrnl||foc)};
     })():null;
     // the daily question: this space's answers, a save handler, and a toast when the partner answers
+    // one-tap daily mood (personal, shown in your partner's presence)
+    var myMood=(((store&&store.moods)||[]).filter(function(m){return m.person_id===whoami&&m.date===TODAY;})[0]||{}).mood||'';
+    function setMood(mood){ apiPost('/api/mood',{mood:mood,date:TODAY}).then(function(r){return r.json();}).then(function(j){ if(!(j&&j.ok)) showToast({text:'Couldn’t save your mood.'}); refresh(); }).catch(function(){ showToast({text:'Couldn’t save your mood.'}); }); }
     var dailyAnswers=((store&&store.daily_answers)||[]).filter(function(a){return a.space_id===space;});
     function answerDaily(text){ apiPost('/api/daily/answer',{space:space,date:TODAY,text:text}).then(function(r){return r.json();}).then(function(j){ if(j&&j.ok){ refresh(); showToast({emoji:'✍️',text:'Answer shared.'}); } else showToast({text:'Couldn’t save your answer.'}); }).catch(function(){ showToast({text:'Couldn’t save your answer.'}); }); }
     var dqRef=useRef(undefined);
@@ -3846,7 +3873,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     if(loading){ content=html`<div class="empty" style=${{marginTop:'60px',color:'var(--accent-muted)'}}><div class="big">${sync.st==='offline'?'Can’t reach the server':'Loading your planner…'}</div><div class="sub">${sync.st==='offline'?'Trying again in a few seconds.':'Syncing shared data.'}</div></div>`; }
     else if(openProj){ content=html`<${ProjectPage} key=${openProj.id} project=${openProj} tasks=${tasks} materials=${materials} onBack=${function(){setPanel(null);}} onToggle=${toggleTask} onEdit=${function(p){setPEdit(p);}} onEditTask=${function(t){setModal({editing:t});}} onAddItem=${addProjectItem} onAddSub=${addSubtask} onAddMaterial=${addMaterial} onDelMaterial=${delMaterial} onReopen=${reopenProject} onFinish=${finishProject} />`; }
     else if(v==='week'){ content=html`<${WeekPage} fresh=${!!leadFlash} data=${wkData} projects=${projects} onToggle=${toggleTask} onTakeOne=${takeOne} onCheer=${function(){ sendWave('💪'); }} />`; }
-    else if(v==='today'){ content=html`<${Fragment}>${showGS?html`<${GetStarted} steps=${gsSteps} done=${gsDone} onDismiss=${function(){setGsHide(true);lsSet('sp_gs_hide','1');}} />`:null}<div class="mobfocus"><${FocusWidget} focus=${focus} whoami=${whoami} onStart=${startFocus} onPause=${pauseFocus} onResume=${resumeFocus} onReset=${resetFocus} /></div><${Today} sel=${sel} filter=${filter} projects=${projects} tasks=${tasks} routines=${routines} upcoming=${upcoming} habits=${habitDefs} habitLogs=${habitLogs} topics=${topics} topicLinks=${topicLinks} settings=${settings} whoami=${whoami} onToggle=${toggleTask} onEdit=${function(t){setModal({editing:t});}} onAdd=${function(d){setModal({defaultDate:d});}} carry=${carry} onMoveAllToday=${moveAllToday} onSetHabit=${checkHabit} onStepHabit=${stepHabit} onEditHabit=${function(h){setHabitEdit(h);}} onAddHabit=${function(){setHabitEdit({});}} notes=${notes} onAddNote=${addNote} onSaveNote=${saveNoteText} onSetNoteColor=${setNoteColor} onDeleteNote=${deleteNote} onGoJournal=${function(){setView2('journal');}} onShowAll=${function(){setView2('tasks');}} onImport=${function(){setImport({});}} importCount=${importable} streak=${usk} repair=${uskRepair} onCover=${coverToday} onRepair=${repairStreak} partner=${partner} nudged=${nudgedToday} onNudge=${sendNudge} onBoost=${sendBoost} dailyAnswers=${dailyAnswers} onAnswer=${answerDaily} score=${thisWeek} help=${helpFor} fresh=${!!leadFlash} onOpenWeek=${function(){setView2('week');}} onQuickAdd=${quickAdd} /><//>`; }
+    else if(v==='today'){ content=html`<${Fragment}>${showGS?html`<${GetStarted} steps=${gsSteps} done=${gsDone} onDismiss=${function(){setGsHide(true);lsSet('sp_gs_hide','1');}} />`:null}<div class="mobfocus"><${FocusWidget} focus=${focus} whoami=${whoami} onStart=${startFocus} onPause=${pauseFocus} onResume=${resumeFocus} onReset=${resetFocus} /></div><${Today} sel=${sel} filter=${filter} projects=${projects} tasks=${tasks} routines=${routines} upcoming=${upcoming} habits=${habitDefs} habitLogs=${habitLogs} topics=${topics} topicLinks=${topicLinks} settings=${settings} whoami=${whoami} onToggle=${toggleTask} onEdit=${function(t){setModal({editing:t});}} onAdd=${function(d){setModal({defaultDate:d});}} carry=${carry} onMoveAllToday=${moveAllToday} onSetHabit=${checkHabit} onStepHabit=${stepHabit} onEditHabit=${function(h){setHabitEdit(h);}} onAddHabit=${function(){setHabitEdit({});}} notes=${notes} onAddNote=${addNote} onSaveNote=${saveNoteText} onSetNoteColor=${setNoteColor} onDeleteNote=${deleteNote} onGoJournal=${function(){setView2('journal');}} onShowAll=${function(){setView2('tasks');}} onImport=${function(){setImport({});}} importCount=${importable} streak=${usk} repair=${uskRepair} onCover=${coverToday} onRepair=${repairStreak} partner=${partner} nudged=${nudgedToday} onNudge=${sendNudge} onBoost=${sendBoost} dailyAnswers=${dailyAnswers} onAnswer=${answerDaily} mood=${myMood} onMood=${setMood} score=${thisWeek} help=${helpFor} fresh=${!!leadFlash} onOpenWeek=${function(){setView2('week');}} onQuickAdd=${quickAdd} /><//>`; }
     else if(v==='tasks'){ content=html`<${TasksTable} tasks=${tasks} projects=${projects} onEdit=${function(t){setModal({editing:t});}} onToggle=${toggleTask} />`; }
     else if(v==='calendar'){ content=html`<${Calendar} tasks=${tasks} projects=${projects} onAddDay=${function(ds){setModal({defaultDate:ds});}} onAddSlot=${function(ds,tm){setModal({defaultDate:ds,defaultTime:tm,defaultType:'event'});}} onEditTask=${function(t){setModal({editing:t});}} onOpenProject=${function(id){setPanel(id);}} onToggle=${toggleTask} onSchedule=${scheduleTask} onNewProject=${function(s,e){setPEdit({start_date:s,end_date:e});}} routines=${routines} />`; }
     else if(v==='projects'){ content=html`<${Projects} projects=${projects} tasks=${tasks} onOpen=${function(id){setPanel(id);}} onNew=${function(){setPEdit({});}} onEdit=${function(p){setPEdit(p);}} onToggle=${toggleTask} onPickDates=${function(){setView2('calendar');}} />`; }

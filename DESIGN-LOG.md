@@ -55,6 +55,14 @@
 
 ---
 
+## 2026-11-12 (later⁶): Slice 4 — check-in upgrades (honest + a mood + leftover triage) — **BUILT, local-verified, NOT deployed**
+
+His picks: all three · keep tap+buzz (no press-hold) · honest skip (streak-neutral) · mood shared.
+- **Done / Skipped for check-habits:** each check-habit can be done, **skipped** ("not today", struck + "Skipped today" + Undo), or pending (empty + "Skip"). Skip = a habit_logs value of **-1**; the worker's value clamp relaxed `Math.max(0…)`→`Math.max(-1…)` (opStatements + /api/habit; delta stays ≥0). A skip reads as "not kept" → doesn't feed the streak/score, isn't a miss. Check tap now `buzz()`es.
+- **One-tap mood:** a `.moodrow` ("How's today?" 😣😕😐🙂😄) at the top of Today; tap sets/toggles your mood. New `moods(id=<person>_<date>, person_id, date, mood)` table (lazy `ensureMood`), `POST /api/mood` (upsert, '' clears). Personal, shown in the **partner's presence** line (`.hm-mood` "Feeling <mood>").
+- **Leftover triage:** the carry "From earlier" rows already had Today · Pick a day · Unplan · Edit; added **Drop** (`carry.onDrop` → `holdDelete` with a 6.5s Undo). Done = the existing checkbox.
+- **Verified local:** mood endpoint persists ("good"); skip -1 persists via the op path and reads "skipped (not kept)"; UI — mood row renders, "Read" shows struck + "Skipped today" + Undo, "Art" shows Skip, Drop works with an Undo toast; no app errors (only stale connection-refused from a dev-server restart). **DEPLOY = `npx wrangler deploy`** (moods self-migrates) — rides with the streak fix + slice 3 (all pending the deploy gate). Next: Slice 5 (the grow-a-thing).
+
 ## 2026-11-12 (later⁵): Slice 3 — the daily question (reveal-after-you-answer) — **BUILT, local-verified, NOT deployed**
 
 His picks: server-enforced reveal · curated pack · toast + states · bottom-of-Today, today-only.

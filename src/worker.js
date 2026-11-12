@@ -156,6 +156,13 @@ async function ensureDailyQ(env) {
   await env.DB.prepare('CREATE TABLE IF NOT EXISTS daily_answers (id TEXT PRIMARY KEY, space_id TEXT, person_id TEXT, date TEXT, text TEXT, created_at INTEGER)').run();
   await env.DB.prepare("INSERT INTO settings (key,value) VALUES ('dailyq_ready','1') ON CONFLICT(key) DO UPDATE SET value='1'").run();
 }
+// a one-tap daily mood per person (id = <person>_<date>); personal, shared to the people in your spaces
+async function ensureMood(env) {
+  const done = await env.DB.prepare("SELECT value FROM settings WHERE key='mood_ready'").first();
+  if (done) return;
+  await env.DB.prepare('CREATE TABLE IF NOT EXISTS moods (id TEXT PRIMARY KEY, person_id TEXT, date TEXT, mood TEXT, created_at INTEGER)').run();
+  await env.DB.prepare("INSERT INTO settings (key,value) VALUES ('mood_ready','1') ON CONFLICT(key) DO UPDATE SET value='1'").run();
+}
 
 // ---- too many wrong tries: 5, then a 1-minute wait ----
 const LOCK_AFTER = 5;
@@ -368,7 +375,7 @@ async function api(req, env, url) {
   }
   if (p === '/api/habit' && req.method === 'POST') {
     const b = await req.json();
-    const val = Math.max(0, parseInt(b.value, 10) || 0);
+    const val = Math.max(-1, parseInt(b.value, 10) || 0);
     await env.DB.prepare('INSERT INTO habit_logs (date,habit,value) VALUES (?1,?2,?3) ON CONFLICT(date,habit) DO UPDATE SET value=excluded.value')
       .bind(String(b.date), String(b.habit), val)
       .run();
@@ -534,6 +541,19 @@ async function api(req, env, url) {
       .bind(id, sid, me, date, text, Date.now()).run();
     return json({ ok: true });
   }
+  // a one-tap daily mood (upsert; '' clears it)
+  if (p === '/api/mood' && req.method === 'POST') {
+    await ensureMood(env);
+    const b = await req.json().catch(() => ({}));
+    const date = String(b.date || '');
+    const mood = String(b.mood || '').slice(0, 16);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return json({ ok: false, error: 'bad_date' }, 400);
+    const id = me + '_' + date;
+    if (!mood) { await env.DB.prepare('DELETE FROM moods WHERE id=?1').bind(id).run(); return json({ ok: true }); }
+    await env.DB.prepare('INSERT INTO moods (id,person_id,date,mood,created_at) VALUES (?1,?2,?3,?4,?5) ON CONFLICT(id) DO UPDATE SET mood=excluded.mood, created_at=excluded.created_at')
+      .bind(id, me, date, mood, Date.now()).run();
+    return json({ ok: true });
+  }
   return json({ error: 'not found' }, 404);
 }
 
@@ -552,12 +572,13 @@ async function loadState(env, me) {
   await ensureStreak(env);
   await ensureWaveKind(env);
   await ensureDailyQ(env);
+  await ensureMood(env);
   // only the spaces you're in; journal entries are yours, or shared into one of your spaces
   const MINE = 'SELECT space_id FROM members WHERE person_id=?1';
   const inMine = (t, order) => env.DB.prepare('SELECT * FROM ' + t + ' WHERE space_id IN (' + MINE + ') OR space_id IS NULL ORDER BY ' + order).bind(me).all();
   // tasks + habits also pull your "personal" items (yours, flagged to travel) from every space — owner-scoped so they stay private to you
   const inMineP = (t, order) => env.DB.prepare('SELECT * FROM ' + t + ' WHERE space_id IN (' + MINE + ') OR space_id IS NULL OR (personal=1 AND owner=?1) ORDER BY ' + order).bind(me).all();
-  const [settings, projects, materials, routines, tasks, journal, habitDefs, habitLogs, topics, topicLinks, notes, focus, waves, people, spaces, members, focusLog, journalDays, streakState, dailyAnswers] = await Promise.all([
+  const [settings, projects, materials, routines, tasks, journal, habitDefs, habitLogs, topics, topicLinks, notes, focus, waves, people, spaces, members, focusLog, journalDays, streakState, dailyAnswers, moods] = await Promise.all([
     env.DB.prepare('SELECT key,value FROM settings').all(),
     inMine('projects', 'sort, created_at'),
     env.DB.prepare('SELECT * FROM project_materials ORDER BY sort, created_at').all(),
@@ -583,6 +604,8 @@ async function loadState(env, me) {
       + ' CASE WHEN da.person_id=?1 OR EXISTS(SELECT 1 FROM daily_answers m WHERE m.space_id=da.space_id AND m.date=da.date AND m.person_id=?1) THEN da.text ELSE \'\' END AS text,'
       + ' CASE WHEN da.person_id=?1 OR EXISTS(SELECT 1 FROM daily_answers m WHERE m.space_id=da.space_id AND m.date=da.date AND m.person_id=?1) THEN 1 ELSE 0 END AS rev'
       + ' FROM daily_answers da WHERE da.space_id IN (' + MINE + ') ORDER BY da.date DESC LIMIT 80').bind(me).all(),
+    // daily moods for the people in your spaces (yours + your partners')
+    env.DB.prepare('SELECT * FROM moods WHERE person_id IN (SELECT person_id FROM members WHERE space_id IN (' + MINE + ')) ORDER BY date DESC LIMIT 60').bind(me).all(),
   ]);
   const rowFor = (rows, ids) => (rows.results || []).find((r) => ids.includes(r.id)) || null;
 
@@ -614,6 +637,7 @@ async function loadState(env, me) {
     journal_days: journalDays.results || [],
     streak_state: streakState.results || [],
     daily_answers: dailyAnswers.results || [],
+    moods: moods.results || [],
     me,
   };
 }
@@ -664,7 +688,7 @@ function opStatements(env, o, me) {
       const d = parseInt(o.delta, 10) || 0;
       return [env.DB.prepare('INSERT INTO habit_logs (date,habit,value) VALUES (?1,?2,MAX(0,?3)) ON CONFLICT(date,habit) DO UPDATE SET value=MAX(0,habit_logs.value+?3)').bind(date, habit, d)];
     }
-    const val = Math.max(0, parseInt(o.value, 10) || 0);
+    const val = Math.max(-1, parseInt(o.value, 10) || 0);   // -1 = a deliberate "skipped today" for a check habit
     return [env.DB.prepare('INSERT INTO habit_logs (date,habit,value) VALUES (?1,?2,?3) ON CONFLICT(date,habit) DO UPDATE SET value=excluded.value').bind(date, habit, val)];
   }
   const cols = TABLES[o.table];

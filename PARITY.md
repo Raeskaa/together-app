@@ -6,6 +6,14 @@
 
 Legend: ✅ done · 🟡 partial · ⬜ todo · 🚫 deliberately different
 
+## 12 Nov Slice 4 — check-in upgrades — built, not deployed
+
+| Piece | Desktop | Phone | Notes |
+|---|---|---|---|
+| Habit Done / Skipped / pending | ✅ verified (struck + "Skipped today" + Undo) | ✅ same rows | skip = -1, streak-neutral; tap buzzes |
+| One-tap mood row | ✅ verified (renders; endpoint persists) | ✅ wraps | shows in partner presence (`.hm-mood`) |
+| Leftover triage · Drop | ✅ verified (Drop + Undo toast) | ✅ same actions | Today/Pick-a-day/Unplan already existed |
+
 ## 12 Nov Slice 3 — the daily question (reveal-after-answer) — built, not deployed
 
 | Piece | Desktop | Phone | Notes |
