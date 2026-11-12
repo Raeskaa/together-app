@@ -5,8 +5,8 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-# ===== 1. Pick the shared passcode you + your partner will type. Change this. =====
-PASSCODE="planner2027"
+# ===== 1. The shared setup passcode. Set it in your env before running, or edit the fallback. =====
+PASSCODE="${PLANNER_PASSCODE:-change-me}"
 
 echo "──────── account check ────────"
 echo "Make sure the account below is YOUR PERSONAL one (not Trueleap). Ctrl-C to abort if wrong."

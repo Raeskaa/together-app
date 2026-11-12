@@ -23,4 +23,4 @@ npx wrangler deploy
 
 echo
 echo "✅ Migrated to v2 and redeployed."
-echo "   Open https://shared-planner.mahesh-3dd.workers.dev  (passcode unchanged: planner2027)"
+echo "   Open https://shared-planner.mahesh-3dd.workers.dev  (setup passcode unchanged)"

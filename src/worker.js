@@ -12,7 +12,7 @@ const TABLES = {
   topic_links: ['id', 'topic_id', 'title', 'url', 'sort', 'created_at'],
   notes: ['id', 'text', 'color', 'owner', 'date', 'created_at', 'space_id'],
   focus: ['id', 'status', 'label', 'minutes', 'ends_at', 'remaining', 'started_by', 'updated_at'],
-  waves: ['id', 'emoji', 'sender', 'created_at'],
+  waves: ['id', 'emoji', 'sender', 'created_at', 'kind', 'note'],
   people: ['id', 'name', 'color', 'created_at'],
   spaces: ['id', 'name', 'kind', 'created_at'],
   members: ['id', 'space_id', 'person_id', 'role', 'joined_at'],
@@ -127,6 +127,20 @@ async function ensureImport(env) {
   if (done) return;
   try { await env.DB.prepare('ALTER TABLE tasks ADD COLUMN copied_from TEXT').run(); } catch (e) {}
   await env.DB.prepare("INSERT INTO settings (key,value) VALUES ('import_ready','1') ON CONFLICT(key) DO UPDATE SET value='1'").run();
+}
+// the pair's shared streak keeps a tiny bit of state per space: days a partner covered, and whether the one free repair was spent. The chain itself is computed from activity.
+async function ensureStreak(env) {
+  const done = await env.DB.prepare("SELECT value FROM settings WHERE key='streak_ready'").first();
+  if (done) return;
+  await env.DB.prepare('CREATE TABLE IF NOT EXISTS streak_state (space_id TEXT PRIMARY KEY, covered_days TEXT, repairs INTEGER DEFAULT 0, updated_at INTEGER)').run();
+  await env.DB.prepare("INSERT INTO settings (key,value) VALUES ('streak_ready','1') ON CONFLICT(key) DO UPDATE SET value='1'").run();
+}
+// waves grew a kind (wave | nudge | boost) + an optional note, so the receiver can show the right message
+async function ensureWaveKind(env) {
+  const done = await env.DB.prepare("SELECT value FROM settings WHERE key='wave_kind_ready'").first();
+  if (done) return;
+  for (const c of ['kind', 'note']) { try { await env.DB.prepare('ALTER TABLE waves ADD COLUMN ' + c + ' TEXT').run(); } catch (e) {} }
+  await env.DB.prepare("INSERT INTO settings (key,value) VALUES ('wave_kind_ready','1') ON CONFLICT(key) DO UPDATE SET value='1'").run();
 }
 
 // ---- too many wrong tries: 5, then a 1-minute wait ----
@@ -431,6 +445,38 @@ async function api(req, env, url) {
     await env.DB.batch(stmts);
     return json({ ok: true, n: parents.length });
   }
+  // the pair's shared streak: a partner vouches a day ("I've got today"), or spends the one free repair to bring a broken streak back
+  if (p === '/api/space/cover' && req.method === 'POST') {
+    await ensureStreak(env);
+    const b = await req.json().catch(() => ({}));
+    const sid = String(b.space_id || '');
+    const day = String(b.day || '');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return json({ ok: false, error: 'bad_day' }, 400);
+    if (!(await env.DB.prepare('SELECT 1 FROM members WHERE space_id=?1 AND person_id=?2').bind(sid, me).first())) return json({ ok: false, error: 'not_member' }, 403);
+    const ex = await env.DB.prepare('SELECT covered_days, repairs FROM streak_state WHERE space_id=?1').bind(sid).first();
+    const set = new Set(parseJSON(ex && ex.covered_days, []).filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d)));
+    set.add(day);
+    const arr = [...set].sort().slice(-400);
+    await env.DB.prepare('INSERT INTO streak_state (space_id,covered_days,repairs,updated_at) VALUES (?1,?2,?3,?4) ON CONFLICT(space_id) DO UPDATE SET covered_days=excluded.covered_days, updated_at=excluded.updated_at')
+      .bind(sid, JSON.stringify(arr), (ex && ex.repairs) || 0, Date.now()).run();
+    return json({ ok: true, covered_days: arr });
+  }
+  if (p === '/api/space/repair' && req.method === 'POST') {
+    await ensureStreak(env);
+    const b = await req.json().catch(() => ({}));
+    const sid = String(b.space_id || '');
+    const days = (Array.isArray(b.days) ? b.days : []).filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d)).slice(0, 60);
+    if (!(await env.DB.prepare('SELECT 1 FROM members WHERE space_id=?1 AND person_id=?2').bind(sid, me).first())) return json({ ok: false, error: 'not_member' }, 403);
+    const ex = await env.DB.prepare('SELECT covered_days, repairs FROM streak_state WHERE space_id=?1').bind(sid).first();
+    const used = (ex && ex.repairs) || 0;
+    if (used >= 1) return json({ ok: false, error: 'no_repair' }, 400);
+    const set = new Set(parseJSON(ex && ex.covered_days, []).filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d)));
+    days.forEach((d) => set.add(d));
+    const arr = [...set].sort().slice(-400);
+    await env.DB.prepare('INSERT INTO streak_state (space_id,covered_days,repairs,updated_at) VALUES (?1,?2,?3,?4) ON CONFLICT(space_id) DO UPDATE SET covered_days=excluded.covered_days, repairs=excluded.repairs, updated_at=excluded.updated_at')
+      .bind(sid, JSON.stringify(arr), used + 1, Date.now()).run();
+    return json({ ok: true, covered_days: arr, repairs: used + 1 });
+  }
   return json({ error: 'not found' }, 404);
 }
 
@@ -445,12 +491,14 @@ function parseJSON(v, fallback) {
 async function loadState(env, me) {
   await ensurePersonal(env);
   await ensureImport(env);
+  await ensureStreak(env);
+  await ensureWaveKind(env);
   // only the spaces you're in; journal entries are yours, or shared into one of your spaces
   const MINE = 'SELECT space_id FROM members WHERE person_id=?1';
   const inMine = (t, order) => env.DB.prepare('SELECT * FROM ' + t + ' WHERE space_id IN (' + MINE + ') OR space_id IS NULL ORDER BY ' + order).bind(me).all();
   // tasks + habits also pull your "personal" items (yours, flagged to travel) from every space — owner-scoped so they stay private to you
   const inMineP = (t, order) => env.DB.prepare('SELECT * FROM ' + t + ' WHERE space_id IN (' + MINE + ') OR space_id IS NULL OR (personal=1 AND owner=?1) ORDER BY ' + order).bind(me).all();
-  const [settings, projects, materials, routines, tasks, journal, habitDefs, habitLogs, topics, topicLinks, notes, focus, waves, people, spaces, members, focusLog, journalDays] = await Promise.all([
+  const [settings, projects, materials, routines, tasks, journal, habitDefs, habitLogs, topics, topicLinks, notes, focus, waves, people, spaces, members, focusLog, journalDays, streakState] = await Promise.all([
     env.DB.prepare('SELECT key,value FROM settings').all(),
     inMine('projects', 'sort, created_at'),
     env.DB.prepare('SELECT * FROM project_materials ORDER BY sort, created_at').all(),
@@ -470,6 +518,7 @@ async function loadState(env, me) {
     env.DB.prepare('SELECT * FROM focus_log WHERE space_id IN (' + MINE + ') ORDER BY ended_at').bind(me).all(),
     // which days each person in your spaces wrote, for the week board: dates only, never the text of a private entry
     env.DB.prepare("SELECT date, owner FROM journal WHERE trim(coalesce(text,''))!='' AND owner IN (SELECT person_id FROM members WHERE space_id IN (" + MINE + '))').bind(me).all(),
+    env.DB.prepare('SELECT * FROM streak_state WHERE space_id IN (' + MINE + ')').bind(me).all(),
   ]);
   const rowFor = (rows, ids) => (rows.results || []).find((r) => ids.includes(r.id)) || null;
 
@@ -499,6 +548,7 @@ async function loadState(env, me) {
     members: members.results || [],
     focus_log: focusLog.results || [],
     journal_days: journalDays.results || [],
+    streak_state: streakState.results || [],
     me,
   };
 }

@@ -6,6 +6,26 @@
 
 Legend: ✅ done · 🟡 partial · ⬜ todo · 🚫 deliberately different
 
+## 12 Nov Slice 2 — presence + nudges/boosts — built, not deployed
+
+| Piece | Desktop | Phone | Notes |
+|---|---|---|---|
+| Partner presence line (`.hm-pres`) | ✅ verified ("Hasn't shown up yet today") | ✅ verified 375px (rail stacks under list) | today's activity + live "Focusing now · label" (pulse dot); no online-tracking |
+| Nudge (contextual, once/day) | ✅ verified (send → toast → "Nudged today ✓") | ✅ verified (persists across reload) | shown only when partner did nothing today |
+| Cheer / boost | 🟡 code-verified | 🟡 code-verified | shown when partner did ≥1 thing; same send path as nudge |
+| Received nudge/boost copy + burst | 🟡 code-verified | 🟡 code-verified | kind-varied copy on the existing `.wavefx` burst |
+| 🫶 free-form wave FAB | ✅ unchanged | ✅ unchanged | still there for anytime warmth |
+
+## 12 Nov Slice 1 — shared "us" streak + combined-first score — DEPLOYED LIVE (637df411)
+
+| Piece | Desktop | Phone | Notes |
+|---|---|---|---|
+| `.usk` streak banner (flame + states) | ✅ verified | ✅ verified 375px (full-width, wraps actions) | top of Today; only on the real today + when a pair |
+| Combined-first `ScorePill` | ✅ "You two · N together · split" | ✅ collapses to "You two N →" (split/unit hidden ≤820px) | min-width:0 header holds; greeting not pushed |
+| Partner-cover ("I've got today") | ✅ verified (toast + persist) | ✅ shares the banner | at-risk state only |
+| Repair ("bring it back") | 🟡 code-verified (mirrors cover) | 🟡 same | not force-triggered locally |
+| WeekPage "Together to 200" + chip | ✅ verified | ✅ responsive (same component) | two-runner track kept below (demoted head-to-head) |
+
 ## 9 Nov UI language refresh (Sky + moments) — built, not deployed
 
 | Piece | Desktop | Phone | Notes |

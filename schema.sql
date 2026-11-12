@@ -148,7 +148,9 @@ CREATE TABLE IF NOT EXISTS waves (
   id         TEXT PRIMARY KEY,  -- the space id
   emoji      TEXT,
   sender     TEXT,              -- person id
-  created_at INTEGER
+  created_at INTEGER,
+  kind       TEXT,              -- wave | nudge | boost
+  note       TEXT
 );
 
 -- seed: the two people in one space + the three starter habits (editable/deletable). Everything else blank.
@@ -168,3 +170,6 @@ INSERT OR IGNORE INTO habits (id,name,kind,owner,unit,target,caption,color,sort,
 
 -- Claude's private link per person (ver bumps to kill old links)
 CREATE TABLE IF NOT EXISTS claude_links (person_id TEXT PRIMARY KEY, ver INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 0, created_at INTEGER, last_used_at INTEGER, last_action TEXT);
+
+-- the pair's shared streak: per-space state (the chain is computed from activity; this holds partner-covered days + the one free repair)
+CREATE TABLE IF NOT EXISTS streak_state (space_id TEXT PRIMARY KEY, covered_days TEXT, repairs INTEGER DEFAULT 0, updated_at INTEGER);
