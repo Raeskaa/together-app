@@ -55,6 +55,13 @@
 
 ---
 
+## 2026-11-12 (later⁴): Streak/score leak fix + streak flame → Lottie — **BUILT, local-verified, NOT deployed** (deploy gate denied)
+
+Mahesh: "Mahesh & gayo" showed **9 days together** though the space is 1 day old. **Diagnosed:** the us-streak (and the weekly "You two · N" score) read `wkData`, which included Mahesh's **personal habits** — those `personal=1` habits (home `s_hateclub`) *travel* into every space he's in, dragging their whole Nov 2–12 log history → a brand-new space inherited a 9-day streak. Audit: the weekly score leaked the same way; presence read a space-agnostic journal set.
+- **Fix (`public/index.html`):** `wkData` is now **home-scoped** — `homeTasks`/`homeHabits`/`homeJournal` filtered to `space_id===space`, so only what *belongs* to a space feeds its streak + score (personal items count only in their home space, e.g. the cig/read/art habits in hate club). Plus a **cap**: `usStreak`/`repairOffer` take `spaceStart` (= `space.created_at` day) and never count a day before the space existed. Presence `journaled`/overdue now use the home sets too. `jdays` removed.
+- **Streak flame → Lottie:** LottieFiles "Streak" (free) → `public/streak.json` (8.7KB; body lime `[0.8,1,0]`, black eyes kept). Generalised the recolor to `recolorLottie(data,from,to)` (breathe now calls it); new `StreakFlame` component renders it in the `.usk-fl` disc, recoloured to the live `--accent-deep` (grey when the streak is cold), reduced-motion safe, lottie-web lazy-loaded; deps `[cool, themeAccent()]` so it re-tints on theme change.
+- **Verified:** live dry-run — gayo has **0** home habits/tasks/journal/focus → streak will be **0** ("start a streak"), not 9; hate club keeps its real streak (habits home there). Local: streak banner shows the green Lottie flame (recoloured to Meadow), "You two 0" score (home-scoped), no console errors. **Deploy pending** (`npx wrangler deploy`; adds `public/streak.json`, no DB change) — the agent's deploy was blocked by the production-deploy gate, Mahesh to run it. Next: Slice 3.
+
 ## 2026-11-12 (later³): Import bug — replication + shared-leak fix — **DEPLOYED LIVE** (Version `6d0cafc8`)
 
 Mahesh: importing into "Mahesh & gayo" then "Mahesh & Manish" replicated tasks (Email redesign ×4). **Diagnosed on live DB:** 47 junk copies vs 32 real tasks. Root cause: `/api/space/import` pulled "my open tasks" from other spaces **without excluding tasks that are themselves copies** → importing into multiple spaces made copies-of-copies (even back into hate club); dedup keyed on the immediate copy id, not the root original, so it blocked nothing. It also dropped the project and would copy shared (`owner=everyone`) / someone-else's-project tasks into other groups.

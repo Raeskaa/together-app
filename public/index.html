@@ -1026,6 +1026,8 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 .usk-fl{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:#fff;box-shadow:0 2px 12px -4px var(--glow);color:#C2704B;flex:none}
 .usk-fl svg{width:22px;height:22px}
 .usk-fl.cool{color:#9AA6B4}
+.usk-fl-lot{width:27px;height:27px;display:block}
+.usk-fl-lot svg{width:100%!important;height:100%!important;display:block}
 .usk-main{flex:1;min-width:0}
 .usk-n{font-weight:700;font-size:16px;letter-spacing:-.01em;color:var(--ink)}
 .usk-n b{font-variant-numeric:tabular-nums}
@@ -2615,13 +2617,14 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     return m;
   }
   // the shared streak: either person keeps it alive; one missed day a month is auto-frozen; covered days count too
-  function usStreak(d,covered){
+  function usStreak(d,covered,start){
     var act=dayActivity(d), cov={}; (covered||[]).forEach(function(x){ cov[x]=1; });
     var nm=(d.members||[]).length;
     function on(k){ var a=act[k]; return (a&&a.n>0)||!!cov[k]; }
     function both(k){ var a=act[k]; return !!(a&&a.n>=2&&nm>=2); }
     var len=0,bothN=0,gaps={},cur=parseYmd(TODAY),first=true,todayDone=false,todayBoth=false;
     for(var i=0;i<400;i++){ var k=ymd(cur);
+      if(start&&k<start) break;   // a space's streak can't predate the space
       if(on(k)){ len++; if(both(k)) bothN++; if(first){ todayDone=true; todayBoth=both(k); } }
       else if(first){ /* today not fed yet — pending, doesn't break */ }
       else { var mo=k.slice(0,7); if(gaps[mo]==null){ gaps[mo]=1; } else break; }
@@ -2630,12 +2633,12 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     return {len:len,both:bothN,todayDone:todayDone,todayBoth:todayBoth,atRisk:!todayDone&&len>0};
   }
   // if the chain just broke, the streak it would restore + the gap days to fill (for the one free repair)
-  function repairOffer(d,covered){
+  function repairOffer(d,covered,start){
     var act=dayActivity(d), cov={}; (covered||[]).forEach(function(x){ cov[x]=1; });
     function on(k){ var a=act[k]; return (a&&a.n>0)||!!cov[k]; }
-    var last=null; for(var i=1;i<8;i++){ var k=ymd(addDays(parseYmd(TODAY),-i)); if(on(k)){ last=k; break; } }
+    var last=null; for(var i=1;i<8;i++){ var k=ymd(addDays(parseYmd(TODAY),-i)); if(start&&k<start) break; if(on(k)){ last=k; break; } }
     if(!last) return null;
-    var len=0,gaps={},c=parseYmd(last); for(var j=0;j<400;j++){ var k2=ymd(c); if(on(k2)){ len++; } else { var mo=k2.slice(0,7); if(gaps[mo]==null){ gaps[mo]=1; } else break; } c=addDays(c,-1); }
+    var len=0,gaps={},c=parseYmd(last); for(var j=0;j<400;j++){ var k2=ymd(c); if(start&&k2<start) break; if(on(k2)){ len++; } else { var mo=k2.slice(0,7); if(gaps[mo]==null){ gaps[mo]=1; } else break; } c=addDays(c,-1); }
     var fill=[],g=addDays(parseYmd(last),1),yest=ymd(addDays(parseYmd(TODAY),-1)); while(ymd(g)<=yest){ fill.push(ymd(g)); g=addDays(g,1); }
     if(len<3||!fill.length) return null;
     return {len:len,fill:fill};
@@ -2657,7 +2660,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       sub=html`<div class="usk-sub">Anything either of you does lights the flame.</div>`;
     }
     return html`<div class=${'usk'+(s.atRisk?' risk':'')+(broken?' broken':'')}>
-      <span class=${'usk-fl'+(cool?' cool':'')}><svg viewBox="0 0 24 24" fill="none" aria-hidden="true">${svgFlame}</svg></span>
+      <span class=${'usk-fl'+(cool?' cool':'')}><${StreakFlame} cool=${cool} /></span>
       <span class="usk-main">${line}${sub}</span>${act}
     </div>`;
   }
@@ -3189,14 +3192,16 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     return _lottieP; }
   function hex01(hex){ hex=(hex||'').trim().replace('#',''); if(hex.length===3) hex=hex.split('').map(function(c){return c+c;}).join(''); var n=parseInt(hex||'195FD0',16); if(isNaN(n)) n=0x195FD0; return [((n>>16)&255)/255,((n>>8)&255)/255,(n&255)/255]; }
   function themeAccent(){ try{ var c=getComputedStyle(document.documentElement).getPropertyValue('--accent-deep').trim(); if(c&&c.charAt(0)==='#') return c; }catch(e){} try{ var t=JSON.parse(lsGet('sp_theme','null')); if(t&&t.bg){ var p=BG_PRESETS.filter(function(x){return x.id===t.bg;})[0]; if(p&&p.ac) return p.ac[1]; } }catch(e){} return '#195FD0'; }
-  function recolorBreathe(data,rgb){ var BLUE=[0.18,0.306,0.867];
-    function isBlue(k){ return Array.isArray(k)&&k.length>=3&&typeof k[0]==='number'&&Math.abs(k[0]-BLUE[0])<0.03&&Math.abs(k[1]-BLUE[1])<0.03&&Math.abs(k[2]-BLUE[2])<0.03; }
-    function repl(k){ if(isBlue(k)){ k[0]=rgb[0]; k[1]=rgb[1]; k[2]=rgb[2]; } }
+  // swap one solid colour in a Lottie for another (handles static + keyframed fills/strokes), leaving other colours (e.g. the black face/eyes) alone
+  function recolorLottie(data,from,to){
+    function isC(k){ return Array.isArray(k)&&k.length>=3&&typeof k[0]==='number'&&Math.abs(k[0]-from[0])<0.06&&Math.abs(k[1]-from[1])<0.06&&Math.abs(k[2]-from[2])<0.06; }
+    function repl(k){ if(isC(k)){ k[0]=to[0]; k[1]=to[1]; k[2]=to[2]; } }
     function walk(o){ if(!o||typeof o!=='object') return;
       if((o.ty==='fl'||o.ty==='st')&&o.c){ if(o.c.a===0) repl(o.c.k); else if(Array.isArray(o.c.k)) o.c.k.forEach(function(kf){ if(kf.s) repl(kf.s); if(kf.e) repl(kf.e); }); }
       for(var key in o){ var v=o[key]; if(Array.isArray(v)) v.forEach(walk); else if(v&&typeof v==='object') walk(v); }
     }
     walk(data); return data; }
+  function recolorBreathe(data,rgb){ return recolorLottie(data,[0.18,0.306,0.867],rgb); }
   function BreatheLoader(){ var ref=useRef(null);
     useEffect(function(){ var anim=null, dead=false;
       loadLottie().then(function(lottie){ if(dead||!ref.current||!lottie) return null;
@@ -3209,6 +3214,21 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       return function(){ dead=true; if(anim){ try{anim.destroy();}catch(e){} } };
     },[]);
     return html`<div class="breathe"><div class="breathe-stage" ref=${ref} aria-hidden="true"></div></div>`;
+  }
+  // the streak flame (LottieFiles "Streak", free) recoloured to the live theme accent — replaces the static flame icon
+  function StreakFlame(props){ var ref=useRef(null); var cool=!!props.cool, tone=themeAccent();
+    useEffect(function(){ var anim=null, dead=false;
+      loadLottie().then(function(lottie){ if(dead||!ref.current||!lottie) return null;
+        return fetch('/streak.json').then(function(r){return r.json();}).then(function(data){ if(dead||!ref.current) return;
+          var to=cool?[0.62,0.67,0.73]:hex01(tone);
+          var colored=recolorLottie(JSON.parse(JSON.stringify(data)), [0.8,1,0], to);
+          anim=lottie.loadAnimation({container:ref.current,renderer:'svg',loop:!RM,autoplay:!RM,animationData:colored});
+          if(RM&&anim) anim.goToAndStop(Math.max(1,Math.floor((colored.op||30)/2)),true);
+        });
+      }).catch(function(){});
+      return function(){ dead=true; if(anim){ try{anim.destroy();}catch(e){} } };
+    },[cool,tone]);
+    return html`<span class="usk-fl-lot" ref=${ref} aria-hidden="true"></span>`;
   }
 
   function App(){
@@ -3575,27 +3595,31 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     // points this week, for this space
     var spaceRow=((store&&store.spaces)||[]).filter(function(x){return x.id===space;})[0];
     var showScores=scoresOn(spaceRow)&&VIEW.members.length>1;
-    var jdays={}; ((store&&store.journal_days)||[]).concat(journal||[]).forEach(function(j){ if(j.text!=null&&!(j.text||'').trim()) return; jdays[j.date+'|'+j.owner]={date:j.date,owner:j.owner}; });
-    var wkData={tasks:tasks||[],habits:habitDefs||[],habitLogs:habitLogs||[],journal:Object.keys(jdays).map(function(k){return jdays[k];}),focusLog:((store&&store.focus_log)||[]).filter(function(f){return f.space_id===space;}),members:VIEW.members};
+    // streak + score count only what BELONGS to this space (its own space_id) — personal items that merely travel here don't seed its streak
+    var homeTasks=((store&&store.tasks)||[]).filter(function(t){return t.space_id===space;});
+    var homeHabits=((store&&store.habits)||[]).filter(function(h){return h.space_id===space;});
+    var homeJournal=((store&&store.journal)||[]).filter(function(j){return j.space_id===space && (j.text==null||(j.text||'').trim()!==''); }).map(function(j){return {date:j.date,owner:j.owner};});
+    var spaceStart=(spaceRow&&spaceRow.created_at)?ymd(new Date(spaceRow.created_at)):'';
+    var wkData={tasks:homeTasks,habits:homeHabits,habitLogs:habitLogs||[],journal:homeJournal,focusLog:((store&&store.focus_log)||[]).filter(function(f){return f.space_id===space;}),members:VIEW.members};
     var thisWeek=(store&&showScores)?scoreWeek(wkData,mondayOf(TODAY)):null;
     // the pair's shared "us" streak: the chain is computed from activity; covered days + the one free repair live in streak_state
     var streakRow=((store&&store.streak_state)||[]).filter(function(x){return x.space_id===space;})[0];
     var covered=(function(){ try{ return JSON.parse((streakRow&&streakRow.covered_days)||'[]'); }catch(e){ return []; } })();
     var repairsUsed=(streakRow&&streakRow.repairs)||0;
-    var usk=(store&&showScores)?usStreak(wkData,covered):null;
-    var uskRepair=(usk&&usk.len===0&&repairsUsed<1)?repairOffer(wkData,covered):null;
+    var usk=(store&&showScores)?usStreak(wkData,covered,spaceStart):null;
+    var uskRepair=(usk&&usk.len===0&&repairsUsed<1)?repairOffer(wkData,covered,spaceStart):null;
     function coverToday(){ apiPost('/api/space/cover',{space_id:space,day:TODAY}).then(function(r){return r.json();}).then(function(j){ if(j&&j.ok){ refresh(); showToast({emoji:'💛',text:'Covered today — the streak’s safe.'}); } else showToast({text:'Couldn’t cover today.'}); }).catch(function(){ showToast({text:'Couldn’t cover today.'}); }); }
     function repairStreak(){ if(!uskRepair) return; apiPost('/api/space/repair',{space_id:space,days:uskRepair.fill}).then(function(r){return r.json();}).then(function(j){ if(j&&j.ok){ refresh(); celebrate([ '#C2704B', personColor(whoami), '#E8A33D' ]); showToast({emoji:'🔥',text:'Streak brought back.'}); } else showToast({text:j&&j.error==='no_repair'?'You’ve used your free repair.':'Couldn’t bring it back.'}); }).catch(function(){ showToast({text:'Couldn’t bring it back.'}); }); }
     // a quiet celebration when the pair crosses 7 / 30 / 100 days together — once each
     useEffect(function(){ if(!usk||!usk.todayDone||!showScores) return; if([7,30,100].indexOf(usk.len)<0) return; var key='sp_uskm_'+space+'_'+usk.len; if(lsGet(key,'')) return; lsSet(key,'1'); celebrate([ '#C2704B', personColor(whoami), '#E8A33D' ]); showToast({emoji:'🔥',text:usk.len+' days together — that’s a real streak.',ms:5000}); }, [usk&&usk.len, usk&&usk.todayDone, showScores, space]);
     // what the partner's done today — the presence line + whether to offer a nudge or a cheer (today's activity only, never a "last online" tracker)
     var partner=(store&&showScores&&other)?(function(){
-      var dn=(tasks||[]).filter(function(t){ return t.owner===other&&t.done&&t.done_by===other&&t.done_at&&dayOfMs(t.done_at)===TODAY&&!isEventType(t.type); }).length;
-      var hb={}; (habitDefs||[]).forEach(function(h){ if(!h.archived&&h.owner===other) hb[h.id]=h; });
+      var dn=homeTasks.filter(function(t){ return t.owner===other&&t.done&&t.done_by===other&&t.done_at&&dayOfMs(t.done_at)===TODAY&&!isEventType(t.type); }).length;
+      var hb={}; homeHabits.forEach(function(h){ if(!h.archived&&h.owner===other) hb[h.id]=h; });
       var kept=0; (habitLogs||[]).forEach(function(l){ var h=hb[l.habit]; if(!h||l.date!==TODAY) return; var ok=h.kind==='count'?(h.target==null?l.value>0:l.value<=h.target):l.value>0; if(ok) kept++; });
-      var jrnl=!!jdays[TODAY+'|'+other];
+      var jrnl=homeJournal.some(function(j){ return j.date===TODAY&&j.owner===other; });
       var foc=!!(focus&&focus.status==='running'&&focus.started_by===other&&Date.now()<(focus.ends_at||0));
-      return {id:other,done:dn,kept:kept,journaled:jrnl,focusing:foc,focusLabel:(focus&&focus.label)||'',late:overdueOf(tasks,other).length,anything:(dn>0||kept>0||jrnl||foc)};
+      return {id:other,done:dn,kept:kept,journaled:jrnl,focusing:foc,focusLabel:(focus&&focus.label)||'',late:overdueOf(homeTasks,other).length,anything:(dn>0||kept>0||jrnl||foc)};
     })():null;
     var leadRef=useRef(undefined);
     useEffect(function(){ if(!thisWeek) return; var L=thisWeek.leader;
