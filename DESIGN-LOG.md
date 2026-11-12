@@ -55,6 +55,14 @@
 
 ---
 
+## 2026-11-12 (later⁵): Slice 3 — the daily question (reveal-after-you-answer) — **BUILT, local-verified, NOT deployed**
+
+His picks: server-enforced reveal · curated pack · toast + states · bottom-of-Today, today-only.
+- **The ritual:** one shared question a day (same for both, `QUESTIONS[parseInt(TODAY)%60]`, 60 warm/reflective/playful prompts). You write an answer; you see your partner's **only once you've written yours**; both revealed after both answer; a *"<name> answered today's question"* toast when theirs lands (reuses `notify` + the store poll).
+- **Reveal is server-enforced** (`src/worker.js`): `loadState` returns your own answers always, but a partner row's `text` is blanked + `rev:0` **unless you've also answered that space+date** — so their answer isn't even in the response until you've written yours. New `daily_answers(id=<space>_<date>_<person>, space_id, person_id, date, text, created_at)` table (lazy `ensureDailyQ`, gated `dailyq_ready`); endpoint `POST /api/daily/answer` (upsert, membership-checked); schema added.
+- **Frontend:** `QUESTIONS` pack + `DailyQuestion` component (states: input · answered+waiting · revealed; reveal animation) rendered above `OneForToday`, only for a pair; `dailyAnswers`/`answerDaily` + a partner-answered toast effect in App. CSS `.dq*`.
+- **Verified local (both sides):** server reveal — partner answers → mahesh (not answered) loads state → partner `text:""`, `rev:0` (withheld); mahesh answers → both `rev:1` (revealed). UI — typed → Share enabled → "Answer shared" toast → my answer + "Waiting for Riya" → seeded Riya's answer → **both revealed side by side** with avatars. No console errors. **Deploy = `npx wrangler deploy`** (adds `public` nothing / the daily_answers table self-migrates; no asset) — rides along with the streak fix (also pending). Next: Slice 4.
+
 ## 2026-11-12 (later⁴): Streak/score leak fix + streak flame → Lottie — **BUILT, local-verified, NOT deployed** (deploy gate denied)
 
 Mahesh: "Mahesh & gayo" showed **9 days together** though the space is 1 day old. **Diagnosed:** the us-streak (and the weekly "You two · N" score) read `wkData`, which included Mahesh's **personal habits** — those `personal=1` habits (home `s_hateclub`) *travel* into every space he's in, dragging their whole Nov 2–12 log history → a brand-new space inherited a 9-day streak. Audit: the weekly score leaked the same way; presence read a space-agnostic journal set.

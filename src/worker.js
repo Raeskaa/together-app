@@ -149,6 +149,13 @@ async function ensureWaveKind(env) {
   for (const c of ['kind', 'note']) { try { await env.DB.prepare('ALTER TABLE waves ADD COLUMN ' + c + ' TEXT').run(); } catch (e) {} }
   await env.DB.prepare("INSERT INTO settings (key,value) VALUES ('wave_kind_ready','1') ON CONFLICT(key) DO UPDATE SET value='1'").run();
 }
+// the daily question: one answer per person per space per day (id = <space>_<date>_<person>)
+async function ensureDailyQ(env) {
+  const done = await env.DB.prepare("SELECT value FROM settings WHERE key='dailyq_ready'").first();
+  if (done) return;
+  await env.DB.prepare('CREATE TABLE IF NOT EXISTS daily_answers (id TEXT PRIMARY KEY, space_id TEXT, person_id TEXT, date TEXT, text TEXT, created_at INTEGER)').run();
+  await env.DB.prepare("INSERT INTO settings (key,value) VALUES ('dailyq_ready','1') ON CONFLICT(key) DO UPDATE SET value='1'").run();
+}
 
 // ---- too many wrong tries: 5, then a 1-minute wait ----
 const LOCK_AFTER = 5;
@@ -513,6 +520,20 @@ async function api(req, env, url) {
       .bind(sid, JSON.stringify(arr), used + 1, Date.now()).run();
     return json({ ok: true, covered_days: arr, repairs: used + 1 });
   }
+  // the daily question: save your answer for a space + day (upsert); the reveal of the partner's answer is handled in loadState
+  if (p === '/api/daily/answer' && req.method === 'POST') {
+    await ensureDailyQ(env);
+    const b = await req.json().catch(() => ({}));
+    const sid = String(b.space || b.space_id || '');
+    const date = String(b.date || '');
+    const text = String(b.text || '').slice(0, 2000);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return json({ ok: false, error: 'bad_date' }, 400);
+    if (!(await env.DB.prepare('SELECT 1 FROM members WHERE space_id=?1 AND person_id=?2').bind(sid, me).first())) return json({ ok: false, error: 'not_member' }, 403);
+    const id = sid + '_' + date + '_' + me;
+    await env.DB.prepare('INSERT INTO daily_answers (id,space_id,person_id,date,text,created_at) VALUES (?1,?2,?3,?4,?5,?6) ON CONFLICT(id) DO UPDATE SET text=excluded.text, created_at=excluded.created_at')
+      .bind(id, sid, me, date, text, Date.now()).run();
+    return json({ ok: true });
+  }
   return json({ error: 'not found' }, 404);
 }
 
@@ -530,12 +551,13 @@ async function loadState(env, me) {
   await ensureProjCopy(env);
   await ensureStreak(env);
   await ensureWaveKind(env);
+  await ensureDailyQ(env);
   // only the spaces you're in; journal entries are yours, or shared into one of your spaces
   const MINE = 'SELECT space_id FROM members WHERE person_id=?1';
   const inMine = (t, order) => env.DB.prepare('SELECT * FROM ' + t + ' WHERE space_id IN (' + MINE + ') OR space_id IS NULL ORDER BY ' + order).bind(me).all();
   // tasks + habits also pull your "personal" items (yours, flagged to travel) from every space — owner-scoped so they stay private to you
   const inMineP = (t, order) => env.DB.prepare('SELECT * FROM ' + t + ' WHERE space_id IN (' + MINE + ') OR space_id IS NULL OR (personal=1 AND owner=?1) ORDER BY ' + order).bind(me).all();
-  const [settings, projects, materials, routines, tasks, journal, habitDefs, habitLogs, topics, topicLinks, notes, focus, waves, people, spaces, members, focusLog, journalDays, streakState] = await Promise.all([
+  const [settings, projects, materials, routines, tasks, journal, habitDefs, habitLogs, topics, topicLinks, notes, focus, waves, people, spaces, members, focusLog, journalDays, streakState, dailyAnswers] = await Promise.all([
     env.DB.prepare('SELECT key,value FROM settings').all(),
     inMine('projects', 'sort, created_at'),
     env.DB.prepare('SELECT * FROM project_materials ORDER BY sort, created_at').all(),
@@ -556,6 +578,11 @@ async function loadState(env, me) {
     // which days each person in your spaces wrote, for the week board: dates only, never the text of a private entry
     env.DB.prepare("SELECT date, owner FROM journal WHERE trim(coalesce(text,''))!='' AND owner IN (SELECT person_id FROM members WHERE space_id IN (" + MINE + '))').bind(me).all(),
     env.DB.prepare('SELECT * FROM streak_state WHERE space_id IN (' + MINE + ')').bind(me).all(),
+    // daily-question answers: your own always; the partner's text only on days you've also answered (the reveal), server-enforced
+    env.DB.prepare('SELECT da.id, da.space_id, da.person_id, da.date, da.created_at,'
+      + ' CASE WHEN da.person_id=?1 OR EXISTS(SELECT 1 FROM daily_answers m WHERE m.space_id=da.space_id AND m.date=da.date AND m.person_id=?1) THEN da.text ELSE \'\' END AS text,'
+      + ' CASE WHEN da.person_id=?1 OR EXISTS(SELECT 1 FROM daily_answers m WHERE m.space_id=da.space_id AND m.date=da.date AND m.person_id=?1) THEN 1 ELSE 0 END AS rev'
+      + ' FROM daily_answers da WHERE da.space_id IN (' + MINE + ') ORDER BY da.date DESC LIMIT 80').bind(me).all(),
   ]);
   const rowFor = (rows, ids) => (rows.results || []).find((r) => ids.includes(r.id)) || null;
 
@@ -586,6 +613,7 @@ async function loadState(env, me) {
     focus_log: focusLog.results || [],
     journal_days: journalDays.results || [],
     streak_state: streakState.results || [],
+    daily_answers: dailyAnswers.results || [],
     me,
   };
 }

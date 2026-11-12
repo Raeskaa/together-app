@@ -6,6 +6,15 @@
 
 Legend: ✅ done · 🟡 partial · ⬜ todo · 🚫 deliberately different
 
+## 12 Nov Slice 3 — the daily question (reveal-after-answer) — built, not deployed
+
+| Piece | Desktop | Phone | Notes |
+|---|---|---|---|
+| Daily question card (`.dq`) at bottom of Today | ✅ verified | ✅ verified (stacks; `.dq-who` wraps) | only for a pair; above One-for-today |
+| Input → answered → revealed states | ✅ verified all three | ✅ same component | reveal animation on the partner's answer |
+| Server-enforced reveal | ✅ verified (text withheld until you answer) | ✅ same (server) | partner's answer not in the response until you answer |
+| Partner-answered toast | 🟡 code-verified (reuses notify/poll) | 🟡 same | — |
+
 ## 12 Nov Breathe loading animation (dynamic colour) — built, not deployed
 
 | Piece | Desktop | Phone | Notes |

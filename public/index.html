@@ -486,6 +486,24 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 .oft-foot{display:flex;gap:16px;margin-top:16px}
 .oft-more{border:none;background:none;font:inherit;font-weight:500;font-size:12px;color:var(--faint);cursor:pointer;padding:2px 0;letter-spacing:.01em}
 .oft-more:hover{color:var(--accent-deep)}
+/* the daily question */
+.dq{margin:30px 2px 0;padding-top:22px;border-top:1px solid var(--line-soft)}
+.dq-eyebrow{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-deep)}
+.dq-q{margin:8px 0 14px;font-size:18px;line-height:1.4;letter-spacing:-.01em;color:var(--ink);font-weight:600}
+.dq-input{width:100%;box-sizing:border-box;border:1px solid var(--line-soft);border-radius:12px;padding:11px 13px;font:inherit;font-size:14px;line-height:1.5;color:var(--ink);background:#fff;resize:vertical;min-height:54px}
+.dq-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+.dq-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px;flex-wrap:wrap}
+.dq-hint{font-size:12px;color:var(--muted)}
+.dq-btn{border:none;background:var(--accent-deep);color:#fff;border-radius:99px;padding:8px 18px;font:inherit;font-weight:600;font-size:13px;cursor:pointer;flex:none}
+.dq-btn:disabled{opacity:.45;cursor:default}
+.dq-ans{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px dotted var(--line-soft)}
+.dq-ans.mine{border-top:none;padding-top:0}
+.dq-ans.reveal{animation:dqreveal .5s var(--ease-out)}
+.dq-who{display:flex;align-items:center;gap:7px;font-weight:600;font-size:12.5px;color:var(--muted);flex:none;width:92px}
+.dq-ans p{margin:0;font-size:14px;line-height:1.5;color:var(--ink);flex:1;min-width:0;white-space:pre-wrap}
+.dq-wait{font-size:13px;color:var(--muted);padding-top:10px;border-top:1px dotted var(--line-soft);margin-top:10px}
+@keyframes dqreveal{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media(max-width:560px){ .dq-who{width:auto} .dq-ans{flex-direction:column;gap:3px} }
 .addnote:hover{background:rgba(255,255,255,.75);border-color:#B9CBE4}
 /* shared focus / pomodoro */
 .focuscard{background:#fff;border:1px solid var(--line,#E7EBF0);border-radius:18px;padding:18px 20px;margin:0 0 18px;box-shadow:0 4px 18px rgba(20,40,80,.05)}
@@ -1380,6 +1398,93 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     {t:"Everything will be okay in the end. If it's not okay, it's not the end.",w:"John Lennon"},
     {t:"Stars can't shine without darkness.",w:"Anonymous"}
   ];
+  // one shared question a day — same for both, rotated by date (no repeat for ~2 months)
+  var QUESTIONS=[
+    "What is one small thing that went right today?",
+    "What are you quietly proud of this week?",
+    "What is something you did today your past self would be proud of?",
+    "What moment today do you want to remember?",
+    "What did you avoid today that you will face tomorrow?",
+    "Where did you spend your best hour today?",
+    "What is one thing you are glad you said no to?",
+    "What surprised you today?",
+    "What made you laugh today?",
+    "What felt hard today that you did anyway?",
+    "What is one habit that is actually sticking?",
+    "What would make this week feel like a win?",
+    "What are you putting off that you know matters?",
+    "What did you learn about yourself this week?",
+    "What is one thing you want to do less of?",
+    "What is one thing you want to do more of?",
+    "What small promise do you want to keep this week?",
+    "Where are you being too hard on yourself?",
+    "What is working better than you expected?",
+    "What is something you appreciate about the other person right now?",
+    "How can the other person help you this week?",
+    "What is one thing you would love to do together soon?",
+    "When did you last feel really understood?",
+    "What is a way the other person made your week easier?",
+    "What do you want to be held accountable for this week?",
+    "What have you been meaning to tell each other?",
+    "What win do you want to celebrate together?",
+    "What is one craving or urge you beat today?",
+    "What did you read or learn today?",
+    "What did you make today, however small?",
+    "What is one thing you did for your health today?",
+    "What trigger did you notice today?",
+    "What would a good day look like tomorrow?",
+    "What is one thing you will do before noon tomorrow?",
+    "If today were a song, what would it be?",
+    "What is the best thing you ate today?",
+    "What tiny luxury did you enjoy today?",
+    "What would you do with one extra free hour tomorrow?",
+    "What made you smile that you did not expect?",
+    "If you could redo one moment today, which?",
+    "What small thing are you looking forward to?",
+    "What color was your day?",
+    "What is something beautiful you noticed today?",
+    "Who are you grateful for today?",
+    "What are you worried about right now?",
+    "What do you need more of lately?",
+    "What are you being brave about?",
+    "What is a fear you would like to shrink?",
+    "What is something you forgave yourself for?",
+    "What is weighing on you that you have not said out loud?",
+    "When did you feel most like yourself today?",
+    "What is one thing you want to protect your time for?",
+    "What truth are you sitting with?",
+    "What would make tomorrow lighter?",
+    "What small kindness did you give or get today?",
+    "What are you letting go of?",
+    "What did you choose to focus on today?",
+    "What is a question you wish someone would ask you?",
+    "What is one word for today?",
+    "What is something you want to start, even badly?"
+  ];
+  // the daily question card: you only see the other's answer once you've written yours (the reveal is server-enforced too)
+  function DailyQuestion(props){
+    var me=props.whoami, other=props.other, ans=props.answers||[];
+    var dayNum=parseInt(TODAY.replace(/-/g,''),10)||0, q=QUESTIONS[dayNum%QUESTIONS.length];
+    var myAns=ans.filter(function(a){return a.date===TODAY&&a.person_id===me;})[0];
+    var otAns=ans.filter(function(a){return a.date===TODAY&&a.person_id===other;})[0];
+    var tS=useState(''); var text=tS[0], setText=tS[1];
+    function submit(){ var v=text.trim(); if(!v) return; props.onAnswer(v); }
+    return html`<section class="dq">
+      <div class="dq-eyebrow">A question for you two · ${shortDate(TODAY)}</div>
+      <h3 class="dq-q">${q}</h3>
+      ${myAns?html`
+        <div class="dq-ans mine"><div class="dq-who"><${Avatar} owner=${me} cls="avm" />You</div><p>${myAns.text}</p></div>
+        ${otAns?html`<div class="dq-ans reveal"><div class="dq-who"><${Avatar} owner=${other} cls="avm" />${nameOf(other)}</div><p>${otAns.text}</p></div>`
+          :html`<div class="dq-wait">Waiting for ${nameOf(other)} to answer…</div>`}
+      `:html`
+        <textarea class="dq-input" rows="2" placeholder="Your answer…" value=${text} onInput=${function(e){setText(e.target.value);}} onKeyDown=${function(e){ if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)) submit(); }}></textarea>
+        <div class="dq-foot">
+          <span class="dq-hint">${otAns?(nameOf(other)+' answered — write yours to see it'):('You’ll see '+nameOf(other)+'’s answer once you write yours')}</span>
+          <button type="button" class="dq-btn" disabled=${!text.trim()} onClick=${submit}>Share</button>
+        </div>
+      `}
+    </section>`;
+  }
   function OneForToday(){
     function pick(){ return {f:Math.floor(Math.random()*FACTS.length), l:Math.floor(Math.random()*LINES.length)}; }
     var sS=useState(pick); var cur=sS[0], setCur=sS[1];   // fresh pair on every load; "Another" reshuffles in place
@@ -1803,6 +1908,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
         ${myNotes.map(function(n){ return html`<${NoteCard} key=${n.id} note=${n} onSave=${props.onSaveNote} onColor=${props.onSetNoteColor} onDelete=${props.onDeleteNote} />`; })}
         <button class="addnote" onClick=${function(){props.onAddNote();}}><span style=${{fontSize:'18px',lineHeight:1}}>+</span> ${myNotes.length?'Add a note':'Jot your first note'}</button>
       </div>
+      ${isToday&&other&&props.onAnswer?html`<${DailyQuestion} whoami=${whoami} other=${other} answers=${props.dailyAnswers} onAnswer=${props.onAnswer} />`:null}
       <${OneForToday} />
     <//>`;
   }
@@ -3621,6 +3727,14 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       var foc=!!(focus&&focus.status==='running'&&focus.started_by===other&&Date.now()<(focus.ends_at||0));
       return {id:other,done:dn,kept:kept,journaled:jrnl,focusing:foc,focusLabel:(focus&&focus.label)||'',late:overdueOf(homeTasks,other).length,anything:(dn>0||kept>0||jrnl||foc)};
     })():null;
+    // the daily question: this space's answers, a save handler, and a toast when the partner answers
+    var dailyAnswers=((store&&store.daily_answers)||[]).filter(function(a){return a.space_id===space;});
+    function answerDaily(text){ apiPost('/api/daily/answer',{space:space,date:TODAY,text:text}).then(function(r){return r.json();}).then(function(j){ if(j&&j.ok){ refresh(); showToast({emoji:'✍️',text:'Answer shared.'}); } else showToast({text:'Couldn’t save your answer.'}); }).catch(function(){ showToast({text:'Couldn’t save your answer.'}); }); }
+    var dqRef=useRef(undefined);
+    var otDqAt=((dailyAnswers.filter(function(a){return a.date===TODAY&&a.person_id===other;})[0])||{}).created_at||0;
+    useEffect(function(){ if(!showScores||!other){ dqRef.current=otDqAt; return; }
+      if(dqRef.current!==undefined && otDqAt && otDqAt!==dqRef.current){ showToast({emoji:'💬',text:nameOf(other)+' answered today’s question'}); notify(nameOf(other)+' answered today’s question','Open hate club to see it.'); }
+      dqRef.current=otDqAt; },[otDqAt, showScores]);
     var leadRef=useRef(undefined);
     useEffect(function(){ if(!thisWeek) return; var L=thisWeek.leader;
       if(leadRef.current!==undefined && L && L!==leadRef.current){ setLeadFlash(Date.now()); showToast({text:L===whoami?'You took the lead':(nameOf(L)+' took the lead'),ms:4000}); var tm=setTimeout(function(){ setLeadFlash(0); },1400); leadRef.current=L; return function(){ clearTimeout(tm); }; }
@@ -3732,7 +3846,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     if(loading){ content=html`<div class="empty" style=${{marginTop:'60px',color:'var(--accent-muted)'}}><div class="big">${sync.st==='offline'?'Can’t reach the server':'Loading your planner…'}</div><div class="sub">${sync.st==='offline'?'Trying again in a few seconds.':'Syncing shared data.'}</div></div>`; }
     else if(openProj){ content=html`<${ProjectPage} key=${openProj.id} project=${openProj} tasks=${tasks} materials=${materials} onBack=${function(){setPanel(null);}} onToggle=${toggleTask} onEdit=${function(p){setPEdit(p);}} onEditTask=${function(t){setModal({editing:t});}} onAddItem=${addProjectItem} onAddSub=${addSubtask} onAddMaterial=${addMaterial} onDelMaterial=${delMaterial} onReopen=${reopenProject} onFinish=${finishProject} />`; }
     else if(v==='week'){ content=html`<${WeekPage} fresh=${!!leadFlash} data=${wkData} projects=${projects} onToggle=${toggleTask} onTakeOne=${takeOne} onCheer=${function(){ sendWave('💪'); }} />`; }
-    else if(v==='today'){ content=html`<${Fragment}>${showGS?html`<${GetStarted} steps=${gsSteps} done=${gsDone} onDismiss=${function(){setGsHide(true);lsSet('sp_gs_hide','1');}} />`:null}<div class="mobfocus"><${FocusWidget} focus=${focus} whoami=${whoami} onStart=${startFocus} onPause=${pauseFocus} onResume=${resumeFocus} onReset=${resetFocus} /></div><${Today} sel=${sel} filter=${filter} projects=${projects} tasks=${tasks} routines=${routines} upcoming=${upcoming} habits=${habitDefs} habitLogs=${habitLogs} topics=${topics} topicLinks=${topicLinks} settings=${settings} whoami=${whoami} onToggle=${toggleTask} onEdit=${function(t){setModal({editing:t});}} onAdd=${function(d){setModal({defaultDate:d});}} carry=${carry} onMoveAllToday=${moveAllToday} onSetHabit=${checkHabit} onStepHabit=${stepHabit} onEditHabit=${function(h){setHabitEdit(h);}} onAddHabit=${function(){setHabitEdit({});}} notes=${notes} onAddNote=${addNote} onSaveNote=${saveNoteText} onSetNoteColor=${setNoteColor} onDeleteNote=${deleteNote} onGoJournal=${function(){setView2('journal');}} onShowAll=${function(){setView2('tasks');}} onImport=${function(){setImport({});}} importCount=${importable} streak=${usk} repair=${uskRepair} onCover=${coverToday} onRepair=${repairStreak} partner=${partner} nudged=${nudgedToday} onNudge=${sendNudge} onBoost=${sendBoost} score=${thisWeek} help=${helpFor} fresh=${!!leadFlash} onOpenWeek=${function(){setView2('week');}} onQuickAdd=${quickAdd} /><//>`; }
+    else if(v==='today'){ content=html`<${Fragment}>${showGS?html`<${GetStarted} steps=${gsSteps} done=${gsDone} onDismiss=${function(){setGsHide(true);lsSet('sp_gs_hide','1');}} />`:null}<div class="mobfocus"><${FocusWidget} focus=${focus} whoami=${whoami} onStart=${startFocus} onPause=${pauseFocus} onResume=${resumeFocus} onReset=${resetFocus} /></div><${Today} sel=${sel} filter=${filter} projects=${projects} tasks=${tasks} routines=${routines} upcoming=${upcoming} habits=${habitDefs} habitLogs=${habitLogs} topics=${topics} topicLinks=${topicLinks} settings=${settings} whoami=${whoami} onToggle=${toggleTask} onEdit=${function(t){setModal({editing:t});}} onAdd=${function(d){setModal({defaultDate:d});}} carry=${carry} onMoveAllToday=${moveAllToday} onSetHabit=${checkHabit} onStepHabit=${stepHabit} onEditHabit=${function(h){setHabitEdit(h);}} onAddHabit=${function(){setHabitEdit({});}} notes=${notes} onAddNote=${addNote} onSaveNote=${saveNoteText} onSetNoteColor=${setNoteColor} onDeleteNote=${deleteNote} onGoJournal=${function(){setView2('journal');}} onShowAll=${function(){setView2('tasks');}} onImport=${function(){setImport({});}} importCount=${importable} streak=${usk} repair=${uskRepair} onCover=${coverToday} onRepair=${repairStreak} partner=${partner} nudged=${nudgedToday} onNudge=${sendNudge} onBoost=${sendBoost} dailyAnswers=${dailyAnswers} onAnswer=${answerDaily} score=${thisWeek} help=${helpFor} fresh=${!!leadFlash} onOpenWeek=${function(){setView2('week');}} onQuickAdd=${quickAdd} /><//>`; }
     else if(v==='tasks'){ content=html`<${TasksTable} tasks=${tasks} projects=${projects} onEdit=${function(t){setModal({editing:t});}} onToggle=${toggleTask} />`; }
     else if(v==='calendar'){ content=html`<${Calendar} tasks=${tasks} projects=${projects} onAddDay=${function(ds){setModal({defaultDate:ds});}} onAddSlot=${function(ds,tm){setModal({defaultDate:ds,defaultTime:tm,defaultType:'event'});}} onEditTask=${function(t){setModal({editing:t});}} onOpenProject=${function(id){setPanel(id);}} onToggle=${toggleTask} onSchedule=${scheduleTask} onNewProject=${function(s,e){setPEdit({start_date:s,end_date:e});}} routines=${routines} />`; }
     else if(v==='projects'){ content=html`<${Projects} projects=${projects} tasks=${tasks} onOpen=${function(id){setPanel(id);}} onNew=${function(){setPEdit({});}} onEdit=${function(p){setPEdit(p);}} onToggle=${toggleTask} onPickDates=${function(){setView2('calendar');}} />`; }

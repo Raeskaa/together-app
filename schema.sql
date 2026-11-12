@@ -174,3 +174,6 @@ CREATE TABLE IF NOT EXISTS claude_links (person_id TEXT PRIMARY KEY, ver INTEGER
 
 -- the pair's shared streak: per-space state (the chain is computed from activity; this holds partner-covered days + the one free repair)
 CREATE TABLE IF NOT EXISTS streak_state (space_id TEXT PRIMARY KEY, covered_days TEXT, repairs INTEGER DEFAULT 0, updated_at INTEGER);
+
+-- the daily question: one answer per person per space per day (id = <space>_<date>_<person>); partner's answer is revealed only once you've answered too
+CREATE TABLE IF NOT EXISTS daily_answers (id TEXT PRIMARY KEY, space_id TEXT, person_id TEXT, date TEXT, text TEXT, created_at INTEGER);
