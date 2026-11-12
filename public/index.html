@@ -1035,6 +1035,10 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
 .usk-btn.warm{border-color:transparent;background:var(--accent-deep);color:#fff}
 .usk-btn:hover{border-color:var(--accent)}
 @media(max-width:560px){ .usk{flex-wrap:wrap} .usk-act{width:100%} .usk-btn{flex:1} }
+/* breathe loader — shown on refresh while the app loads; the Lottie blue is recoloured to the theme accent at runtime */
+.breathe{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--grad);z-index:60}
+.breathe-stage{width:200px;height:280px}
+.breathe-stage svg{display:block;width:100%!important;height:100%!important}
 @media(max-width:1000px){ .hm-grid{grid-template-columns:1fr;gap:6px} .hm-rail{border-left:0;padding:0;border-top:1px solid var(--line-soft);margin-top:10px} }
 @media(max-width:820px){ .scp-split,.scp-unit{display:none} .scpill{padding:6px 10px} }
 
@@ -3178,6 +3182,35 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     </form></div>`;
   }
 
+  // ---- breathe loader (LottieFiles "Breathe" by Kelly Loh, free) — recoloured to the live theme accent, shown while the app loads ----
+  var _lottieP=null;
+  function loadLottie(){ if(typeof window!=='undefined'&&window.lottie) return Promise.resolve(window.lottie); if(_lottieP) return _lottieP;
+    _lottieP=new Promise(function(res){ var s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js'; s.async=true; s.onload=function(){ res(window.lottie||null); }; s.onerror=function(){ res(null); }; document.head.appendChild(s); });
+    return _lottieP; }
+  function hex01(hex){ hex=(hex||'').trim().replace('#',''); if(hex.length===3) hex=hex.split('').map(function(c){return c+c;}).join(''); var n=parseInt(hex||'195FD0',16); if(isNaN(n)) n=0x195FD0; return [((n>>16)&255)/255,((n>>8)&255)/255,(n&255)/255]; }
+  function themeAccent(){ try{ var c=getComputedStyle(document.documentElement).getPropertyValue('--accent-deep').trim(); if(c&&c.charAt(0)==='#') return c; }catch(e){} try{ var t=JSON.parse(lsGet('sp_theme','null')); if(t&&t.bg){ var p=BG_PRESETS.filter(function(x){return x.id===t.bg;})[0]; if(p&&p.ac) return p.ac[1]; } }catch(e){} return '#195FD0'; }
+  function recolorBreathe(data,rgb){ var BLUE=[0.18,0.306,0.867];
+    function isBlue(k){ return Array.isArray(k)&&k.length>=3&&typeof k[0]==='number'&&Math.abs(k[0]-BLUE[0])<0.03&&Math.abs(k[1]-BLUE[1])<0.03&&Math.abs(k[2]-BLUE[2])<0.03; }
+    function repl(k){ if(isBlue(k)){ k[0]=rgb[0]; k[1]=rgb[1]; k[2]=rgb[2]; } }
+    function walk(o){ if(!o||typeof o!=='object') return;
+      if((o.ty==='fl'||o.ty==='st')&&o.c){ if(o.c.a===0) repl(o.c.k); else if(Array.isArray(o.c.k)) o.c.k.forEach(function(kf){ if(kf.s) repl(kf.s); if(kf.e) repl(kf.e); }); }
+      for(var key in o){ var v=o[key]; if(Array.isArray(v)) v.forEach(walk); else if(v&&typeof v==='object') walk(v); }
+    }
+    walk(data); return data; }
+  function BreatheLoader(){ var ref=useRef(null);
+    useEffect(function(){ var anim=null, dead=false;
+      loadLottie().then(function(lottie){ if(dead||!ref.current||!lottie) return null;
+        return fetch('/breathe.json').then(function(r){return r.json();}).then(function(data){ if(dead||!ref.current) return;
+          var colored=recolorBreathe(JSON.parse(JSON.stringify(data)), hex01(themeAccent()));
+          anim=lottie.loadAnimation({container:ref.current,renderer:'svg',loop:!RM,autoplay:!RM,animationData:colored});
+          if(RM&&anim) anim.goToAndStop(Math.max(1,Math.floor((colored.op||30)/2)),true);
+        });
+      }).catch(function(){});
+      return function(){ dead=true; if(anim){ try{anim.destroy();}catch(e){} } };
+    },[]);
+    return html`<div class="breathe"><div class="breathe-stage" ref=${ref} aria-hidden="true"></div></div>`;
+  }
+
   function App(){
     var authS=useState('checking'); var auth=authS[0], setAuth=authS[1];
     var authRef=useRef(auth); authRef.current=auth;
@@ -3371,7 +3404,9 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     VIEW.who=whoami; VIEW.people=pmap; VIEW.members=mids.length?mids:['p_mahesh','p_partner'];
     var other=otherOf(whoami);
     useEffect(function(){ try{
-      var bg=(settings&&settings.theme_bg)||'sky', ft=(settings&&settings.theme_font)||'general', rd=(settings&&settings.theme_radius)||'default';
+      // before settings arrive (a refresh), fall back to the last theme we cached, so the loader + ground show your colour, not Sky
+      var cz=null; if(!settings){ try{ cz=JSON.parse(lsGet('sp_theme','null')); }catch(e){} }
+      var bg=(settings&&settings.theme_bg)||(cz&&cz.bg)||'sky', ft=(settings&&settings.theme_font)||(cz&&cz.ft)||'general', rd=(settings&&settings.theme_radius)||(cz&&cz.rd)||'default';
       var bgp=BG_PRESETS.filter(function(p){return p.id===bg;})[0];
       var S=document.documentElement.style;
       S.setProperty('--grad', bgp?bgp.css:DEFAULT_GRAD);
@@ -3382,6 +3417,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
       var fo=FONTS.filter(function(f){return f.id===ft;})[0];
       S.setProperty('--font', fo?fo.stack:GENERAL_STACK);
       var r=document.getElementById('root'); if(r){ r.setAttribute('data-radius', rd); if(bgp&&bgp.dark) r.setAttribute('data-ground','dark'); else r.removeAttribute('data-ground'); }
+      if(settings){ try{ lsSet('sp_theme', JSON.stringify({bg:bg,ft:ft,rd:rd})); }catch(e){} }
     }catch(e){} },[settings]);
     // while a focus session runs, sync faster so both people see start/pause/reset within a few seconds
     useEffect(function(){ var f=focus; if(!f||f.status!=='running'||Date.now()>(f.ends_at||0)) return; var iv=setInterval(function(){ if(document.visibilityState!=='hidden') refresh(); },5000); return function(){ clearInterval(iv); }; },[focus&&focus.status]);
@@ -3577,6 +3613,7 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     if(auth==='signin'){ return html`<${SignIn} onIn=${loadMe} onSetup=${function(){ setClaimable(null); authRef.current='setup'; setAuth('setup'); }} />`; }
     if(auth==='setup'){ return html`<${Setup} claimable=${claimable} onIn=${loadMe} onSignIn=${function(){ authRef.current='signin'; setAuth('signin'); }} />`; }
     var loading=!store;
+    if(loading) return html`<${BreatheLoader} />`;
     var openProj=panel?(projects||[]).filter(function(p){return p.id===panel;})[0]:null;
     var v=(view==='week'&&!showScores)?'today':view;
     var editingTask=modalV&&modalV.editing;

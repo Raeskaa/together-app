@@ -55,7 +55,16 @@
 
 ---
 
-## 2026-11-12 (later): Slice 2 — presence + nudges/boosts — **BUILT, local-verified, NOT deployed**
+## 2026-11-12 (later²): Breathe loading animation (dynamic theme colour) — **BUILT, local-verified, NOT deployed**
+
+Mahesh: add LottieFiles' "Breathe" blob (by Kelly Loh, free) as the refresh/cold-load screen, recoloured from its blue to the live theme accent. His picks: runtime colour-swap · initial-load/refresh only · embed JSON + lottie-web from cdnjs.
+- Asset: unpacked the dotLottie → `public/breathe.json` (42KB). The body blue is `[0.18,0.306,0.867]` (≈#2E4EDD) on 3 segments; the face is black (kept).
+- `recolorBreathe(data, rgb)` walks fill/stroke colours (static + keyframed s/e) and swaps anything ≈blue for the accent; `themeAccent()` reads `--accent-deep` (falls back to the cached theme preset → `#195FD0`); `hex01()` converts. `loadLottie()` lazy-injects `lottie-web@5.12.2` from cdnjs once (keeps normal loads lean). `BreatheLoader` fetches `/breathe.json`, deep-clones, recolours to the live accent, and plays full lottie (one expression in the file); reduced-motion → `goToAndStop` mid-frame.
+- Wired: `App` early-returns `<BreatheLoader/>` while `loading` (`!store`, after the auth guards → no hook-order risk). CSS `.breathe` = fixed full-screen on `var(--grad)`, 200×280 stage. The Lottie carries its own "Breathe in / out" text, so no extra caption.
+- Theme cache: the theme effect now writes `{bg,ft,rd}` to `localStorage.sp_theme` when settings load, and **falls back to it when settings are absent** — so on a refresh the loader + ground show *your* theme colour, not Sky.
+- Verified local: ran the exact pipeline in-page — theme accent `#178049` (Meadow) → blob renders `rgb(23,128,73)`, no blue left; mounted the real `.breathe` overlay (green blob on the green ground), then re-tinted to Peach `#C4471C` (orange blob on peach ground). App boots clean, no console errors. **Deploy = `npx wrangler deploy`** (adds `public/breathe.json`; no DB change). Next: Slice 3 (daily question).
+
+## 2026-11-12 (later): Slice 2 — presence + nudges/boosts — **DEPLOYED LIVE** (Version `75346ea9`)
 
 Second engagement slice (his picks: one-tap cheer / nudge once-a-day / activity-only presence no "last online" / enrich the rail). Makes each person's day visible and the wave contextual — all grown from the existing `sendWave`/`waves`/`.wavefx` + `focus` plumbing.
 - **Presence line** — the Today rail's partner block (`.hm-pres`) now reads from *today's activity only*: "Riya · read today ✓ · 2 done", live "**Focusing now** · label" (pulse dot `.hm-pdot`, from the active-space `focus` row), or "Hasn't shown up yet today". Computed in App as `partner={done,kept,journaled,focusing,late,anything}` (tasks done_at today · habits kept · `jdays[TODAY+'|'+id]` · focus.started_by===other), passed to Today.

@@ -6,7 +6,16 @@
 
 Legend: ✅ done · 🟡 partial · ⬜ todo · 🚫 deliberately different
 
-## 12 Nov Slice 2 — presence + nudges/boosts — built, not deployed
+## 12 Nov Breathe loading animation (dynamic colour) — built, not deployed
+
+| Piece | Desktop | Phone | Notes |
+|---|---|---|---|
+| Breathe loader on refresh (`.breathe`) | ✅ verified | ✅ same markup, centered full-screen | one responsive element; `var(--grad)` ground |
+| Recolour blue → theme accent (runtime) | ✅ verified green (Meadow) + orange (Peach) | ✅ shared logic | reads `--accent-deep`; face kept black |
+| Reduced motion | ✅ `goToAndStop` mid-frame | ✅ same | honors `prefers-reduced-motion` |
+| Theme cached for instant colour on refresh | ✅ `sp_theme` fallback | ✅ same | effect writes cache; falls back pre-settings |
+
+## 12 Nov Slice 2 — presence + nudges/boosts — DEPLOYED LIVE (75346ea9)
 
 | Piece | Desktop | Phone | Notes |
 |---|---|---|---|
