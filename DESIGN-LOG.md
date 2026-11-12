@@ -55,7 +55,15 @@
 
 ---
 
-## 2026-11-12 (later²): Breathe loading animation (dynamic theme colour) — **BUILT, local-verified, NOT deployed**
+## 2026-11-12 (later³): Import bug — replication + shared-leak fix — **DEPLOYED LIVE** (Version `6d0cafc8`)
+
+Mahesh: importing into "Mahesh & gayo" then "Mahesh & Manish" replicated tasks (Email redesign ×4). **Diagnosed on live DB:** 47 junk copies vs 32 real tasks. Root cause: `/api/space/import` pulled "my open tasks" from other spaces **without excluding tasks that are themselves copies** → importing into multiple spaces made copies-of-copies (even back into hate club); dedup keyed on the immediate copy id, not the root original, so it blocked nothing. It also dropped the project and would copy shared (`owner=everyone`) / someone-else's-project tasks into other groups.
+- **Model (his):** one you, many spaces. *Your own, non-shared* work can be pulled into any of your groups. *Shared* work stays in its space; to collaborate, add the person to that space — never copy.
+- **Cleanup (live, backed up first):** `DELETE FROM tasks WHERE copied_from IS NOT NULL` → 47 removed, back to 32 originals. Backups in session scratchpad.
+- **Import rewrite** (`src/worker.js`): candidate query now `owner=me AND open AND top-level AND non-event AND (copied_from IS NULL)` **and** `(project IS NULL OR project IN (my projects))` — originals only, own, not in someone else's project. Brings **subtasks** (originals only) + the task's **project** (copied into target, deduped via new `projects.copied_from`, task relinked via `projMap`). Dedup now reliable (keys on the original id, which is always a root). New `ensureProjCopy` migration (gated `projcopy_ready`) + `copied_from` on TABLES.projects + schema. Frontend (`public/index.html`): `openCountIn` matches the rule (`!copied_from && (!project || myProjIds[project])`); import sheet copy updated + a "shared work stays in its space — add the person instead" note.
+- **Verified:** live dry-run = 6 clean importables into gayo (2 shared excluded, 0 mine-in-others'-project). Local end-to-end on the new code: import→4, re-import→**0** (dedup), target got **1 subtask + 1 linked project copy**, **0** not-mine. **Live after deploy:** a real import into Manish ran clean — 9 tasks, **all of-original, 0 copies-of-copies, 0 in-space duplicates**. **DEPLOYED `6d0cafc8`** + `projects.copied_from` applied on the remote. Next: Slice 3.
+
+## 2026-11-12 (later²): Breathe loading animation (dynamic theme colour) — **DEPLOYED LIVE** (Version `c38c9e4a`)
 
 Mahesh: add LottieFiles' "Breathe" blob (by Kelly Loh, free) as the refresh/cold-load screen, recoloured from its blue to the live theme accent. His picks: runtime colour-swap · initial-load/refresh only · embed JSON + lottie-web from cdnjs.
 - Asset: unpacked the dotLottie → `public/breathe.json` (42KB). The body blue is `[0.18,0.306,0.867]` (≈#2E4EDD) on 3 segments; the face is black (kept).

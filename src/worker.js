@@ -4,7 +4,7 @@ import { handleMcp, claudeApi } from './claude.js';
 
 const TABLES = {
   tasks: ['id', 'title', 'project', 'owner', 'type', 'date', 'time', 'due', 'due_time', 'done', 'subtodos', 'parent_id', 'sort', 'created_at', 'space_id', 'done_at', 'done_by', 'personal'],
-  projects: ['id', 'name', 'color', 'owner', 'kind', 'start_date', 'end_date', 'description', 'archived', 'sort', 'created_at', 'space_id'],
+  projects: ['id', 'name', 'color', 'owner', 'kind', 'start_date', 'end_date', 'description', 'archived', 'sort', 'created_at', 'space_id', 'copied_from'],
   project_materials: ['id', 'project_id', 'title', 'url', 'sort', 'created_at'],
   journal: ['id', 'date', 'owner', 'text', 'tag', 'updated_at', 'space_id'],
   habits: ['id', 'name', 'kind', 'owner', 'unit', 'target', 'caption', 'color', 'sort', 'archived', 'created_at', 'space_id', 'personal'],
@@ -127,6 +127,13 @@ async function ensureImport(env) {
   if (done) return;
   try { await env.DB.prepare('ALTER TABLE tasks ADD COLUMN copied_from TEXT').run(); } catch (e) {}
   await env.DB.prepare("INSERT INTO settings (key,value) VALUES ('import_ready','1') ON CONFLICT(key) DO UPDATE SET value='1'").run();
+}
+// import also brings the task's project, so projects need their own copied_from (dedup + mark a copy)
+async function ensureProjCopy(env) {
+  const done = await env.DB.prepare("SELECT value FROM settings WHERE key='projcopy_ready'").first();
+  if (done) return;
+  try { await env.DB.prepare('ALTER TABLE projects ADD COLUMN copied_from TEXT').run(); } catch (e) {}
+  await env.DB.prepare("INSERT INTO settings (key,value) VALUES ('projcopy_ready','1') ON CONFLICT(key) DO UPDATE SET value='1'").run();
 }
 // the pair's shared streak keeps a tiny bit of state per space: days a partner covered, and whether the one free repair was spent. The chain itself is computed from activity.
 async function ensureStreak(env) {
@@ -414,9 +421,12 @@ async function api(req, env, url) {
     await env.DB.prepare('DELETE FROM members WHERE space_id=?1 AND person_id=?2').bind(sid, me).run();
     return json({ ok: true });
   }
-  // import: copy your open tasks (+ their subtasks) from another space into this one, once (copied_from dedups)
+  // import: bring YOUR OWN workspace into another of your spaces — your open, non-shared, original tasks
+  //   (never copies, never owner='everyone', never a task in someone else's project) + their subtasks + their project.
+  //   Shared work stays in its space; you collaborate on it by adding a person to that space, not by copying.
   if (p === '/api/space/import' && req.method === 'POST') {
     await ensureImport(env);
+    await ensureProjCopy(env);
     const b = await req.json().catch(() => ({}));
     const target = String(b.target || '');
     const source = String(b.source || '');   // a space id, or 'all'
@@ -427,18 +437,44 @@ async function api(req, env, url) {
       if (!(await env.DB.prepare('SELECT 1 FROM members WHERE space_id=?1 AND person_id=?2').bind(source, me).first())) return json({ ok: false, error: 'bad_source' }, 400);
       where = 'space_id=?2'; binds = [me, source];
     }
-    const already = await env.DB.prepare('SELECT copied_from FROM tasks WHERE space_id=?1 AND copied_from IS NOT NULL').bind(target).all();
+    // only MY OWN, open, top-level, non-event, ORIGINAL tasks that aren't inside someone else's project
+    const cand = await env.DB.prepare("SELECT * FROM tasks WHERE owner=?1 AND done=0 AND (parent_id IS NULL OR parent_id='') AND type!='event'"
+      + " AND (copied_from IS NULL OR copied_from='')"
+      + " AND (project IS NULL OR project='' OR project IN (SELECT id FROM projects WHERE owner=?1))"
+      + ' AND (' + where + ') ORDER BY sort, created_at LIMIT 300').bind(...binds).all();
+    // dedup: an original we've already brought into the target (keyed on the original's id)
+    const already = await env.DB.prepare("SELECT copied_from FROM tasks WHERE space_id=?1 AND copied_from IS NOT NULL AND copied_from!=''").bind(target).all();
     const skip = new Set((already.results || []).map((r) => r.copied_from));
-    const cand = await env.DB.prepare("SELECT * FROM tasks WHERE owner=?1 AND done=0 AND (parent_id IS NULL OR parent_id='') AND type!='event' AND (" + where + ') ORDER BY sort, created_at LIMIT 300').bind(...binds).all();
     const parents = (cand.results || []).filter((t) => !skip.has(t.id));
     if (!parents.length) return json({ ok: true, n: 0 });
+    // bring the projects these tasks belong to (your own projects only), deduped on the original project id
+    const projIds = [...new Set(parents.map((t) => t.project).filter(Boolean))];
+    const projMap = {};
+    if (projIds.length) {
+      const existP = await env.DB.prepare("SELECT id, copied_from FROM projects WHERE space_id=?1 AND copied_from IS NOT NULL AND copied_from!=''").bind(target).all();
+      const pHave = {}; (existP.results || []).forEach((r) => { pHave[r.copied_from] = r.id; });
+      const pph = projIds.map((_, i) => '?' + (i + 1)).join(',');
+      const srcProjs = await env.DB.prepare('SELECT * FROM projects WHERE id IN (' + pph + ') AND owner=?' + (projIds.length + 1)).bind(...projIds, me).all();
+      const pstmts = [];
+      (srcProjs.results || []).forEach((pr) => {
+        if (pHave[pr.id]) { projMap[pr.id] = pHave[pr.id]; return; }
+        const npid = 'pr_' + crypto.randomUUID().replace(/-/g, '').slice(0, 16);
+        projMap[pr.id] = npid;
+        pstmts.push(env.DB.prepare('INSERT INTO projects (id,name,color,owner,kind,start_date,end_date,description,archived,sort,created_at,space_id,copied_from) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,0,?9,?10,?11,?12)')
+          .bind(npid, pr.name || '', pr.color || '', me, pr.kind || 'plain', pr.start_date || '', pr.end_date || '', pr.description || '', pr.sort || Date.now(), Date.now(), target, pr.id));
+      });
+      if (pstmts.length) await env.DB.batch(pstmts);
+    }
     const pids = parents.map((p2) => p2.id);
     const ph = pids.map((_, i) => '?' + (i + 1)).join(',');
-    const kids = await env.DB.prepare('SELECT * FROM tasks WHERE done=0 AND parent_id IN (' + ph + ')').bind(...pids).all();
+    const kids = await env.DB.prepare("SELECT * FROM tasks WHERE done=0 AND (copied_from IS NULL OR copied_from='') AND parent_id IN (" + ph + ')').bind(...pids).all();
     const now = Date.now();
     const idMap = {};
-    const mk = (t, newId, parentId) => env.DB.prepare('INSERT INTO tasks (id,title,project,owner,type,date,time,due,due_time,done,subtodos,parent_id,sort,created_at,space_id,personal,copied_from) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,0,?10,?11,?12,?13,?14,0,?15)')
-      .bind(newId, t.title || '', '', me, t.type || 'task', t.date || '', t.time || '', t.due || '', t.due_time || '', '[]', parentId, t.sort || now, now, target, t.id);
+    const mk = (t, newId, parentId) => {
+      const proj = (t.project && projMap[t.project]) || '';
+      return env.DB.prepare('INSERT INTO tasks (id,title,project,owner,type,date,time,due,due_time,done,subtodos,parent_id,sort,created_at,space_id,personal,copied_from) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,0,?10,?11,?12,?13,?14,0,?15)')
+        .bind(newId, t.title || '', proj, me, t.type || 'task', t.date || '', t.time || '', t.due || '', t.due_time || '', '[]', parentId, t.sort || now, now, target, t.id);
+    };
     const stmts = [];
     parents.forEach((t) => { const nid = 'tk_' + crypto.randomUUID().replace(/-/g, '').slice(0, 16); idMap[t.id] = nid; stmts.push(mk(t, nid, null)); });
     (kids.results || []).forEach((c) => { const np = idMap[c.parent_id]; if (!np) return; const nid = 'tk_' + crypto.randomUUID().replace(/-/g, '').slice(0, 16); stmts.push(mk(c, nid, np)); });
@@ -491,6 +527,7 @@ function parseJSON(v, fallback) {
 async function loadState(env, me) {
   await ensurePersonal(env);
   await ensureImport(env);
+  await ensureProjCopy(env);
   await ensureStreak(env);
   await ensureWaveKind(env);
   // only the spaces you're in; journal entries are yours, or shared into one of your spaces

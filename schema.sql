@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS projects (
   archived   INTEGER DEFAULT 0,
   sort       INTEGER,
   created_at INTEGER,
-  space_id   TEXT
+  space_id   TEXT,
+  copied_from TEXT               -- set => an imported copy of another space's project
 );
 
 CREATE TABLE IF NOT EXISTS project_materials (

@@ -3636,7 +3636,10 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
     var curSpaceName=(spaceRow&&spaceRow.name)||'hate club';
     function spaceMembers(id){ return ((store&&store.members)||[]).filter(function(m){return m.space_id===id;}).map(function(m){return m.person_id;}); }
     var allTasksAll=(store&&store.tasks)||[];
-    function openCountIn(sid){ return allTasksAll.filter(function(t){ return t.owner===whoami && !t.done && !t.parent_id && !isEventType(t.type) && t.space_id===sid; }).length; }
+    // projects you own (across your spaces) — importing only brings your own tasks that aren't in someone else's project
+    var myProjIds={}; ((store&&store.projects)||[]).forEach(function(p){ if(p.owner===whoami) myProjIds[p.id]=1; });
+    // importable from a space = your own, open, top-level, non-event, ORIGINAL tasks, not inside someone else's project
+    function openCountIn(sid){ return allTasksAll.filter(function(t){ return t.owner===whoami && !t.done && !t.parent_id && !isEventType(t.type) && t.space_id===sid && !t.copied_from && (!t.project || myProjIds[t.project]); }).length; }
     var otherSpaces=mySpaces.filter(function(sp){ return sp.id!==space; });
     var importable=otherSpaces.reduce(function(n,sp){ return n+openCountIn(sp.id); },0);
     var sidebar = html`<aside class="sidebar">
@@ -3743,11 +3746,12 @@ h1.title{margin:2px 0 0;font-weight:700;font-size:29px;letter-spacing:-.02em;col
         <div class="nsmodal">
           <div class="meyebrow">Import</div>
           <h3 class="nsh">Bring your tasks into ${curSpaceName}</h3>
-          <p class="nssub">Copies your open tasks (and their subtasks) here. The originals stay put, and it won't duplicate ones you've already imported.</p>
+          <p class="nssub">Brings your own tasks — with their subtasks and project — into ${curSpaceName}. Your originals stay put, and importing again won't duplicate anything.</p>
           <div class="implist">
             ${otherSpaces.filter(function(sp){return openCountIn(sp.id)>0;}).map(function(sp){ var c=openCountIn(sp.id); return html`<button key=${sp.id} class="improw" disabled=${importV.busy} onClick=${function(){nsImport(sp.id);}}><span class="spacesw-avs">${spaceMembers(sp.id).slice(0,3).map(function(m,k){return html`<span key=${m} class="av avm" style=${{background:personColor(m),marginLeft:k?'-7px':0,border:'2px solid var(--card)'}}>${initialOf(m)}</span>`;})}</span><span class="improw-nm">${sp.name}</span><span class="improw-c">${c} task${c>1?'s':''}</span></button>`; })}
             ${otherSpaces.filter(function(sp){return openCountIn(sp.id)>0;}).length>1?html`<button class="improw improw-all" disabled=${importV.busy} onClick=${function(){nsImport('all');}}><span class="improw-nm">All my spaces</span><span class="improw-c">${importable} task${importable>1?'s':''}</span></button>`:null}
           </div>
+          <p class="nssub" style=${{marginTop:'14px',paddingTop:'12px',borderTop:'1px solid var(--line-soft)',fontSize:'12px'}}>Shared work — anything you share with someone, or that lives in their project — stays in its space. To work on it together, add that person to the space instead.</p>
           <div class="mactions" style=${{justifyContent:'flex-end',marginTop:'16px'}}><button class="btn ghost" style=${{flex:'none'}} disabled=${importV.busy} onClick=${function(){setImport(null);}}>${importV.busy?'Importing…':'Cancel'}</button></div>
         </div>
       </div>`:null}
