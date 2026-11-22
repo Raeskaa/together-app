@@ -55,6 +55,27 @@
 
 ---
 
+## 2026-11-23: v2 — component system (Headspace) + account switch — **COMPONENT SYSTEM BUILT**
+
+Mahesh rejected the full-page prototype — "so shitty — build the component system first, then wireframe pages." Re-sequenced correctly: **components before pages.**
+- **Component system:** `hateclub-ds.html` → artifact https://claude.ai/artifact/XPMaagUkoQEvhVKEEE5YzN (PRIVATE to the old account; re-publish from the source HTML). Foundations (color · **real General Sans embedded** · spacing · radius) + every core component in isolation with states + a one-line job description: side panel · buttons (hierarchy / states / sizes) · fields · selection row · chips & status · cards · list rows · checkbox & switch · avatars · moments (mascot, streak orb, mood, timeline). Light + dark.
+- **General Sans** embedded as data-URIs from `/Users/design/leapcomm/public/fonts/general-sans-{400,500,600,700}.woff2` (artifacts can't load a font from Fontshare/CDN — data-URI is the way). Injector: scratchpad `inject_font.py`.
+- **Process locked:** components first → Mahesh critiques each → fix → THEN wireframe pages. He's critiquing now (side panel, type, buttons).
+- **ACCOUNT SWITCH (weekly limit):** continues in a new Claude account. These design files persist on the same Mac; committed locally (not pushed). **Open question for the next account:** does this Headspace direction apply to the LIVE **helloo** app (`helloo-platform` — the shipped hate club successor, currently a plainer blue/light design), or is it a separate exploration? **Ask Mahesh.** Full handoff: `~/.claude/HANDOFF.md` top thread.
+
+---
+
+## 2026-11-19: v2 rebuild — design pass (Headspace-derived) — **ARTIFACT BUILT, nothing in code / DB yet**
+
+Mahesh is rebuilding hate club from scratch: off the single `public/index.html`, toward a **public multi-tenant** app (React/Next on Cloudflare, stack decided after design). This pass is DESIGN ONLY — no production code touched, live D1 untouched.
+- **PRD of the current app:** `PRD.md`. **Brief:** `DESIGN-BRIEF.md` (v2 scope cut — ships Onboarding/Today/This week/one Projects view/Tasks/Journal/care layer/lean Settings/Spaces; cuts the 4 calendar views→Month+Agenda, 4 project views→1, 9 themes→1+dark, roadmap slices 5–11, import, Claude-connector UI).
+- **Direction — Headspace-derived** (`HEADSPACE-DS.md`): keeps **blue `#1F6FEB` as the CTA** (Headspace's product CTA is blue too — orange is brand/illustration only); cream shell `#FBF5EC`, warm charcoal ink `#1C1C1D`, orange for the "moments" (streak/mascot) via sunrise gradients, full-pill buttons, soft 400–600ms motion, warm name+question voice, **flat-vector blobs** (not claymation). General Sans kept (Aperçu-family). Sourcing caveat: Headspace publishes no official hex/type spec — values reverse-engineered.
+- **Clickable prototype:** https://claude.ai/artifact/WyrPER4nwCKoo9vdBJjdnp · source `hateclub-v2.html` (also sent to Mahesh). 7 surfaces, web + mobile toggle, light + dark toggle. Prototype font = Hanken Grotesk (Google) standing in for General Sans.
+- **Gate:** run manually — `~/.claude/skills/design/SKILL.md` is missing (only `templates/` left), so no banner; followed the 8 steps from memory. Brief confirmed by Mahesh ("Build it").
+- **Next:** Mahesh reviews the artifact → iterate the design → pick stack → build for real → migrate D1 (deferred).
+
+---
+
 ## 2026-11-12 (later⁶): Slice 4 — check-in upgrades (honest + a mood + leftover triage) — **BUILT, local-verified, NOT deployed**
 
 His picks: all three · keep tap+buzz (no press-hold) · honest skip (streak-neutral) · mood shared.
